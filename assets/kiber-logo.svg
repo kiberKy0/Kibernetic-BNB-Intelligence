@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Kibernetic Kiber logo">
-  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1da9ff"/><stop offset="1" stop-color="#44e7ff"/></linearGradient></defs>
-  <rect width="128" height="128" rx="30" fill="#071521"/><circle cx="64" cy="64" r="46" fill="none" stroke="url(#g)" stroke-width="8"/>
-  <path d="M44 35v58h12V70l24 23h17L68 64l27-29H79L56 59V35z" fill="#f7fcff"/>
-  <circle cx="64" cy="64" r="53" fill="none" stroke="#173b57" stroke-width="2" stroke-dasharray="5 7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Kiber logo">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#087cff"/><stop offset="1" stop-color="#16c9ff"/></linearGradient></defs>
+<rect width="128" height="128" rx="30" fill="url(#bg)"/>
+<path d="M64 18v12" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="64" cy="14" r="6" fill="#fff"/>
+<rect x="23" y="31" width="82" height="70" rx="31" fill="none" stroke="#fff" stroke-width="8"/>
+<rect x="14" y="53" width="14" height="31" rx="7" fill="#fff"/><rect x="100" y="53" width="14" height="31" rx="7" fill="#fff"/>
+<circle cx="49" cy="62" r="7" fill="#fff"/><circle cx="79" cy="62" r="7" fill="#fff"/>
+<path d="M47 78c9 10 25 10 34 0" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
 </svg>
