@@ -1,15 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 500" role="img" aria-label="Mascotte robot Kiber">
-  <defs><linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7fbff"/><stop offset="1" stop-color="#9ab7c9"/></linearGradient><linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1da9ff"/><stop offset="1" stop-color="#44e7ff"/></linearGradient></defs>
-  <g stroke="#071521" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M210 42v35"/><circle cx="210" cy="31" r="15" fill="url(#blue)"/>
-    <rect x="85" y="72" width="250" height="190" rx="82" fill="url(#body)"/>
-    <rect x="112" y="100" width="196" height="133" rx="58" fill="#071521"/>
-    <circle cx="167" cy="160" r="15" fill="#44e7ff" stroke="none"/><circle cx="253" cy="160" r="15" fill="#44e7ff" stroke="none"/>
-    <path d="M168 194c23 22 61 22 84 0" fill="none" stroke="#44e7ff" stroke-width="10"/>
-    <rect x="128" y="255" width="164" height="160" rx="58" fill="url(#body)"/>
-    <circle cx="210" cy="325" r="39" fill="#071521"/><circle cx="210" cy="325" r="26" fill="none" stroke="url(#blue)" stroke-width="8"/><path d="M199 325h22M210 314v22" stroke="#44e7ff" stroke-width="6"/>
-    <path d="M134 286L76 330 46 302" fill="none" stroke="url(#body)" stroke-width="34"/><path d="M286 286l56 40 34-43" fill="none" stroke="url(#body)" stroke-width="34"/>
-    <path d="M168 406l-14 61M252 406l14 61" fill="none" stroke="url(#body)" stroke-width="37"/>
-    <path d="M130 477h52M238 477h52" stroke="#dcecf5" stroke-width="24"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 500" role="img" aria-label="Mascotte Kiber">
+<defs>
+<linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#cdeeff"/></linearGradient>
+<linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#087cff"/><stop offset="1" stop-color="#20d8ff"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g stroke="#08224c" stroke-linecap="round" stroke-linejoin="round">
+<path d="M210 31v36" stroke-width="9"/><circle cx="210" cy="21" r="15" fill="#9cf4ff" stroke="#087cff" stroke-width="6" filter="url(#glow)"/>
+<ellipse cx="210" cy="155" rx="132" ry="112" fill="url(#shell)" stroke-width="8"/>
+<rect x="103" y="90" width="214" height="139" rx="62" fill="#050b17" stroke-width="7"/>
+<circle cx="160" cy="154" r="21" fill="#18d8ff" stroke="none" filter="url(#glow)"/><circle cx="260" cy="154" r="21" fill="#18d8ff" stroke="none" filter="url(#glow)"/>
+<path d="M158 190c29 28 75 28 104 0" fill="none" stroke="#18d8ff" stroke-width="11" filter="url(#glow)"/>
+<circle cx="82" cy="156" r="24" fill="url(#blue)" stroke-width="7"/><circle cx="338" cy="156" r="24" fill="url(#blue)" stroke-width="7"/>
+<path d="M160 253h100c45 0 70 31 70 78v65H90v-65c0-47 25-78 70-78z" fill="url(#shell)" stroke-width="8"/>
+<circle cx="210" cy="328" r="48" fill="#06101f" stroke-width="7"/><circle cx="210" cy="328" r="34" fill="none" stroke="url(#blue)" stroke-width="7"/><circle cx="197" cy="323" r="5" fill="#20d8ff" stroke="none"/><circle cx="223" cy="323" r="5" fill="#20d8ff" stroke="none"/><path d="M198 339c8 7 16 7 24 0" fill="none" stroke="#20d8ff" stroke-width="5"/>
+<path d="M106 287L55 332" fill="none" stroke="url(#shell)" stroke-width="34"/><path d="M55 332l-20-21M55 332l-3-31M55 332l20-24" fill="none" stroke="url(#shell)" stroke-width="18"/>
+<path d="M314 286l52-40" fill="none" stroke="url(#shell)" stroke-width="34"/><path d="M366 246l16-27M366 246l-3-32M366 246l-22-22" fill="none" stroke="url(#shell)" stroke-width="17"/>
+<path d="M150 394l-13 72M270 394l13 72" fill="none" stroke="url(#shell)" stroke-width="40"/><path d="M105 478h76M239 478h76" stroke="#e8f8ff" stroke-width="28"/>
+<path d="M111 478h63M246 478h63" stroke="#087cff" stroke-width="6" filter="url(#glow)"/>
+</g>
 </svg>
