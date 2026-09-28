@@ -1,18 +1,4 @@
 function xmlText(s){return s.replace(/<!\[CDATA\[|\]\]>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>')}
 function extract(xml,tag){const m=xml.match(new RegExp('<'+tag+'[^>]*>([\\s\\S]*?)<\\/'+tag+'>','i'));return m?xmlText(m[1].trim()):''}
-function cat(title){return /regulat|government|policy|law|politic|sec |eu |micar|mica /i.test(title)?'policy':/inflation|fed |ecb|rate cut|interest rate|macro|jobs|cpi|gdp/i.test(title)?'macro':/bnb|binance chain|bsc/i.test(title)?'bnb':'token'}
-module.exports = async function handler(req,res){
-  res.setHeader('Cache-Control','s-maxage=300, stale-while-revalidate=900');
-  try{
-    const queries=['BNB Chain crypto','crypto regulation OR crypto policy','crypto macro market'];
-    const all=[];
-    for(const q of queries){
-      const url='https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl=it&gl=IT&ceid=IT:it';
-      const r=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0'}}); if(!r.ok) continue;
-      const xml=await r.text(); const items=[...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0,7);
-      for(const m of items){const block=m[1],title=extract(block,'title'),link=extract(block,'link'),pub=extract(block,'pubDate'),source=extract(block,'source');if(title)all.push({title,url:link,source:source||'Google News',published:pub,category:cat(title)})}
-    }
-    const seen=new Set();const items=all.filter(x=>{const k=x.title.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).slice(0,20);
-    res.status(200).json({items});
-  }catch(e){res.status(502).json({items:[],error:'News unavailable'});}
-}
+function cat(title){return /regulat|government|policy|law|politic|sec |eu |micar|mica |election|sanction/i.test(title)?'policy':/inflation|fed |ecb|rate cut|interest rate|macro|jobs|cpi|gdp/i.test(title)?'macro':/defi|dex|liquid staking|yield|lending/i.test(title)?'defi':/\bai\b|artificial intelligence|agent|compute|gpu/i.test(title)?'ai':/meme|memecoin|doge|shib|pepe/i.test(title)?'meme':/bnb|binance chain|bsc/i.test(title)?'bnb':'token'}
+module.exports=async function handler(req,res){res.setHeader('Cache-Control','s-maxage=300, stale-while-revalidate=900');try{const queries=['BNB Chain crypto','BNB Chain DeFi DEX','BNB Chain AI crypto','memecoin crypto BNB','crypto regulation OR crypto policy','crypto macro market'];const all=[];for(const q of queries){const url='https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl=it&gl=IT&ceid=IT:it';const r=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0'}});if(!r.ok)continue;const xml=await r.text(),items=[...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0,6);for(const m of items){const block=m[1],title=extract(block,'title'),link=extract(block,'link'),pub=extract(block,'pubDate'),source=extract(block,'source');if(title)all.push({title,url:link,source:source||'Google News',published:pub,category:cat(title)})}}const seen=new Set(),items=all.filter(x=>{const k=x.title.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).slice(0,30);res.status(200).json({items})}catch(e){res.status(502).json({items:[],error:'News unavailable'})}}
