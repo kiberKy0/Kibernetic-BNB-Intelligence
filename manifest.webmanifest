@@ -1,11 +1,12 @@
 {
-  "name": "Kibernetic BNB Intelligence",
+  "name": "Kibernetic BNB Intelligence V17",
   "short_name": "Kiber BNB",
-  "description": "Dashboard BNB Chain Intelligence di Kibernetic",
-  "start_url": "./",
+  "description": "BNB Chain intelligence: token, settori, news, rischio, storico e monitoraggio H24.",
+  "start_url": "./v17-production.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#03080e",
-  "theme_color": "#06111c",
+  "background_color": "#07111d",
+  "theme_color": "#07111d",
   "icons": [
     {"src":"assets/kiber-logo.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
   ]
