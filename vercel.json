@@ -1,13 +1,27 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {"source": "/", "destination": "/v17-production.html"}
+  ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         {"key": "X-Content-Type-Options", "value": "nosniff"},
-        {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"}
+        {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"},
+        {"key": "X-Frame-Options", "value": "DENY"},
+        {"key": "Permissions-Policy", "value": "geolocation=(), camera=(), microphone=()"},
+        {"key": "Content-Security-Policy", "value": "default-src 'self'; connect-src 'self' https://*.supabase.co https://api.binance.com; img-src 'self' data: https:; style-src 'self'; script-src 'self'; manifest-src 'self'; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com"}
       ]
+    },
+    {
+      "source": "/v17-production.html",
+      "headers": [{"key": "Cache-Control", "value": "no-store"}]
+    },
+    {
+      "source": "/sw-v17.js",
+      "headers": [{"key": "Cache-Control", "value": "no-cache"}]
     }
   ]
 }
