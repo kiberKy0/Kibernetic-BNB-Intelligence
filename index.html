@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#06111c" />
+  <meta name="description" content="Kibernetic BNB Intelligence: dashboard demo per leggere stato della BNB Chain, opportunità, rischi, settori e news di mercato." />
+  <title>Kibernetic BNB Intelligence</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <style>
+    :root{
+      --bg:#03080e;--panel:#081421;--panel2:#0c1b2b;--panel3:#0e2236;--line:#173a55;
+      --text:#f6fbff;--muted:#8da8bb;--blue:#1da9ff;--cyan:#44e7ff;--green:#49e89b;
+      --amber:#ffd166;--red:#ff667a;--purple:#ba8cff;--shadow:0 18px 45px rgba(0,0,0,.28);
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:
+      radial-gradient(circle at 15% -10%,rgba(29,169,255,.18),transparent 35%),
+      radial-gradient(circle at 90% 10%,rgba(68,231,255,.08),transparent 25%),var(--bg);
+      color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    button,input,select{font:inherit} a{color:inherit;text-decoration:none} button{cursor:pointer}
+    .app{min-height:100vh;display:grid;grid-template-columns:244px minmax(0,1fr)}
+    .sidebar{position:sticky;top:0;height:100vh;padding:22px 16px;border-right:1px solid rgba(68,231,255,.1);
+      background:rgba(4,12,20,.94);backdrop-filter:blur(16px);z-index:20;display:flex;flex-direction:column}
+    .brand{display:flex;align-items:center;gap:11px;padding:2px 6px 20px}.brand img{width:44px;height:44px}.brand strong{display:block;font-size:17px}.brand span{color:var(--muted);font-size:11px;letter-spacing:.12em}
+    .nav{display:grid;gap:6px}.nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;color:#a9c1d2;font-weight:700;font-size:14px}
+    .nav a:hover,.nav a.active{background:linear-gradient(90deg,rgba(29,169,255,.16),rgba(68,231,255,.05));color:#fff;border:1px solid rgba(68,231,255,.13)}
+    .nav .ico{width:22px;text-align:center}.side-pro{margin-top:auto;background:linear-gradient(145deg,#0d2034,#0a1726);border:1px solid #214a67;border-radius:16px;padding:15px}
+    .side-pro b{display:block;margin:7px 0 5px}.side-pro p{color:var(--muted);font-size:12px;line-height:1.45;margin:0 0 12px}.side-pro .price{font-size:23px;font-weight:950}.side-pro .price small{font-size:11px;color:var(--muted)}
+    .main{min-width:0}.topbar{height:72px;display:flex;align-items:center;gap:12px;padding:0 24px;border-bottom:1px solid rgba(68,231,255,.1);background:rgba(3,8,14,.72);backdrop-filter:blur(16px);position:sticky;top:0;z-index:15}
+    .menu-btn{display:none;background:#0a1a29;border:1px solid #173c59;color:#fff;border-radius:10px;padding:9px 11px}.search{flex:1;max-width:540px;position:relative}.search input{width:100%;background:#071521;border:1px solid #173b57;color:#fff;border-radius:13px;padding:11px 15px 11px 39px;outline:none}.search:before{content:'⌕';position:absolute;left:14px;top:8px;color:#6f91a8;font-size:22px}
+    .top-status{margin-left:auto;display:flex;align-items:center;gap:10px}.badge,.mini-badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;border:1px solid #1d4663;background:#0a1e2e;padding:7px 10px;font-size:11px;font-weight:900;letter-spacing:.05em}.badge.demo{color:#7ee6ff}.badge.live{color:var(--green)}.dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+    .content{padding:24px;max-width:1540px;margin:auto}.eyebrow{color:#75dcff;font-weight:900;font-size:12px;letter-spacing:.12em}.hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);gap:16px;margin-bottom:18px}
+    .hero-card{position:relative;overflow:hidden;min-height:245px;background:linear-gradient(135deg,#0a1b2d 0%,#0a2944 62%,#0d3c5f 100%);border:1px solid #1b5074;border-radius:24px;padding:28px;box-shadow:var(--shadow)}
+    .hero-card:after{content:'';position:absolute;right:-100px;top:-80px;width:390px;height:390px;border-radius:50%;background:radial-gradient(circle,rgba(68,231,255,.23),transparent 64%)}
+    .hero-copy{max-width:720px;position:relative;z-index:2}.hero h1{font-size:clamp(34px,4.2vw,60px);line-height:.98;margin:10px 0 14px;letter-spacing:-.04em}.hero h1 span{color:#65e6ff}.hero p{max-width:690px;color:#adc5d5;font-size:16px;line-height:1.55;margin:0}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+    .btn{border:0;border-radius:11px;padding:10px 14px;font-weight:900}.btn.primary{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#00121c}.btn.ghost{background:#0a1b2a;color:#e9f8ff;border:1px solid #24506e}.btn.small{padding:8px 11px;font-size:12px}.btn.full{width:100%}
+    .hero-mascot{position:absolute;right:2%;bottom:-22px;width:min(270px,35%);opacity:.98;filter:drop-shadow(0 15px 28px #0008);z-index:1}
+    .chain-card{background:linear-gradient(180deg,#0b1e2f,#07131f);border:1px solid #174461;border-radius:24px;padding:22px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow)}
+    .chain-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.chain-head h2{font-size:17px;margin:0}.chain-score{font-size:44px;font-weight:950;letter-spacing:-.04em;margin:16px 0 4px}.chain-state{color:var(--green);font-weight:900}.signal-list{display:grid;gap:9px;margin-top:18px}.signal{display:flex;justify-content:space-between;gap:12px;color:#afc4d3;font-size:13px}.signal strong{color:#eef9ff}
+    .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}.card{background:linear-gradient(180deg,rgba(12,27,43,.97),rgba(7,19,31,.97));border:1px solid #143c58;border-radius:18px;padding:17px;box-shadow:0 12px 34px rgba(0,0,0,.16)}
+    .metric{grid-column:span 3}.label{color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.metric .value{font-size:27px;font-weight:950;margin:7px 0 2px}.sub{font-size:12px;color:#86a2b6}.up{color:var(--green)}.warn{color:var(--amber)}.down{color:var(--red)}
+    .section{margin-top:22px}.section-head{display:flex;justify-content:space-between;align-items:end;gap:14px;margin-bottom:11px}.section-head h2{margin:0;font-size:23px}.section-head p{margin:5px 0 0;color:var(--muted);font-size:13px}.section-tag{font-size:10px;font-weight:900;letter-spacing:.1em;color:#76dfff;border:1px solid #1d4e70;background:#0a2031;padding:6px 9px;border-radius:999px;white-space:nowrap}
+    .pulse{grid-column:span 5}.scores{grid-column:span 7}.pulse-line{height:115px;display:flex;align-items:end;gap:5px;padding-top:18px}.pulse-line i{flex:1;min-width:5px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,#55e8ff,#1a76ff);opacity:.83}.legend{display:flex;gap:13px;flex-wrap:wrap;margin-top:13px;color:var(--muted);font-size:11px}.legend b{color:#eaf8ff}.scores-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:13px}.score-card{background:#071722;border:1px solid #12364f;border-radius:14px;padding:13px}.score-top{display:flex;justify-content:space-between;gap:8px;align-items:center}.score-num{font-size:27px;font-weight:950}.bar{height:7px;border-radius:10px;background:#112b40;overflow:hidden;margin-top:11px}.bar span{display:block;height:100%;border-radius:inherit}.resource .bar span{width:91%;background:linear-gradient(90deg,#1ca8ff,#4ce8ff)}.speculation .bar span{width:64%;background:linear-gradient(90deg,#ffbd4a,#ffe17a)}.risk .bar span{width:35%;background:linear-gradient(90deg,#ff536d,#ff8898)}
+    .opps{grid-column:span 8}.alerts{grid-column:span 4}.table-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.table-tools input,.table-tools select{background:#06141f;border:1px solid #183d58;color:#fff;border-radius:10px;padding:9px 10px}.table-tools input{flex:1;min-width:190px}.scroll{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:700px}.table th,.table td{text-align:left;padding:12px 9px;border-bottom:1px solid #113149}.table th{font-size:10px;color:#7694aa;text-transform:uppercase;letter-spacing:.06em}.table td{font-size:13px}.token{font-weight:950}.pill{display:inline-flex;padding:4px 7px;border-radius:999px;font-size:10px;font-weight:950}.pill.core{background:#11382b;color:#67efae}.pill.growth{background:#423515;color:#ffe17a}.pill.spec{background:#321e45;color:#dba7ff}.pill.risk{background:#451b26;color:#ff93a1}.action{font-weight:900;color:#76e5ff}.locked{opacity:.52}.alert-list{display:grid;gap:10px;margin-top:12px}.alert{border:1px solid #1d3d52;background:#081825;border-radius:13px;padding:12px}.alert .row{display:flex;justify-content:space-between;gap:8px}.alert b{font-size:13px}.alert p{margin:5px 0 0;color:#95afc1;font-size:12px;line-height:1.4}
+    .sector-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.sector{min-height:150px}.sector-icon{font-size:26px}.sector h3{font-size:15px;margin:11px 0 6px}.sector p{color:var(--muted);font-size:12px;line-height:1.45;margin:0}.trend{display:inline-block;margin-top:13px;font-size:10px;font-weight:900;border:1px solid #1d4b69;background:#0a2030;padding:5px 7px;border-radius:999px;color:#73dfff}
+    .news{grid-column:span 8}.what-moves{grid-column:span 4}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:11px 0}.tab{background:#071723;border:1px solid #143951;color:#8da8bb;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:850}.tab.active{color:#fff;border-color:#2380b8;background:#0c2b42}.news-list{display:grid}.news-item{padding:12px 0;border-bottom:1px solid #123148}.news-item:last-child{border-bottom:0}.news-meta{font-size:10px;color:#6f91a8;text-transform:uppercase;font-weight:900;letter-spacing:.07em}.news-item h3{font-size:14px;margin:5px 0 4px}.news-item p{margin:0;color:#95adbe;font-size:12px;line-height:1.45}.impact{display:inline-flex;margin-top:8px;border-radius:999px;padding:4px 7px;font-size:10px;font-weight:900;background:#102b3e;color:#82dfff}.impact.high{background:#3e1b25;color:#ff95a3}.impact.medium{background:#3b3117;color:#ffe18a}
+    .move-list{display:grid;gap:10px;margin-top:12px}.move{display:flex;gap:10px;align-items:start;border-bottom:1px solid #123149;padding-bottom:10px}.move:last-child{border:0}.move .n{width:26px;height:26px;border-radius:8px;background:#0d2b40;display:grid;place-items:center;color:#74e1ff;font-weight:950;font-size:11px;flex:0 0 auto}.move b{display:block;font-size:12px}.move span{color:#8fa8ba;font-size:11px;line-height:1.4}
+    .pro{margin:24px 0 5px;background:linear-gradient(135deg,#0a1d31,#0d314f);border:1px solid #1d5d86;border-radius:22px;padding:22px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:18px}.pro h2{font-size:27px;margin:4px 0 7px}.pro p{color:#a9c1d2;margin:0;max-width:790px;line-height:1.5}.pro-price{text-align:center;min-width:190px}.pro-price strong{display:block;font-size:38px}.pro-price span{font-size:12px;color:#a3bac9}
+    .footer{margin-top:28px;border-top:1px solid #11334b;padding:22px 0 30px;color:#6f8fa5;font-size:11px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .modal{position:fixed;inset:0;background:#000b;display:none;place-items:center;z-index:70;padding:18px}.modal.show{display:grid}.modal-box{width:min(480px,100%);background:#081824;border:1px solid #235579;border-radius:18px;padding:22px;box-shadow:var(--shadow)}.modal-box h3{font-size:25px;margin:8px 0}.modal-box p{color:#9eb5c5;line-height:1.5}.close{float:right;background:none;border:0;color:#9bb3c4;font-size:24px}
+    @media(max-width:1150px){.app{grid-template-columns:82px minmax(0,1fr)}.sidebar{padding:18px 10px}.brand strong,.brand span,.nav .txt,.side-pro{display:none}.brand{justify-content:center}.nav a{justify-content:center}.hero{grid-template-columns:1fr}.chain-card{min-height:220px}.metric{grid-column:span 6}.pulse,.scores,.opps,.alerts,.news,.what-moves{grid-column:span 12}.sector-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:720px){.app{display:block}.sidebar{position:fixed;left:-260px;width:244px;transition:.2s;box-shadow:20px 0 50px #0008}.sidebar.open{left:0}.brand strong,.brand span,.nav .txt,.side-pro{display:block}.brand{justify-content:flex-start}.nav a{justify-content:flex-start}.topbar{height:64px;padding:0 12px}.menu-btn{display:block}.top-status .badge:not(.demo){display:none}.content{padding:14px}.hero-card{padding:21px;min-height:320px}.hero-mascot{width:180px;max-width:48%;right:-8px}.hero-copy{max-width:78%}.hero p{font-size:14px}.metric{grid-column:span 12}.scores-grid{grid-template-columns:1fr}.sector-grid{grid-template-columns:1fr}.pro{grid-template-columns:1fr}.pro-price{text-align:left}.section-head{align-items:start}.section-tag{display:none}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="assets/kiber-logo.svg" alt="Logo Kiber"><div><strong>Kibernetic</strong><span>BNB INTELLIGENCE</span></div></div>
+    <nav class="nav">
+      <a class="active" href="#dashboard"><span class="ico">◈</span><span class="txt">Dashboard</span></a>
+      <a href="#opportunita"><span class="ico">⌁</span><span class="txt">Scanner BNB</span></a>
+      <a href="#settori"><span class="ico">▦</span><span class="txt">Settori</span></a>
+      <a href="#news"><span class="ico">◎</span><span class="txt">News & Impatto</span></a>
+      <a href="#rischi"><span class="ico">△</span><span class="txt">Rischi</span></a>
+      <a href="#pro"><span class="ico">♛</span><span class="txt">Kibernetic PRO</span></a>
+    </nav>
+    <div class="side-pro"><span class="mini-badge">♛ PRO</span><b>Più dati, meno rumore.</b><p>Scanner completo, alert, token emergenti e analisi di impatto.</p><div class="price">€3,50 <small>/ mese</small></div><button class="btn primary full" onclick="openPro()">Vedi PRO</button></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" aria-label="Apri menu" onclick="toggleMenu()">☰</button>
+      <div class="search"><input id="globalSearch" placeholder="Cerca token, settore, rischio..." oninput="globalFilter()"></div>
+      <div class="top-status"><span class="badge demo"><i class="dot"></i> DATI DEMO</span><span class="badge live">● Sistema pronto</span></div>
+    </header>
+
+    <main class="content" id="dashboard">
+      <section class="hero">
+        <div class="hero-card">
+          <div class="hero-copy"><div class="eyebrow">KIBERNETIC • BNB CHAIN INTELLIGENCE</div><h1>Capire prima.<br><span>Agire con criterio.</span></h1><p>Una dashboard semplice per vedere in pochi secondi cosa succede sulla BNB Chain: salute della rete, opportunità, rischi, settori e notizie che possono muovere il mercato.</p><div class="hero-actions"><a class="btn primary" href="#opportunita">Apri Scanner</a><a class="btn ghost" href="#news">Vedi cosa muove il mercato</a></div></div>
+          <img class="hero-mascot" src="assets/kiber-mascot.svg" alt="Mascotte Kiber">
+        </div>
+        <div class="chain-card">
+          <div><div class="chain-head"><div><div class="label">BNB Chain Health</div><h2>Stato generale della rete</h2></div><span class="section-tag">DEMO</span></div><div class="chain-score">82<span style="font-size:18px;color:var(--muted)">/100</span></div><div class="chain-state">● ATTIVITÀ FORTE</div></div>
+          <div class="signal-list"><div class="signal"><span>Volume 24h</span><strong class="up">+18,4%</strong></div><div class="signal"><span>Liquidità</span><strong class="up">+12,7%</strong></div><div class="signal"><span>Nuovi token</span><strong>142</strong></div><div class="signal"><span>Capital Flow</span><strong class="up">+$186M</strong></div></div>
+        </div>
+      </section>
+
+      <section class="grid" aria-label="Metriche principali">
+        <div class="card metric"><div class="label">Token analizzati</div><div class="value">12.846</div><div class="sub up">+5,4% nelle ultime 24h</div></div>
+        <div class="card metric"><div class="label">Volume BNB Chain</div><div class="value">$3,24B</div><div class="sub up">Momentum positivo</div></div>
+        <div class="card metric"><div class="label">Liquidità totale</div><div class="value">$1,12B</div><div class="sub">Profondità monitorata</div></div>
+        <div class="card metric"><div class="label">Alert attivi</div><div class="value">7</div><div class="sub warn">2 ad alta priorità</div></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div><h2>1. Leggi lo stato del mercato</h2><p>Prima il contesto. Poi i token. Così la dashboard non sembra il cockpit di un'astronave costruita da un commercialista.</p></div><span class="section-tag">PANORAMICA</span></div>
+        <div class="grid">
+          <div class="card pulse"><div class="label">Capital Flow • 24H</div><div class="pulse-line" aria-label="Grafico dimostrativo flusso capitale"><i style="height:28%"></i><i style="height:42%"></i><i style="height:35%"></i><i style="height:51%"></i><i style="height:66%"></i><i style="height:59%"></i><i style="height:73%"></i><i style="height:62%"></i><i style="height:81%"></i><i style="height:92%"></i><i style="height:84%"></i><i style="height:96%"></i></div><div class="legend"><span><b>+$186M</b> netto</span><span>Pressione acquisto: <b>alta</b></span><span>Volatilità: <b>media</b></span></div></div>
+          <div class="card scores"><div class="label">Kibernetic Score</div><div class="scores-grid"><div class="score-card resource"><div class="score-top"><div><b>Resource</b><div class="sub">Qualità e fondamentali</div></div><div class="score-num">91</div></div><div class="bar"><span></span></div></div><div class="score-card speculation"><div class="score-top"><div><b>Speculation</b><div class="sub">Momentum e catalizzatori</div></div><div class="score-num">64</div></div><div class="bar"><span></span></div></div><div class="score-card risk"><div class="score-top"><div><b>Risk</b><div class="sub">Contratto e liquidità</div></div><div class="score-num">35</div></div><div class="bar"><span></span></div></div></div></div>
+        </div>
+      </section>
+
+      <section class="section" id="opportunita">
+        <div class="section-head"><div><h2>2. Guarda le opportunità</h2><p>Lo scanner ordina i token in modo leggibile: Risorsa, Crescita o Speculazione.</p></div><span class="section-tag">SCANNER BNB</span></div>
+        <div class="grid">
+          <div class="card opps">
+            <div class="table-tools"><input id="tokenSearch" placeholder="Cerca token o settore..." oninput="filterRows()"><select id="tokenClass" onchange="filterRows()"><option value="all">Tutte le classi</option><option value="core">Risorsa</option><option value="growth">Crescita</option><option value="spec">Speculazione</option></select></div>
+            <div class="scroll"><table class="table" id="tokenTable"><thead><tr><th>Token</th><th>Settore</th><th>Classe</th><th>Resource</th><th>Spec.</th><th>Risk</th><th>Stato</th></tr></thead><tbody>
+              <tr data-kind="core"><td class="token">BNB</td><td>Layer 1</td><td><span class="pill core">RISORSA</span></td><td>91</td><td>64</td><td>35</td><td class="action">Forte</td></tr>
+              <tr data-kind="core"><td class="token">CGPT</td><td>AI</td><td><span class="pill core">RISORSA</span></td><td>82</td><td>78</td><td>67</td><td class="action">Emergente</td></tr>
+              <tr data-kind="growth"><td class="token">KITE</td><td>AI Agents</td><td><span class="pill growth">CRESCITA</span></td><td>76</td><td>88</td><td>69</td><td class="warn">Da seguire</td></tr>
+              <tr data-kind="growth"><td class="token">SPACE ID</td><td>Identity</td><td><span class="pill growth">CRESCITA</span></td><td>77</td><td>61</td><td>48</td><td>Osserva</td></tr>
+              <tr data-kind="growth"><td class="token">CARV</td><td>Data</td><td><span class="pill growth">CRESCITA</span></td><td>74</td><td>72</td><td>56</td><td>Osserva</td></tr>
+              <tr data-kind="spec" class="locked" onclick="openPro()"><td class="token">SKYAI</td><td>AI / Data</td><td><span class="pill spec">SPEC</span></td><td>••</td><td>••</td><td>••</td><td class="warn">🔒 PRO</td></tr>
+              <tr data-kind="spec" class="locked" onclick="openPro()"><td class="token">XPIN</td><td>DePIN</td><td><span class="pill spec">SPEC</span></td><td>••</td><td>••</td><td>••</td><td class="warn">🔒 PRO</td></tr>
+            </tbody></table></div>
+          </div>
+          <div class="card alerts" id="rischi"><div class="label">Rischi da vedere subito</div><div class="alert-list"><div class="alert"><div class="row"><b>Liquidità troppo bassa</b><span class="pill risk">ALTO</span></div><p>Evita che un +80% sul grafico nasconda un'uscita quasi impossibile.</p></div><div class="alert"><div class="row"><b>Concentrazione holder</b><span class="pill growth">MEDIO</span></div><p>Controllo sui wallet dominanti prima di classificare un token come opportunità.</p></div><div class="alert"><div class="row"><b>Tax / contratto</b><span class="pill risk">ALTO</span></div><p>Modulo previsto per honeypot, tax, permessi e funzioni sospette.</p></div></div></div>
+        </div>
+      </section>
+
+      <section class="section" id="settori">
+        <div class="section-head"><div><h2>3. Capisci dove sta andando il capitale</h2><p>Quattro aree principali, senza disperdere l'attenzione su quaranta narrative contemporaneamente.</p></div><span class="section-tag">SETTORI</span></div>
+        <div class="sector-grid"><div class="card sector"><div class="sector-icon">🤖</div><h3>AI & Agents</h3><p>Agent infrastructure, servizi AI, automazione e compute.</p><span class="trend">Trend demo: forte</span></div><div class="card sector"><div class="sector-icon">🧠</div><h3>Data & Intelligence</h3><p>Dati on-chain, analytics, identity graph e data infrastructure.</p><span class="trend">Trend demo: crescita</span></div><div class="card sector"><div class="sector-icon">⚡</div><h3>DePIN & Compute</h3><p>GPU, nodi, connettività e infrastrutture digitali distribuite.</p><span class="trend">Trend demo: selettivo</span></div><div class="card sector"><div class="sector-icon">🛡️</div><h3>Cyber & Identity</h3><p>Sicurezza, audit, identità e protezione smart contract.</p><span class="trend">Trend demo: strutturale</span></div></div>
+      </section>
+
+      <section class="section" id="news">
+        <div class="section-head"><div><h2>4. Vedi cosa può muovere il mercato</h2><p>Non solo crypto: anche macro, regolamentazione/politica e geopolitica, sempre separate dai dati di prezzo.</p></div><span class="section-tag">NEWS & IMPATTO</span></div>
+        <div class="grid">
+          <div class="card news"><div class="tabs"><button class="tab active" data-tab="all" onclick="filterNews('all',this)">Tutte</button><button class="tab" data-tab="crypto" onclick="filterNews('crypto',this)">Crypto</button><button class="tab" data-tab="macro" onclick="filterNews('macro',this)">Macro</button><button class="tab" data-tab="policy" onclick="filterNews('policy',this)">Politica / Regole</button><button class="tab" data-tab="geo" onclick="filterNews('geo',this)">Geopolitica</button></div><div class="news-list" id="newsList">
+            <article class="news-item" data-news="crypto"><div class="news-meta">CRYPTO • FEED DA COLLEGARE</div><h3>Movimenti di volume, listing, upgrade e flussi on-chain</h3><p>La versione live collegherà fonti e segnalerà solo le notizie con possibile impatto sui token monitorati.</p><span class="impact medium">Impatto: da calcolare</span></article>
+            <article class="news-item" data-news="macro"><div class="news-meta">MACRO • FEED DA COLLEGARE</div><h3>Tassi, inflazione, liquidità e dollaro</h3><p>Il modulo macro servirà a spiegare il contesto in cui si muove il mercato crypto.</p><span class="impact medium">Impatto: da calcolare</span></article>
+            <article class="news-item" data-news="policy"><div class="news-meta">POLITICA / REGOLAMENTAZIONE • FEED DA COLLEGARE</div><h3>Regole, provvedimenti e decisioni istituzionali rilevanti</h3><p>Le notizie saranno riportate in modo fattuale, con fonte e distinzione tra fatto, dichiarazione e analisi.</p><span class="impact high">Priorità: alta se market-moving</span></article>
+            <article class="news-item" data-news="geo"><div class="news-meta">GEOPOLITICA • FEED DA COLLEGARE</div><h3>Eventi con possibile effetto su rischio, energia e liquidità globale</h3><p>Solo eventi materialmente collegati al mercato, evitando il solito rumore da feed infinito.</p><span class="impact medium">Impatto: da calcolare</span></article>
+          </div></div>
+          <div class="card what-moves"><div class="label">Come Kiber spiega una notizia</div><div class="move-list"><div class="move"><div class="n">1</div><div><b>Cosa è successo</b><span>Fatto e fonte, senza mescolarlo all'interpretazione.</span></div></div><div class="move"><div class="n">2</div><div><b>Perché conta</b><span>Collegamento con liquidità, rischio, settore o token.</span></div></div><div class="move"><div class="n">3</div><div><b>Impatto possibile</b><span>Positivo, negativo o incerto, con livello di rilevanza.</span></div></div><div class="move"><div class="n">4</div><div><b>Cosa osservare</b><span>Metriche da seguire, senza trasformare una news in un ordine d'acquisto.</span></div></div></div></div>
+        </div>
+      </section>
+
+      <section class="pro" id="pro"><div><div class="eyebrow">KIBERNETIC PRO</div><h2>La parte avanzata costa €3,50 al mese.</h2><p>Radar completo, filtri avanzati, alert, token emergenti, analisi di rischio, news con impatto e schede dettagliate. Il checkout reale verrà collegato nella fase di pubblicazione.</p></div><div class="pro-price"><strong>€3,50</strong><span>al mese</span><button class="btn primary full" style="margin-top:10px" onclick="openPro()">Apri demo PRO</button></div></section>
+
+      <footer class="footer"><div>© 2026 Kibernetic Intelligence • BNB Chain Intelligence</div><div>Demo V2 • dati statici, non live • contenuto informativo, non consulenza finanziaria</div></footer>
+    </main>
+  </div>
+</div>
+
+<div class="modal" id="proModal" onclick="if(event.target===this)closePro()"><div class="modal-box"><button class="close" onclick="closePro()">×</button><span class="section-tag">DEMO CHECKOUT</span><h3>Kibernetic PRO • €3,50/mese</h3><p>Questa schermata segna il punto in cui collegheremo account, pagamento e accesso alle funzioni PRO. Nessun pagamento viene eseguito in questa demo.</p><button class="btn primary full" onclick="closePro()">Chiudi demo</button></div></div>
+
+<script>
+  function openPro(){document.getElementById('proModal').classList.add('show')}
+  function closePro(){document.getElementById('proModal').classList.remove('show')}
+  function toggleMenu(){document.getElementById('sidebar').classList.toggle('open')}
+  function filterRows(){
+    const q=document.getElementById('tokenSearch').value.toLowerCase();
+    const k=document.getElementById('tokenClass').value;
+    document.querySelectorAll('#tokenTable tbody tr').forEach(r=>{
+      const okq=r.innerText.toLowerCase().includes(q); const okk=k==='all'||r.dataset.kind===k;
+      r.style.display=okq&&okk?'':'none';
+    })
+  }
+  function globalFilter(){
+    const q=document.getElementById('globalSearch').value.toLowerCase().trim();
+    document.querySelectorAll('#tokenTable tbody tr').forEach(r=>r.style.display=!q||r.innerText.toLowerCase().includes(q)?'':'none');
+    document.querySelectorAll('.sector,.alert,.news-item').forEach(el=>el.style.display=!q||el.innerText.toLowerCase().includes(q)?'':'none');
+  }
+  function filterNews(type,btn){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active');
+    document.querySelectorAll('.news-item').forEach(item=>item.style.display=type==='all'||item.dataset.news===type?'':'none')
+  }
+  document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>document.getElementById('sidebar').classList.remove('open')))
+</script>
+</body>
+</html>
