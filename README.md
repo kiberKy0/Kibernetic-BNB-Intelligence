@@ -1,33 +1,46 @@
 # Kibernetic BNB Intelligence
 
-Dashboard demo V2 del progetto **Kibernetic BNB Intelligence**.
+**V17 Production Candidate** del progetto Kibernetic BNB Intelligence.
 
 ## Obiettivo
-Rendere comprensibile la BNB Chain in pochi passaggi:
-1. stato generale della chain;
-2. opportunità scannerizzate;
-3. rischi principali;
-4. rotazione dei settori;
-5. news crypto, macro, politica/regolamentazione e geopolitica con spiegazione dell'impatto.
+Raccogliere dati di mercato, storico, settori, news, macro e regolamentazione BNB Chain e trasformarli in informazioni più semplici da leggere: fatti osservati, segnali, rischi, ipotesi e fattori da monitorare.
 
-## Cosa include la V2
-- BNB Chain Health
-- Capital Flow demo
-- Resource / Speculation / Risk Score
-- Scanner token con ricerca e filtri
-- Sezione rischi
-- Settori AI & Agents, Data, DePIN, Cyber & Identity
-- News & Impatto con tab dedicate
-- Paywall demo Kibernetic PRO a **€3,50/mese**
-- Layout responsive mobile/desktop
-- PWA manifest
-- Logo e mascotte SVG leggeri
+## V17
+- Interfaccia standalone senza iframe/versioni annidate
+- Ricerca token BNB Chain
+- Aggregazione multi-pool per prezzo, liquidità, volume e flussi
+- Risk Score scomposto per componenti
+- Profilo progetto e classificazione settore con livello di confidenza
+- Storico 24H / 7G / 1M / 1A / 3A quando disponibile
+- Watchlist senza duplicati con sincronizzazione cloud anonima
+- Monitor server H24 ogni 15 minuti
+- Snapshot storici e confronto “cosa è cambiato da ieri”
+- Alert server per prezzo, liquidità, volume e rischio
+- News Intelligence deduplicata con impatto e “perché conta”
+- Dollaro / macro e SEC Monitor
+- Profilo, avatar e temi
+- PWA / service worker notifiche
+- Kiber locale; endpoint Kiber AI già predisposto lato server
+- Checkout Kibernetic PRO predisposto per Stripe
 
-## Stato dati
-I valori mostrati sono **dati statici dimostrativi**. Non sono dati live e non costituiscono consulenza finanziaria.
+## Backend
+Supabase Edge Functions:
+- `kibernetic-data`: feed mercato/news/macro
+- `kibernetic-intelligence`: token multi-pool, progetto, storico, news e alert
+- `kibernetic-cloud`: dispositivo anonimo e watchlist cloud
+- `kibernetic-monitor`: raccolta H24 e news pipeline
 
-## Prossima fase tecnica
-Collegare API live per prezzi/volume/liquidità, DexScreener e controlli rischio; aggiungere feed news con fonti, autenticazione e checkout PRO.
+Il monitor viene eseguito automaticamente tramite `pg_cron` + `pg_net`.
 
-## Avvio locale
-Aprire `index.html` nel browser oppure servire la cartella con un semplice server statico.
+## Production
+`v17-production.html` è la candidate da testare prima di sostituire definitivamente la pagina principale.
+
+Il file `vercel.json` è già preparato per servire V17 come root una volta importato il repository in Vercel.
+
+## Integrazioni ancora da autorizzare
+Per attivare completamente queste funzioni servono credenziali esterne che non devono essere salvate nel repository:
+- `OPENAI_API_KEY` per Kiber AI
+- Stripe (`STRIPE_SECRET_KEY` + `STRIPE_PRICE_ID`) per PRO €3,50/mese
+
+## Principio dati
+Le stime Kibernetic sono strumenti informativi. Correlazione temporale, news e movimenti di prezzo non vengono presentati automaticamente come rapporti causali certi.
