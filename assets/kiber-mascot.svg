@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 500" role="img" aria-label="Mascotte robot Kiber">
+  <defs><linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7fbff"/><stop offset="1" stop-color="#9ab7c9"/></linearGradient><linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1da9ff"/><stop offset="1" stop-color="#44e7ff"/></linearGradient></defs>
+  <g stroke="#071521" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M210 42v35"/><circle cx="210" cy="31" r="15" fill="url(#blue)"/>
+    <rect x="85" y="72" width="250" height="190" rx="82" fill="url(#body)"/>
+    <rect x="112" y="100" width="196" height="133" rx="58" fill="#071521"/>
+    <circle cx="167" cy="160" r="15" fill="#44e7ff" stroke="none"/><circle cx="253" cy="160" r="15" fill="#44e7ff" stroke="none"/>
+    <path d="M168 194c23 22 61 22 84 0" fill="none" stroke="#44e7ff" stroke-width="10"/>
+    <rect x="128" y="255" width="164" height="160" rx="58" fill="url(#body)"/>
+    <circle cx="210" cy="325" r="39" fill="#071521"/><circle cx="210" cy="325" r="26" fill="none" stroke="url(#blue)" stroke-width="8"/><path d="M199 325h22M210 314v22" stroke="#44e7ff" stroke-width="6"/>
+    <path d="M134 286L76 330 46 302" fill="none" stroke="url(#body)" stroke-width="34"/><path d="M286 286l56 40 34-43" fill="none" stroke="url(#body)" stroke-width="34"/>
+    <path d="M168 406l-14 61M252 406l14 61" fill="none" stroke="url(#body)" stroke-width="37"/>
+    <path d="M130 477h52M238 477h52" stroke="#dcecf5" stroke-width="24"/>
+  </g>
+</svg>
