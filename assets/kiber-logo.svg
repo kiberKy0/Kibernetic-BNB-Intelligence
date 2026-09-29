@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Kiber logo">
-<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#087cff"/><stop offset="1" stop-color="#16c9ff"/></linearGradient></defs>
-<rect width="128" height="128" rx="30" fill="url(#bg)"/>
-<path d="M64 18v12" stroke="#fff" stroke-width="7" stroke-linecap="round"/><circle cx="64" cy="14" r="6" fill="#fff"/>
-<rect x="23" y="31" width="82" height="70" rx="31" fill="none" stroke="#fff" stroke-width="8"/>
-<rect x="14" y="53" width="14" height="31" rx="7" fill="#fff"/><rect x="100" y="53" width="14" height="31" rx="7" fill="#fff"/>
-<circle cx="49" cy="62" r="7" fill="#fff"/><circle cx="79" cy="62" r="7" fill="#fff"/>
-<path d="M47 78c9 10 25 10 34 0" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="t"><title id="t">Kiber</title><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#19d8ff"/><stop offset="1" stop-color="#168bff"/></linearGradient><filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect x="43" y="70" width="170" height="124" rx="58" fill="#050b14" stroke="url(#g)" stroke-width="12"/><rect x="26" y="101" width="25" height="62" rx="12" fill="url(#g)"/><rect x="205" y="101" width="25" height="62" rx="12" fill="url(#g)"/><path d="M128 70V40" stroke="url(#g)" stroke-width="12" stroke-linecap="round"/><circle cx="128" cy="28" r="13" fill="url(#g)" filter="url(#glow)"/><circle cx="91" cy="126" r="12" fill="#f5faff"/><circle cx="165" cy="126" r="12" fill="#f5faff"/><path d="M94 152c9 14 21 21 34 21s25-7 34-21" fill="none" stroke="#f5faff" stroke-width="11" stroke-linecap="round"/></svg>
