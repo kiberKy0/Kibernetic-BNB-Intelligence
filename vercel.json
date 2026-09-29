@@ -16,12 +16,20 @@
       ]
     },
     {
+      "source": "/",
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+    },
+    {
+      "source": "/index.html",
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+    },
+    {
       "source": "/v21-clean.html",
-      "headers": [{"key": "Cache-Control", "value": "no-store"}]
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
     },
     {
       "source": "/v20-production.html",
-      "headers": [{"key": "Cache-Control", "value": "no-store"}]
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
     },
     {
       "source": "/sw-v17.js",
