@@ -27,6 +27,9 @@
   function setupAvatarPicker(){
     const sel=$('avatarSelect');
     if(!sel)return;
+    const saved=sel.value||state?.profile?.avatar||'🤖';
+    sel.innerHTML=AVATARS.map(v=>`<option value="${v}">${v}</option>`).join('');
+    sel.value=AVATARS.includes(saved)?saved:'🤖';
     const theme=$('themeSelect');
     const themeLabel=theme?.closest('label');
     if(themeLabel)themeLabel.remove();
