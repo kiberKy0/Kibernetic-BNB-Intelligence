@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 270" role="img" aria-label="Kiber">
+<defs><filter id="g" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<g fill="none" stroke="#f7fbff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+<path d="M160 31v36"/><circle cx="160" cy="20" r="12" fill="#f7fbff" stroke="none"/>
+<rect x="54" y="67" width="212" height="161" rx="78"/>
+<path d="M54 125h-14c-16 0-23 12-23 30v24c0 18 7 30 23 30h14M266 125h14c16 0 23 12 23 30v24c0 18-7 30-23 30h-14"/>
+</g>
+<g fill="#19d8ff" filter="url(#g)"><circle cx="120" cy="143" r="15"/><circle cx="200" cy="143" r="15"/></g>
+<path d="M121 181c22 25 56 25 78 0" fill="none" stroke="#19d8ff" stroke-width="15" stroke-linecap="round" filter="url(#g)"/>
+</svg>
