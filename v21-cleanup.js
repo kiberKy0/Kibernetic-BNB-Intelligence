@@ -74,7 +74,7 @@
     if(typeof renderMarket!=='function'||window.__v21MarketCapWrapped)return;
     window.__v21MarketCapWrapped=true;
     const base=renderMarket;
-    renderMarket=function(){base();const rows=qa('#marketList .token-row'),items=(state.filtered||[]).slice(0,70);rows.forEach((row,i)=>{if(row.querySelector('.v21-onchain-cap'))return;const p=items[i];if(!p)return;const d=document.createElement('div');d.className='v21-onchain-cap';d.innerHTML='<small>Market cap</small><b>'+compact(p.marketCap||p.fdv)+'</b>';row.appendChild(d)})};
+    renderMarket=function(){base();const rows=qa('#marketList .token-row'),items=(state.filtered||[]).slice(0,70);rows.forEach((row,i)=>{if(row.querySelector('.v21-onchain-cap'))return;const p=items[i];if(!p)return;const d=document.createElement('div');d.className='v21-onchain-cap';const mc=Number(p.marketCap)||0,fdv=Number(p.fdv)||0,label=mc?'Market cap':fdv?'FDV':'Market cap';d.innerHTML='<small>'+label+'</small><b>'+compact(mc||fdv)+'</b>';row.appendChild(d)})};
     try{renderMarket()}catch{}
   }
 
