@@ -43,7 +43,7 @@ module.exports=async function handler(req,res){
       method:'POST',
       headers:{Authorization:'Bearer '+process.env.OPENAI_API_KEY,'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:process.env.OPENAI_MODEL||'gpt-5.6-luna',
+        model:process.env.OPENAI_MODEL||'gpt-6-luna',
         instructions,
         input,
         max_output_tokens:800
@@ -53,7 +53,7 @@ module.exports=async function handler(req,res){
     if(!r.ok)return res.status(502).json({error:d.error?.message||'OpenAI error'});
     const answer=d.output_text||((d.output||[]).flatMap(x=>x.content||[]).find(x=>x.type==='output_text')?.text)||'';
     if(!answer)return res.status(502).json({error:'Empty OpenAI response'});
-    return res.status(200).json({answer,model:process.env.OPENAI_MODEL||'gpt-5.6-luna'});
+    return res.status(200).json({answer,model:process.env.OPENAI_MODEL||'gpt-6-luna'});
   }catch(e){
     return res.status(500).json({error:'Kiber backend error'});
   }
