@@ -10,6 +10,7 @@
   function statusText(){const online=String($('monitorState')?.textContent||'').toLowerCase().includes('online');return online?'V20 · KIBER BNB INTELLIGENCE · MONITOR H24':'V20 · KIBER BNB INTELLIGENCE'}
   function setStatus(){const s=$('v20Status');if(!s)return;const next=statusText();if(s.textContent!==next)s.textContent=next;s.classList.add('brand-live')}
   function enforceHero(){document.title='Kiber BNB Intelligence V20';const hero=qs('.hero');if(!hero)return;const eye=qs('.eyebrow',hero),h1=qs('h1',hero),p=qs(':scope > p',hero);if(eye&&eye.textContent!=='KIBER BNB INTELLIGENCE · V20')eye.textContent='KIBER BNB INTELLIGENCE · V20';if(h1&&h1.textContent!==HERO_TITLE)h1.textContent=HERO_TITLE;if(p&&p.textContent!==HERO_TEXT)p.textContent=HERO_TEXT}
+  function loadTokenLogoModule(){if(document.querySelector('script[data-kiber-token-icons]'))return;const s=document.createElement('script');s.src='v20-token-icons.js?v=20-token-1';s.async=false;s.dataset.kiberTokenIcons='1';document.body.appendChild(s)}
 
   function bootBrand(){
     ensureLegacyStatus();
@@ -27,6 +28,7 @@
     const chat=$('chatMessages');if(chat)new MutationObserver(()=>{document.body.classList.add('kiber-thinking');clearTimeout(window.__kiberBrandTimer);window.__kiberBrandTimer=setTimeout(()=>document.body.classList.remove('kiber-thinking'),1100);qsa('.assistant-msg',chat).forEach(m=>m.dataset.brandInsight='1')}).observe(chat,{childList:true,subtree:true});
     const point=$('pointAnalysis');if(point)new MutationObserver(()=>{if(!point.hidden&&point.textContent.trim()&&!qs('.kiber-insight-label',point)){const l=document.createElement('div');l.className='kiber-insight-label';l.textContent='KIBER RESEARCH';point.prepend(l)}}).observe(point,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
     const changes=$('changesBox');if(changes)new MutationObserver(()=>{if(!changes.hidden&&changes.textContent.trim()&&!qs('.kiber-insight-label',changes)){const l=document.createElement('div');l.className='kiber-insight-label';l.textContent='KIBER CHANGE INTELLIGENCE';changes.prepend(l)}}).observe(changes,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden']});
+    loadTokenLogoModule();
   }
 
   ensureLegacyStatus();
