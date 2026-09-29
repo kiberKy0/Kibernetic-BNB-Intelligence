@@ -11,9 +11,10 @@
   function setStatus(){const s=$('v20Status');if(!s)return;const next=statusText();if(s.textContent!==next)s.textContent=next;s.classList.add('brand-live')}
   function enforceHero(){document.title='Kiber BNB Intelligence V20';const hero=qs('.hero');if(!hero)return;const eye=qs('.eyebrow',hero),h1=qs('h1',hero),p=qs(':scope > p',hero);if(eye&&eye.textContent!=='KIBER BNB INTELLIGENCE · V20')eye.textContent='KIBER BNB INTELLIGENCE · V20';if(h1&&h1.textContent!==HERO_TITLE)h1.textContent=HERO_TITLE;if(p&&p.textContent!==HERO_TEXT)p.textContent=HERO_TEXT}
   function loadTokenLogoModule(){if(document.querySelector('script[data-kiber-token-icons]'))return;const s=document.createElement('script');s.src='v20-token-icons.js?v=20-token-2';s.async=false;s.dataset.kiberTokenIcons='1';document.body.appendChild(s)}
+  function loadLogoStyle(){if(document.querySelector('link[data-kiber-logo-style]'))return;const l=document.createElement('link');l.rel='stylesheet';l.href='v20-logo-bw.css?v=bw1';l.dataset.kiberLogoStyle='1';document.head.appendChild(l)}
 
   function bootBrand(){
-    ensureLegacyStatus();
+    ensureLegacyStatus();loadLogoStyle();
     const top=qs('.top > div:first-child');
     if(top){top.className='brand-shell';top.innerHTML='<img class="brand-mark" src="'+LOGO+'" alt="Kiber"><div class="brand-copy"><strong>Kiber</strong><small>BNB Intelligence</small><div class="status brand-live" id="v20Status">V20 · KIBER BNB INTELLIGENCE</div></div>'}
     const hero=qs('.hero');
