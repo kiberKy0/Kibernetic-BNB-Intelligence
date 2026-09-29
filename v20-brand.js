@@ -3,7 +3,11 @@
   (async()=>{
     try{
       await load('v20-brand-frozen.js?v=v20-frozen-e718');
-      await load('v21-market.js?v=21-market-a');
-    }catch(e){console.error('Avvio V21 non riuscito',e)}
+      window.__v20FrozenReady=true;
+      document.dispatchEvent(new Event('kiber:v20-ready'));
+    }catch(e){
+      console.error('Avvio base V20 non riuscito',e);
+      window.__v20FrozenReady=false;
+    }
   })();
 })();
