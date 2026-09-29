@@ -17,109 +17,22 @@
 
   async function pancakeMap(){
     try{const saved=JSON.parse(localStorage.getItem(PANCAKE_KEY)||'null');if(saved?.at&&Date.now()-saved.at<LIST_TTL&&saved.map)return saved.map}catch{}
-    try{
-      const r=await fetch('https://tokens.pancakeswap.finance/pancakeswap-extended.json');
-      if(!r.ok)throw Error('pancake');
-      const d=await r.json(),items=Array.isArray(d)?d:(d.tokens||[]),map={};
-      for(const t of items){if(Number(t.chainId)===56&&t.address&&t.logoURI)map[lower(t.address)]=t.logoURI}
-      try{localStorage.setItem(PANCAKE_KEY,JSON.stringify({at:Date.now(),map}))}catch{}
-      return map;
-    }catch{return {}}
+    try{const r=await fetch('https://tokens.pancakeswap.finance/pancakeswap-extended.json');if(!r.ok)throw Error('pancake');const d=await r.json(),items=Array.isArray(d)?d:(d.tokens||[]),map={};for(const t of items){if(Number(t.chainId)===56&&t.address&&t.logoURI)map[lower(t.address)]=t.logoURI}try{localStorage.setItem(PANCAKE_KEY,JSON.stringify({at:Date.now(),map}))}catch{}return map}catch{return {}}
   }
+  async function resolvePancake(addresses){const map=await pancakeMap();for(const a of addresses){const url=map[lower(a)];if(url)putCached(a,url,'Lista token PancakeSwap')}}
+  async function resolveGecko(addresses){for(let i=0;i<addresses.length;i+=25){const batch=addresses.slice(i,i+25).filter(a=>!getCached(a)?.url);if(!batch.length)continue;try{const r=await fetch('https://api.geckoterminal.com/api/v2/networks/bsc/tokens/multi/'+batch.join(','),{headers:{Accept:'application/json'}});if(!r.ok)continue;const d=await r.json();for(const row of (d?.data||[])){const at=row?.attributes||{},a=lower(at.address||String(row?.id||'').replace(/^bsc_/,'')),url=at.image_url||at.imageUrl||'';if(a&&url)putCached(a,url,'GeckoTerminal / CoinGecko')}}catch{}}}
+  async function resolveDex(addresses){for(let i=0;i<addresses.length;i+=30){const batch=addresses.slice(i,i+30).filter(a=>!getCached(a)?.url);if(!batch.length)continue;try{const r=await fetch('https://api.dexscreener.com/tokens/v1/bsc/'+batch.join(','));if(!r.ok)continue;const rows=await r.json(),best={};for(const p of (Array.isArray(rows)?rows:[])){const a=lower(p?.baseToken?.address),url=directLogo(p);if(!a||!url)continue;const score=Number(p?.liquidity?.usd||0)+Number(p?.volume?.h24||0)*.1;if(!best[a]||score>best[a].score)best[a]={url,score}}for(const [a,x] of Object.entries(best))putCached(a,x.url,'DEX Screener')}catch{}}}
+  async function resolveBatch(addresses){const all=[...new Set((addresses||[]).map(lower).filter(Boolean))];let need=all.filter(a=>!getCached(a)?.url);if(!need.length)return;await resolvePancake(need);need=need.filter(a=>!getCached(a)?.url);if(need.length)await resolveGecko(need);need=need.filter(a=>!getCached(a)?.url);if(need.length)await resolveDex(need);need=need.filter(a=>!getCached(a)?.url);for(const a of need)putCached(a,'','Nessun logo pubblicato dalle fonti collegate')}
 
-  async function resolvePancake(addresses){
-    const map=await pancakeMap();
-    for(const a of addresses){const url=map[lower(a)];if(url)putCached(a,url,'PancakeSwap token list')}
-  }
+  function upgradeRows(root=document){root.querySelectorAll('.token-row').forEach(row=>{const address=row.dataset.address||row.dataset.watch||'';const nameBox=row.querySelector('.token-name');if(!nameBox||nameBox.querySelector('.token-logo-wrap'))return;const b=nameBox.querySelector('b'),small=nameBox.querySelector('small'),symbol=b?.textContent?.trim()||'?',name=(small?.textContent||'').split('·')[0].trim();const known=state.market?.find?.(p=>lower(p?.baseToken?.address)===lower(address));const wrap=document.createElement('span');wrap.className='token-logo-wrap';wrap.innerHTML=img(address,symbol,name,known);nameBox.prepend(wrap)})}
+  async function refreshVisibleLogos(){const rows=[...document.querySelectorAll('.token-row')],addresses=rows.map(r=>r.dataset.address||r.dataset.watch).filter(Boolean);await resolveBatch(addresses);rows.forEach(row=>{const address=row.dataset.address||row.dataset.watch||'',box=row.querySelector('.token-logo-wrap'),cached=getCached(address);if(box&&cached?.url&&!box.querySelector('img')){const b=row.querySelector('.token-name b'),small=row.querySelector('.token-name small');box.innerHTML=img(address,b?.textContent||'?',(small?.textContent||'').split('·')[0].trim(),null);box.title='Logo: '+cached.source}})}
 
-  async function resolveGecko(addresses){
-    for(let i=0;i<addresses.length;i+=25){
-      const batch=addresses.slice(i,i+25).filter(a=>!getCached(a)?.url);if(!batch.length)continue;
-      try{
-        const r=await fetch('https://api.geckoterminal.com/api/v2/networks/bsc/tokens/multi/'+batch.join(','),{headers:{Accept:'application/json'}});
-        if(!r.ok)continue;
-        const d=await r.json();
-        for(const row of (d?.data||[])){
-          const at=row?.attributes||{},a=lower(at.address||String(row?.id||'').replace(/^bsc_/,'')),url=at.image_url||at.imageUrl||'';
-          if(a&&url)putCached(a,url,'GeckoTerminal / CoinGecko');
-        }
-      }catch{}
-    }
-  }
+  const baseRenderMarket=renderMarket;renderMarket=function(){baseRenderMarket();upgradeRows($('marketList'));refreshVisibleLogos()};
+  const baseRenderWatch=renderWatch;renderWatch=function(){baseRenderWatch();upgradeRows($('watchList'));refreshVisibleLogos()};
+  const baseRenderLab=renderLab;renderLab=function(){baseRenderLab();const t=state.selected;if(!t)return;let identity=document.querySelector('.lab-token-identity');if(!identity){identity=document.createElement('div');identity.className='lab-token-identity';const h=$('labName');h?.parentNode?.insertBefore(identity,h);if(h)identity.appendChild(h)}identity.querySelector('.lab-token-logo')?.remove();const holder=document.createElement('span');holder.className='lab-token-logo';holder.innerHTML=img(t.address,t.symbol,t.name,t,'token-logo token-logo-large');identity.prepend(holder);resolveBatch([t.address]).then(()=>{const c=getCached(t.address);if(c?.url){holder.innerHTML=img(t.address,t.symbol,t.name,t,'token-logo token-logo-large');holder.title='Logo: '+c.source}})};
+  const baseAddWatch=addWatch;addWatch=async function(){await baseAddWatch();const t=state.selected;if(!t)return;const w=state.watch.find(x=>lower(x.address)===lower(t.address)),known=state.market?.find?.(p=>lower(p?.baseToken?.address)===lower(t.address));if(w)w.logo=logoFor(t.address,known)||getCached(t.address)?.url||w.logo||''};
 
-  async function resolveDex(addresses){
-    for(let i=0;i<addresses.length;i+=30){
-      const batch=addresses.slice(i,i+30).filter(a=>!getCached(a)?.url);if(!batch.length)continue;
-      try{
-        const r=await fetch('https://api.dexscreener.com/tokens/v1/bsc/'+batch.join(','));
-        if(!r.ok)continue;
-        const rows=await r.json(),best={};
-        for(const p of (Array.isArray(rows)?rows:[])){
-          const a=lower(p?.baseToken?.address),url=directLogo(p);if(!a||!url)continue;
-          const score=Number(p?.liquidity?.usd||0)+Number(p?.volume?.h24||0)*.1;
-          if(!best[a]||score>best[a].score)best[a]={url,score};
-        }
-        for(const [a,x] of Object.entries(best))putCached(a,x.url,'DEX Screener');
-      }catch{}
-    }
-  }
-
-  async function resolveBatch(addresses){
-    const all=[...new Set((addresses||[]).map(lower).filter(Boolean))];
-    let need=all.filter(a=>!getCached(a)?.url);
-    if(!need.length)return;
-    await resolvePancake(need);
-    need=need.filter(a=>!getCached(a)?.url);
-    if(need.length)await resolveGecko(need);
-    need=need.filter(a=>!getCached(a)?.url);
-    if(need.length)await resolveDex(need);
-    need=need.filter(a=>!getCached(a)?.url);
-    for(const a of need)putCached(a,'','Nessun logo pubblicato dalle fonti collegate');
-  }
-
-  function upgradeRows(root=document){
-    root.querySelectorAll('.token-row').forEach(row=>{
-      const address=row.dataset.address||row.dataset.watch||'';
-      const nameBox=row.querySelector('.token-name');
-      if(!nameBox||nameBox.querySelector('.token-logo-wrap'))return;
-      const b=nameBox.querySelector('b'),small=nameBox.querySelector('small'),symbol=b?.textContent?.trim()||'?',name=(small?.textContent||'').split('·')[0].trim();
-      const known=state.market?.find?.(p=>lower(p?.baseToken?.address)===lower(address));
-      const wrap=document.createElement('span');wrap.className='token-logo-wrap';wrap.innerHTML=img(address,symbol,name,known);nameBox.prepend(wrap);
-    });
-  }
-
-  async function refreshVisibleLogos(){
-    const rows=[...document.querySelectorAll('.token-row')],addresses=rows.map(r=>r.dataset.address||r.dataset.watch).filter(Boolean);
-    await resolveBatch(addresses);
-    rows.forEach(row=>{
-      const address=row.dataset.address||row.dataset.watch||'',box=row.querySelector('.token-logo-wrap'),cached=getCached(address);
-      if(box&&cached?.url&&!box.querySelector('img')){
-        const b=row.querySelector('.token-name b'),small=row.querySelector('.token-name small');
-        box.innerHTML=img(address,b?.textContent||'?',(small?.textContent||'').split('·')[0].trim(),null);
-        box.title='Logo: '+cached.source;
-      }
-    });
-  }
-
-  const baseRenderMarket=renderMarket;
-  renderMarket=function(){baseRenderMarket();upgradeRows($('marketList'));refreshVisibleLogos()};
-  const baseRenderWatch=renderWatch;
-  renderWatch=function(){baseRenderWatch();upgradeRows($('watchList'));refreshVisibleLogos()};
-
-  const baseRenderLab=renderLab;
-  renderLab=function(){
-    baseRenderLab();const t=state.selected;if(!t)return;
-    let identity=document.querySelector('.lab-token-identity');
-    if(!identity){identity=document.createElement('div');identity.className='lab-token-identity';const h=$('labName');h?.parentNode?.insertBefore(identity,h);if(h)identity.appendChild(h)}
-    identity.querySelector('.lab-token-logo')?.remove();
-    const holder=document.createElement('span');holder.className='lab-token-logo';holder.innerHTML=img(t.address,t.symbol,t.name,t,'token-logo token-logo-large');identity.prepend(holder);
-    resolveBatch([t.address]).then(()=>{const c=getCached(t.address);if(c?.url){holder.innerHTML=img(t.address,t.symbol,t.name,t,'token-logo token-logo-large');holder.title='Logo: '+c.source}});
-  };
-
-  const baseAddWatch=addWatch;
-  addWatch=async function(){await baseAddWatch();const t=state.selected;if(!t)return;const w=state.watch.find(x=>lower(x.address)===lower(t.address)),known=state.market?.find?.(p=>lower(p?.baseToken?.address)===lower(t.address));if(w)w.logo=logoFor(t.address,known)||getCached(t.address)?.url||w.logo||''};
-
-  function useKiberLogoEverywhere(){document.querySelectorAll('.kiber-guide img').forEach(el=>{el.src='assets/kiber-logo-bw.svg?v=bw1';el.alt='Kiber';el.classList.add('kiber-logo-mascot')})}
+  function useKiberLogoEverywhere(){document.querySelectorAll('.kiber-guide img').forEach(el=>{el.src='assets/kiber-logo.svg?v=v20-logo-exact-2';el.alt='Kiber';el.classList.add('kiber-logo-mascot')})}
   function boot(){upgradeRows();refreshVisibleLogos();useKiberLogoEverywhere();const mo=new MutationObserver(muts=>{let tokenChanged=false,kiberChanged=false;for(const m of muts){for(const n of m.addedNodes){if(n.nodeType!==1)continue;if(n.matches?.('.token-row')||n.querySelector?.('.token-row'))tokenChanged=true;if(n.matches?.('.kiber-guide')||n.querySelector?.('.kiber-guide'))kiberChanged=true}}if(tokenChanged){upgradeRows();refreshVisibleLogos()}if(kiberChanged)useKiberLogoEverywhere()});mo.observe(document.body,{childList:true,subtree:true})}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
