@@ -4,13 +4,13 @@
   const qsa=(s,r=document)=>[...r.querySelectorAll(s)];
   const HERO_TITLE='Capire cosa si muove, quando e perché.';
   const HERO_TEXT='Kiber collega mercato, storico, liquidità, volume e notizie. Il grafico è il centro dell’indagine: seleziona un momento e cerca cosa stava accadendo.';
-  const LOGO='assets/kiber-logo-official.webp?v=official-2';
+  const LOGO='assets/kiber-logo-bw.svg?v=bw1';
 
   function ensureLegacyStatus(){let legacy=$('appStatus');if(!legacy){legacy=document.createElement('span');legacy.id='appStatus';legacy.hidden=true;legacy.setAttribute('aria-hidden','true');legacy.style.display='none';document.body.appendChild(legacy)}return legacy}
   function statusText(){const online=String($('monitorState')?.textContent||'').toLowerCase().includes('online');return online?'V20 · KIBER BNB INTELLIGENCE · MONITOR H24':'V20 · KIBER BNB INTELLIGENCE'}
   function setStatus(){const s=$('v20Status');if(!s)return;const next=statusText();if(s.textContent!==next)s.textContent=next;s.classList.add('brand-live')}
   function enforceHero(){document.title='Kiber BNB Intelligence V20';const hero=qs('.hero');if(!hero)return;const eye=qs('.eyebrow',hero),h1=qs('h1',hero),p=qs(':scope > p',hero);if(eye&&eye.textContent!=='KIBER BNB INTELLIGENCE · V20')eye.textContent='KIBER BNB INTELLIGENCE · V20';if(h1&&h1.textContent!==HERO_TITLE)h1.textContent=HERO_TITLE;if(p&&p.textContent!==HERO_TEXT)p.textContent=HERO_TEXT}
-  function loadTokenLogoModule(){if(document.querySelector('script[data-kiber-token-icons]'))return;const s=document.createElement('script');s.src='v20-token-icons.js?v=20-token-1';s.async=false;s.dataset.kiberTokenIcons='1';document.body.appendChild(s)}
+  function loadTokenLogoModule(){if(document.querySelector('script[data-kiber-token-icons]'))return;const s=document.createElement('script');s.src='v20-token-icons.js?v=20-token-2';s.async=false;s.dataset.kiberTokenIcons='1';document.body.appendChild(s)}
 
   function bootBrand(){
     ensureLegacyStatus();
