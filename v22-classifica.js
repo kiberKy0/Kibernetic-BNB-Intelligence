@@ -1,12 +1,13 @@
 (()=>{
   const CATALOG='https://iytjxruxpvwjjhbndkzo.supabase.co/functions/v1/kibernetic-catalog';
   const byId=new Map();
-  const money=v=>Number.isFinite(Number(v))?'$'+Number(v).toLocaleString('it-IT',{maximumFractionDigits:Math.abs(Number(v))<1?8:2}):'—';
-  const compact=v=>{const n=Number(v);if(!Number.isFinite(n))return'—';if(Math.abs(n)>=1e12)return'$'+(n/1e12).toFixed(2)+'T';if(Math.abs(n)>=1e9)return'$'+(n/1e9).toFixed(2)+'B';if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return'$'+(n/1e3).toFixed(1)+'K';return money(n)};
-  const amount=v=>{const n=Number(v);if(!Number.isFinite(n))return'—';return n.toLocaleString('it-IT',{maximumFractionDigits:2})};
-  const pct=v=>Number.isFinite(Number(v))?`${Number(v)>=0?'+':''}${Number(v).toLocaleString('it-IT',{maximumFractionDigits:2})}%`:'—';
+  const valid=v=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v));
+  const money=v=>valid(v)?'$'+Number(v).toLocaleString('it-IT',{maximumFractionDigits:Math.abs(Number(v))<1?8:2}):'—';
+  const compact=v=>{if(!valid(v))return'—';const n=Number(v);if(Math.abs(n)>=1e12)return'$'+(n/1e12).toFixed(2)+'T';if(Math.abs(n)>=1e9)return'$'+(n/1e9).toFixed(2)+'B';if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return'$'+(n/1e3).toFixed(1)+'K';return money(n)};
+  const amount=v=>valid(v)?Number(v).toLocaleString('it-IT',{maximumFractionDigits:2}):'—';
+  const pct=v=>valid(v)?`${Number(v)>=0?'+':''}${Number(v).toLocaleString('it-IT',{maximumFractionDigits:2})}%`:'—';
   const date=v=>{if(!v)return'—';try{return new Date(v).toLocaleDateString('it-IT')}catch{return'—'}};
-  const cls=v=>Number(v)>=0?'up':'down';
+  const cls=v=>!valid(v)?'neutral':Number(v)>=0?'up':'down';
 
   function setVersion(){
     document.title='Kiber BNB Intelligence V22.1';
