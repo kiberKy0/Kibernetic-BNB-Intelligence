@@ -8,6 +8,13 @@
   const date=v=>{if(!v)return'—';try{return new Date(v).toLocaleDateString('it-IT')}catch{return'—'}};
   const cls=v=>Number(v)>=0?'up':'down';
 
+  function setVersion(){
+    document.title='Kiber BNB Intelligence V22.1';
+    const st=document.getElementById('v21Status')||document.getElementById('v20Status');
+    if(st){st.id='v22Status';st.textContent='V22.1 · KIBER BNB INTELLIGENCE · CLASSIFICA BNB'}
+    const eye=document.querySelector('.hero .eyebrow');if(eye)eye.textContent='KIBER BNB INTELLIGENCE · V22.1';
+  }
+
   function details(x){
     return `<div class="v22-detail-head"><div><b>${x.name||x.symbol}</b><small>Profilo mercato CoinGecko · BNB Chain</small></div><span>#${x.rank||'—'}</span></div>
       <div class="v22-detail-grid">
@@ -59,6 +66,8 @@
   }
 
   function boot(){
+    setVersion();
+    setTimeout(setVersion,500);
     load();
     const root=document.getElementById('section-market')||document.body;
     new MutationObserver(()=>enhanceAll()).observe(root,{childList:true,subtree:true});
