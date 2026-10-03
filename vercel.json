@@ -28,6 +28,18 @@
       "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
     },
     {
+      "source": "/v24.html",
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+    },
+    {
+      "source": "/v24.js",
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+    },
+    {
+      "source": "/v24.css",
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+    },
+    {
       "source": "/v20-production.html",
       "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
     },
