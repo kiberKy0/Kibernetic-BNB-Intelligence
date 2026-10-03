@@ -1,0 +1,33 @@
+/* Kiber BNB Intelligence V23.5 */
+#v21AvatarGrid,.v21-avatar-choice,#v21AvatarTitle,#avatarSelect{display:none!important}
+#avatarSelect+*{display:none!important}
+.v235-neutral-avatar{background:transparent!important}
+.v235-ai-head{align-items:center!important}
+.v235-ai-logo{width:68px!important;height:68px!important;min-width:68px!important;max-width:68px!important;display:block!important;object-fit:contain!important;object-position:center!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:0!important;filter:drop-shadow(0 8px 18px rgba(0,132,255,.28))!important}
+.v235-bnb-card{grid-column:1/-1!important;min-height:auto!important;padding-bottom:18px!important}
+.v235-chain-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(111,160,204,.2)}
+.v235-chain-metrics>div{min-width:0;padding:10px 9px;border:1px solid rgba(111,160,204,.16);border-radius:14px;background:rgba(6,20,33,.48)}
+.v235-chain-metrics span{display:block;font-size:10px;line-height:1.25;color:#829bb3;text-transform:uppercase;letter-spacing:.05em}
+.v235-chain-metrics b{display:block;margin-top:5px;font-size:14px;line-height:1.2;color:#eaf6ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v235-chain-source{display:block;margin-top:10px;color:#6f8da8!important;font-size:10px!important;line-height:1.35}
+.v235-ai-result{margin-top:14px;border:1px solid rgba(25,190,255,.25);border-radius:18px;background:linear-gradient(180deg,rgba(7,29,45,.88),rgba(4,17,29,.88));overflow:hidden}
+.v235-ai-result-empty,.v235-ai-loading{padding:16px;color:#86a0b8;font-size:13px;line-height:1.45}
+.v235-ai-loading{color:#9edfff;animation:v235Pulse 1.2s ease-in-out infinite alternate}
+.v235-ai-result-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(25,190,255,.16)}
+.v235-ai-result-head span{font-weight:800;color:#eaf7ff;font-size:13px}
+.v235-ai-result-head small{color:#58cfff;font-size:10px;text-align:right}
+.v235-ai-result-text{padding:14px;color:#c9d9e8;font-size:13px;line-height:1.55}
+.v23-ai-prompts button{position:relative;transition:border-color .18s ease,background .18s ease,transform .18s ease}
+.v23-ai-prompts button.v235-active{border-color:#22c9ff!important;background:rgba(12,54,75,.92)!important;box-shadow:0 0 0 1px rgba(34,201,255,.12),0 10px 28px rgba(0,119,255,.12)}
+.v23-ai-prompts button.v235-active:after{content:'ATTIVO';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:8px;letter-spacing:.08em;color:#65dcff}
+.v235-engine-msg{border-left:2px solid rgba(34,201,255,.5)!important}
+@keyframes v235Pulse{from{opacity:.65}to{opacity:1}}
+@media(max-width:680px){
+  .v235-ai-logo{width:58px!important;height:58px!important;min-width:58px!important;max-width:58px!important}
+  .v235-chain-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .v235-chain-metrics>div:last-child{grid-column:1/-1}
+  .v235-chain-metrics span{font-size:9px}
+  .v235-chain-metrics b{font-size:13px}
+  .v235-ai-result-head{align-items:flex-start;flex-direction:column}
+  .v235-ai-result-head small{text-align:left}
+}
