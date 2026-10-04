@@ -12,7 +12,8 @@ module.exports=async function handler(req,res){
   };
   const val=x=>x===null||x===undefined||x===''?null:(Number.isFinite(Number(x))?Number(x):null);
   const ratio=(a,b)=>a!==null&&b!==null&&b!==0?a/b*100:null;
-  const normalizeSeries=(rows,timeIndex=0,valueIndex=1)=>Array.isArray(rows)?rows.map(x=>({t:val(Array.isArray(x)?x[timeIndex]:x?.date)*1000,v:val(Array.isArray(x)?x[valueIndex]:x?.tvl)})).filter(x=>x.t&&x.v!==null):[];
+  const toMs=x=>{x=val(x);if(x===null)return null;return x>1e12?x:x*1000};
+  const normalizeSeries=(rows,timeIndex=0,valueIndex=1)=>Array.isArray(rows)?rows.map(x=>({t:toMs(Array.isArray(x)?x[timeIndex]:x?.date),v:val(Array.isArray(x)?x[valueIndex]:x?.tvl)})).filter(x=>x.t&&x.v!==null):[];
   const pctChange=(series,days)=>{
     if(!Array.isArray(series)||series.length<2)return null;
     const last=series.at(-1),cut=last.t-days*86400000;
