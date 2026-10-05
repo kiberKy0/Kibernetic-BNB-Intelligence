@@ -61,6 +61,13 @@ function renderWatch(){
   box.innerHTML=`<div class="v272-watch-head"><div><span>MONITORATI KIBER</span><b>${list.length} asset</b></div><small>Salvati dal nuovo scanner</small></div>${list.length?list.map(x=>`<button data-v272-watch="${esc(x.key)}"><div><b>${esc(x.symbol||'TOKEN')} · ${esc(x.name||'Asset')}</b><small>${x.address?'BNB Chain contract':'CoinGecko market id'}</small></div><span>Apri →</span></button>`).join(''):'<div class="v272-note">Non hai ancora aggiunto monete ai monitorati.</div>'}`;
   qa('[data-v272-watch]',box).forEach((b,i)=>b.onclick=()=>{const x=list[i];if(!x)return;x.id?window.kiberOpenCoin?.(x.id):x.address&&window.kiberOpenToken?.(x.address)});
 }
+function wireCards(){
+  const cards=qa('#v241Home .v241-card');if(cards.length>=2&&cards[1].dataset.v272!=='1'){cards[1].dataset.v272='1';cards[1].onclick=e=>{e.preventDefault();e.stopPropagation();searchDialog('')}}
+}
+function tokenChat(){
+  const host=q('#v271TokenView .v271-inline-actions');if(!host||$('v272TokenChat'))return;
+  const b=document.createElement('button');b.id='v272TokenChat';b.textContent='Apri chat Kiber';b.onclick=()=>{const tc=typeof window.kiberTokenContext==='function'?window.kiberTokenContext():null,c=tc?.coin;if(!c)return;window.v268OpenChat?.(`Analizza ${c.name||c.symbol} (${c.symbol||'TOKEN'}) usando tutti i dati disponibili. Dimmi direzione, motivi, rischi, contraddizioni, invalidazione e qualità delle evidenze.`,true)};host.appendChild(b);
+}
 function interceptSearch(e){
   const btn=e.target.closest?.('#searchBtn,#v241MarketGo');if(btn){e.preventDefault();e.stopImmediatePropagation();const raw=$('v241MarketInput')?.value||$('tokenSearch')?.value||'';searchDialog(raw);return}
 }
@@ -68,8 +75,8 @@ function keys(e){
   if(e.key!=='Enter')return;const el=e.target;if(el?.id==='tokenSearch'||el?.id==='v241MarketInput'){e.preventDefault();e.stopImmediatePropagation();searchDialog(el.value||'')}
 }
 function boot(){
-  mark();ensureOverlay();ensureTools();renderWatch();document.addEventListener('click',interceptSearch,true);document.addEventListener('keydown',keys,true);
-  window.addEventListener('storage',renderWatch);window.addEventListener('kiber-watch-change',renderWatch);setTimeout(()=>{ensureTools();renderWatch();health().catch(()=>{})},900);setInterval(()=>{mark();ensureTools();renderWatch()},3500);
+  mark();ensureOverlay();ensureTools();wireCards();tokenChat();renderWatch();document.addEventListener('click',interceptSearch,true);document.addEventListener('keydown',keys,true);
+  window.addEventListener('storage',renderWatch);window.addEventListener('kiber-watch-change',renderWatch);setTimeout(()=>{ensureTools();wireCards();tokenChat();renderWatch();health().catch(()=>{})},900);setInterval(()=>{mark();ensureTools();wireCards();tokenChat();renderWatch()},3500);
 }
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();
 })();
