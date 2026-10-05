@@ -16,8 +16,18 @@ function deterministic(body){
   const subject=/chain|rete|tvl|dex/.test(q)?'BNB Chain':'BNB';
   return `${label}\n${subject}\n\nPerché: ${reasons.slice(0,3).join(' · ')||'dati insufficienti per forzare una direzione.'}\n\nCosa può cambiare la lettura: variazioni significative di prezzo, volume, TVL, flussi DEX o nuove informazioni rilevanti.\n\nLettura automatica Kiber basata sui dati disponibili.`;
 }
+async function gatewayCall(credential,{instructions,input}){
+  const model=process.env.AI_GATEWAY_MODEL||'openai/gpt-6-luna';
+  const r=await fetch('https://ai-gateway.vercel.sh/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+credential,'Content-Type':'application/json'},body:JSON.stringify({model,instructions,input,max_output_tokens:1400})});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d?.error?.message||`AI Gateway ${r.status}`);
+  const answer=d.output_text||((d.output||[]).flatMap(x=>x.content||[]).find(x=>x.type==='output_text')?.text)||'';
+  if(!answer)throw new Error('Empty AI Gateway response');
+  return {answer,provider:'vercel-ai-gateway',model};
+}
 async function callProvider({instructions,input}){
   const openaiKey=process.env.OPENAI_API_KEY||'';
+  const gatewayKey=process.env.AI_GATEWAY_API_KEY||'';
   const oidc=process.env.VERCEL_OIDC_TOKEN||'';
   if(openaiKey){
     const model=process.env.OPENAI_MODEL||'gpt-6-luna';
@@ -28,20 +38,13 @@ async function callProvider({instructions,input}){
     if(!answer)throw new Error('Empty OpenAI response');
     return {answer,provider:'openai',model};
   }
-  if(oidc){
-    const model=process.env.AI_GATEWAY_MODEL||'openai/gpt-6-luna';
-    const r=await fetch('https://ai-gateway.vercel.sh/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+oidc,'Content-Type':'application/json'},body:JSON.stringify({model,instructions,input,max_output_tokens:1400})});
-    const d=await r.json().catch(()=>({}));
-    if(!r.ok)throw new Error(d?.error?.message||`AI Gateway ${r.status}`);
-    const answer=d.output_text||((d.output||[]).flatMap(x=>x.content||[]).find(x=>x.type==='output_text')?.text)||'';
-    if(!answer)throw new Error('Empty AI Gateway response');
-    return {answer,provider:'vercel-ai-gateway',model};
-  }
+  if(gatewayKey)return gatewayCall(gatewayKey,{instructions,input});
+  if(oidc)return gatewayCall(oidc,{instructions,input});
   throw new Error('No AI credential available');
 }
 module.exports=async function handler(req,res){
   if(req.method==='GET'){
-    const provider=process.env.OPENAI_API_KEY?'openai':process.env.VERCEL_OIDC_TOKEN?'vercel-ai-gateway':'deterministic';
+    const provider=process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
     return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-luna':'gpt-6-luna'),version:'26.9'});
   }
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
