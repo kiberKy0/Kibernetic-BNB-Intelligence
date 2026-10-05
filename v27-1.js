@@ -87,8 +87,14 @@ function loadLib(){return new Promise((ok,no)=>{if(window.LightweightCharts)retu
 function chartMetrics(points){
   const prices=points.map(x=>n(x.p??x.close)).filter(v=>v!==null);if(!prices.length)return;const first=prices[0],last=prices.at(-1),hi=Math.max(...prices),lo=Math.min(...prices),chg=first?((last/first)-1)*100:null;$('v271High').textContent=money(hi);$('v271Low').textContent=money(lo);$('v271PeriodChange').textContent=pct(chg)
 }
+function renderFallbackChart(){
+  const el=$('v271Chart');if(!el)return;const candles=(S.intel?.technical?.candles||[]).map(x=>({t:Number(x?.[0])*1000,p:n(x?.[4])})).filter(x=>Number.isFinite(x.t)&&x.p!==null),market=(S.chartData?.points||[]).map(x=>({t:Number(x.t),p:n(x.p)})).filter(x=>Number.isFinite(x.t)&&x.p!==null),a=(candles.length>=4&&S.days<=30?candles:market);
+  if(a.length<2){el.innerHTML='<div class="v271-error">Storico non disponibile per questo periodo.</div>';return}
+  const vals=a.map(x=>x.p),lo=Math.min(...vals),hi=Math.max(...vals),rg=hi-lo||1,W=1000,H=360,L=70,R=20,T=20,B=42,X=i=>L+i/(a.length-1)*(W-L-R),Y=v=>T+(hi-v)/rg*(H-T-B),pts=a.map((x,i)=>`${X(i).toFixed(1)},${Y(x.p).toFixed(1)}`).join(' ');
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="rgba(120,160,185,.18)"/><polyline points="${pts}" fill="none" stroke="#59d7ff" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>`;chartMetrics(a);$('v271Source').textContent=(candles.length>=4&&S.days<=30?'GeckoTerminal':'CoinGecko')+' · fallback';$('v271ChartTitle').textContent='Grafico resiliente · fallback locale';
+}
 function renderChart(){
-  const el=$('v271Chart');if(!el)return;const LC=window.LightweightCharts;if(!LC){el.innerHTML='<div class="v271-error">Libreria grafico non disponibile.</div>';return}destroyChart();el.innerHTML='';
+  const el=$('v271Chart');if(!el)return;const LC=window.LightweightCharts;if(!LC){renderFallbackChart();return}destroyChart();el.innerHTML='';
   S.chart=LC.createChart(el,{width:el.clientWidth,height:390,layout:{background:{type:'solid',color:'#04111d'},textColor:'#7895aa',fontFamily:'system-ui,-apple-system,sans-serif'},grid:{vertLines:{color:'rgba(110,150,175,.06)'},horzLines:{color:'rgba(110,150,175,.08)'}},rightPriceScale:{borderColor:'rgba(110,150,175,.15)'},timeScale:{borderColor:'rgba(110,150,175,.15)',timeVisible:S.days<=7,secondsVisible:false},crosshair:{mode:LC.CrosshairMode?.Normal??0},localization:{locale:'it-IT',priceFormatter:p=>money(p)}});
   const candles=(S.intel?.technical?.candles||[]).map(x=>({time:Number(x?.[0]),open:n(x?.[1]),high:n(x?.[2]),low:n(x?.[3]),close:n(x?.[4]),volume:n(x?.[5])})).filter(x=>Number.isFinite(x.time)&&[x.open,x.high,x.low,x.close].every(v=>v!==null));
   const useCandles=candles.length>=4&&S.days<=30;
@@ -108,7 +114,7 @@ async function loadChart(){
     if(S.coin?.id)S.chartData=await json(`/api/coingecko?type=coin_chart&id=${encodeURIComponent(S.coin.id)}&days=${S.days}&v=271`,{cache:'no-store'});else S.chartData=null;
     if(S.coin?.address&&S.days<=30){try{S.intel=await json(`/api/token-intel-v26?address=${encodeURIComponent(S.coin.address)}&period=${periodForIntel(S.days)}&v=271`,{cache:'no-store'})}catch{}}
     if(token!==S.chartSeq)return;renderCoin();await loadLib();if(token!==S.chartSeq)return;renderChart();
-  }catch(e){if(token!==S.chartSeq)return;try{await loadLib();renderChart()}catch{el.innerHTML='<div class="v271-error">Grafico temporaneamente non disponibile. I dati principali restano attivi.</div>'}}
+  }catch(e){if(token!==S.chartSeq)return;try{await loadLib();renderChart()}catch{renderFallbackChart()}}
 }
 function changePeriod(days){if(![1,7,30,90].includes(days))return;S.days=days;qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===days));if(!S.coin?.id&&days===90){S.days=30;qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===30));return}loadChart()}
 
