@@ -39,7 +39,7 @@ async function health(force=false){
     ['News','/api/news-v26?v=272'],
     ['Kiber AI','/api/kiber?v=272']
   ];
-  const started=performance.now(),rows=await Promise.all(tests.map(async([name,url])=>{const t=performance.now();try{const d=await j(url,{cache:'no-store'},7000);return{name,ok:true,ms:Math.round(performance.now()-t),detail:name==='Kiber AI'?(d.ai?`IA · ${d.provider||'provider'}`:'fallback deterministico'):(d.source?String(Array.isArray(d.source)?d.source.join(' + '):d.source):'online'),ai:name==='Kiber AI'?!!d.ai:null}}catch(e){return{name,ok:false,ms:Math.round(performance.now()-t),detail:'non disponibile'}}));
+  const started=performance.now(),rows=await Promise.all(tests.map(async([name,url])=>{const t=performance.now();try{const d=await j(url,{cache:'no-store'},7000);return{name,ok:true,ms:Math.round(performance.now()-t),detail:name==='Kiber AI'?(d.ai?`IA · ${d.provider||'provider'}`:'fallback deterministico'):(d.source?String(Array.isArray(d.source)?d.source.join(' + '):d.source):'online'),ai:name==='Kiber AI'?!!d.ai:null}}catch(e){return{name,ok:false,ms:Math.round(performance.now()-t),detail:'non disponibile'}}}));
   const dom=[
     ['Scanner token',typeof window.kiberOpenCoin==='function'&&typeof window.kiberOpenToken==='function'],
     ['Ricerca',!!($('tokenSearch')||$('v241MarketInput'))],
@@ -69,7 +69,7 @@ function keys(e){
 }
 function boot(){
   mark();ensureOverlay();ensureTools();renderWatch();document.addEventListener('click',interceptSearch,true);document.addEventListener('keydown',keys,true);
-  window.addEventListener('storage',renderWatch);setTimeout(()=>{ensureTools();renderWatch();health().catch(()=>{})},900);setInterval(()=>{mark();ensureTools();renderWatch()},3500);
+  window.addEventListener('storage',renderWatch);window.addEventListener('kiber-watch-change',renderWatch);setTimeout(()=>{ensureTools();renderWatch();health().catch(()=>{})},900);setInterval(()=>{mark();ensureTools();renderWatch()},3500);
 }
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();
 })();
