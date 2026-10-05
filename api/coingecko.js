@@ -2,7 +2,7 @@ module.exports = async function handler(req,res){
   if(req.method!=='GET') return res.status(405).json({error:'Method not allowed'});
   const key=process.env.COINGECKO_API_KEY||'';
   const type=String(req.query?.type||'bsc');
-  const headers={Accept:'application/json','User-Agent':'Kiber-BNB-Intelligence/22.1'};
+  const headers={Accept:'application/json','User-Agent':'Kiber-BNB-Intelligence/26.7'};
   if(key) headers['x-cg-demo-api-key']=key;
   const get=async url=>{
     const r=await fetch(url,{headers});
@@ -25,6 +25,18 @@ module.exports = async function handler(req,res){
   const markets=async params=>get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=false&price_change_percentage=1h%2C24h%2C7d%2C30d&'+params);
   try{
     if(type==='health') return res.status(200).json({ok:true,service:'Kiber CoinGecko Proxy',authenticated:!!key});
+    if(type==='bnb_chart'){
+      const allowed=[1,7,30,90,365];
+      const asked=Math.max(1,Number(req.query?.days||30)||30);
+      const days=allowed.reduce((best,x)=>Math.abs(x-asked)<Math.abs(best-asked)?x:best,30);
+      res.setHeader('Cache-Control','s-maxage=60, stale-while-revalidate=180');
+      const d=await get(`https://api.coingecko.com/api/v3/coins/binancecoin/market_chart?vs_currency=usd&days=${days}`);
+      const prices=Array.isArray(d?.prices)?d.prices:[],caps=Array.isArray(d?.market_caps)?d.market_caps:[],vols=Array.isArray(d?.total_volumes)?d.total_volumes:[];
+      const capMap=new Map(caps.map(x=>[Number(x?.[0]),n(x?.[1])]));
+      const volMap=new Map(vols.map(x=>[Number(x?.[0]),n(x?.[1])]));
+      const points=prices.map(x=>({t:Number(x?.[0]),p:n(x?.[1]),marketCap:capMap.get(Number(x?.[0]))??null,volume:volMap.get(Number(x?.[0]))??null})).filter(x=>Number.isFinite(x.t)&&x.p!==null);
+      return res.status(200).json({ok:true,asset:'BNB',days,points,source:key?'CoinGecko Demo API':'CoinGecko public API',updatedAt:new Date().toISOString()});
+    }
     if(type==='bsc'){
       const page=Math.max(1,Math.min(5,Number(req.query?.page||1)||1));
       const per=Math.max(25,Math.min(250,Number(req.query?.per_page||250)||250));
