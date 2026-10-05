@@ -56,7 +56,15 @@ function basicForecast(){
   const label=score>=22?'RIALZISTA':score<=-22?'RIBASSISTA':'NEUTRALE',cls=label==='RIALZISTA'?'up':label==='RIBASSISTA'?'down':'neutral',icon=cls==='up'?'🟢':cls==='down'?'🔴':'🟡';
   return{score,label,cls,icon,reasons:[...new Set(reasons)].slice(0,4)};
 }
-function renderForecast(){const f=basicForecast(),pill=$('v271Forecast');pill.className='v271-pill '+f.cls;pill.textContent=`${f.icon} ${f.label}`;const why=f.reasons.length?f.reasons.join(' · '):'I segnali disponibili non convergono abbastanza per forzare una direzione.';$('v271Why').innerHTML=`<b>${esc(f.label)}</b><span>${esc(why)}</span><small>Kiber score ${f.score>=0?'+':''}${f.score}/100 · indicatore interno, non probabilità.</small>`}
+function evidenceMeta(){
+  const c=S.coin||{},i=S.intel||{},vals=[c.change24,c.change7d,c.change30d,i?.outlook?.score,i?.technical?.rsi14,i?.token?.liquidityUsd,i?.projectQuality?.score,(S.news?.counts?.positive||0)+(S.news?.counts?.negative||0)];
+  const present=vals.reduce((a,v,idx)=>a+((idx===7?Number(v)>0:n(v)!==null)?1:0),0),quality=Math.round(present/vals.length*100),votes=[];
+  [[c.change24,1],[c.change7d,1],[i?.outlook?.score,1]].forEach(([v])=>{v=n(v);if(v!==null&&Math.abs(v)>.01)votes.push(Math.sign(v))});
+  const nd=(n(S.news?.counts?.positive)||0)-(n(S.news?.counts?.negative)||0);if(nd)votes.push(Math.sign(nd));
+  const pos=votes.filter(x=>x>0).length,neg=votes.filter(x=>x<0).length,agree=votes.length?Math.max(pos,neg)/votes.length:0,convergence=quality<38?'BASSA':agree>=.75?'ALTA':agree>=.55?'MEDIA':'BASSA';
+  return{quality,convergence};
+}
+function renderForecast(){const f=basicForecast(),m=evidenceMeta(),pill=$('v271Forecast');pill.className='v271-pill '+f.cls;pill.textContent=`${f.icon} ${f.label}`;const why=f.reasons.length?f.reasons.join(' · '):'I segnali disponibili non convergono abbastanza per forzare una direzione.';$('v271Why').innerHTML=`<b>${esc(f.label)}</b><span>${esc(why)}</span><small>Kiber score ${f.score>=0?'+':''}${f.score}/100 · Qualità dati ${m.quality}/100 · Convergenza ${m.convergence}. Indicatori interni, non probabilità.</small>`}
 function renderCoin(){
   const c=S.coin||{};$('v271TopName').textContent=c.symbol?`${c.symbol} · ${c.name||'Token'}`:(c.name||'Token');$('v271Name').textContent=c.name||'Token';$('v271Symbol').textContent=c.symbol||'TOKEN';
   const img=$('v271Logo');if(c.image){img.src=c.image;img.alt=c.symbol||c.name||'Token';img.hidden=false}else{img.removeAttribute('src');img.alt='';img.hidden=true}
