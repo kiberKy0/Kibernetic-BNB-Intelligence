@@ -62,7 +62,7 @@ module.exports = async function handler(req,res){
     if(type==='coin_chart'){
       const id=String(req.query?.id||'').trim();
       if(!validId(id))return res.status(400).json({error:'Invalid CoinGecko id'});
-      const allowed=[1,7,30,90,365],asked=Math.max(1,Number(req.query?.days||30)||30),days=allowed.reduce((best,x)=>Math.abs(x-asked)<Math.abs(best-asked)?x:best,30);
+      const allowed=[1,7,30,90,365,1095],asked=Math.max(1,Number(req.query?.days||30)||30),days=allowed.reduce((best,x)=>Math.abs(x-asked)<Math.abs(best-asked)?x:best,30);
       res.setHeader('Cache-Control','s-maxage=45, stale-while-revalidate=120');
       const d=await get(`https://api.coingecko.com/api/v3/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=${days}`);
       const prices=Array.isArray(d?.prices)?d.prices:[],caps=Array.isArray(d?.market_caps)?d.market_caps:[],vols=Array.isArray(d?.total_volumes)?d.total_volumes:[];
@@ -71,12 +71,19 @@ module.exports = async function handler(req,res){
     }
 
     if(type==='bnb_ohlc'){
-      const requested=Math.max(1,Math.min(90,Number(req.query?.days||30)||30));
-      const cfg=requested<=1?{days:1,interval:'15m',limit:96}:requested<=7?{days:7,interval:'1h',limit:168}:requested<=30?{days:30,interval:'4h',limit:180}:{days:90,interval:'1d',limit:90};
+      const requested=Math.max(1,Math.min(1095,Number(req.query?.days||30)||30));
+      const cfg=requested<=1?{days:1,interval:'15m',limit:96}:requested<=7?{days:7,interval:'1h',limit:168}:requested<=30?{days:30,interval:'4h',limit:180}:requested<=90?{days:90,interval:'1d',limit:90}:requested<=365?{days:365,interval:'1d',limit:365}:{days:1095,interval:'1d',limit:1095};
       res.setHeader('Cache-Control','s-maxage=20, stale-while-revalidate=60');
       try{
-        const raw=await get(`https://data-api.binance.vision/api/v3/klines?symbol=BNBUSDT&interval=${cfg.interval}&limit=${cfg.limit}`,{Accept:'application/json','User-Agent':'Kiber-BNB-Intelligence/27.1'});
-        const candles=(Array.isArray(raw)?raw:[]).map(k=>({t:Math.floor(Number(k?.[0])/1000),open:n(k?.[1]),high:n(k?.[2]),low:n(k?.[3]),close:n(k?.[4]),volume:n(k?.[5]),quoteVolume:n(k?.[7])})).filter(x=>Number.isFinite(x.t)&&[x.open,x.high,x.low,x.close].every(v=>v!==null));
+        let raw=[];let remaining=cfg.limit,endTime=null;
+        while(remaining>0){
+          const lim=Math.min(1000,remaining),end=endTime?`&endTime=${endTime}`:'';
+          const part=await get(`https://data-api.binance.vision/api/v3/klines?symbol=BNBUSDT&interval=${cfg.interval}&limit=${lim}${end}`,{Accept:'application/json','User-Agent':'Kiber-BNB-Intelligence/27.4'});
+          if(!Array.isArray(part)||!part.length)break;
+          raw=[...part,...raw];remaining-=part.length;
+          const first=Number(part[0]?.[0]);if(!Number.isFinite(first)||part.length<lim)break;endTime=first-1;
+        }
+        const seen=new Set();const candles=(Array.isArray(raw)?raw:[]).map(k=>({t:Math.floor(Number(k?.[0])/1000),open:n(k?.[1]),high:n(k?.[2]),low:n(k?.[3]),close:n(k?.[4]),volume:n(k?.[5]),quoteVolume:n(k?.[7])})).filter(x=>Number.isFinite(x.t)&&[x.open,x.high,x.low,x.close].every(v=>v!==null)&&(!seen.has(x.t)&&seen.add(x.t)));
         if(candles.length>2)return res.status(200).json({ok:true,asset:'BNB',pair:'BNBUSDT',days:cfg.days,interval:cfg.interval,candles,source:'Binance Spot public market data',updatedAt:new Date().toISOString()});
       }catch(e){}
       const d=await get(`https://api.coingecko.com/api/v3/coins/binancecoin/market_chart?vs_currency=usd&days=${cfg.days}`,headers);
@@ -88,7 +95,7 @@ module.exports = async function handler(req,res){
     }
 
     if(type==='bnb_chart'){
-      const allowed=[1,7,30,90,365];
+      const allowed=[1,7,30,90,365,1095];
       const asked=Math.max(1,Number(req.query?.days||30)||30);
       const days=allowed.reduce((best,x)=>Math.abs(x-asked)<Math.abs(best-asked)?x:best,30);
       res.setHeader('Cache-Control','s-maxage=60, stale-while-revalidate=180');
