@@ -1,4 +1,4 @@
-const VERSION='27.4.0';
+const VERSION='27.5.0';
 const num=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Number(v):null);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function pct(v){v=num(v);return v===null?'—':`${v>=0?'+':''}${v.toFixed(2)}%`}
@@ -46,9 +46,28 @@ function enrichEvaluation(e){
 }
 function chooseEvaluation(body){const e=(body?.token?.symbol||body?.token?.name)?tokenEvaluation(body):(/chain|rete|tvl|dex/.test(String(body?.message||'').toLowerCase())?chainEvaluation(body):bnbEvaluation(body));return enrichEvaluation(e)}
 function icon(d){return d==='RIALZISTA'?'🟢':d==='RIBASSISTA'?'🔴':'🟡'}
+function chartOracleFallback(body,e){
+  const chart=body?.analysis?.chart||{},i=body?.tokenIntel||{},b=body?.bnb||{},ch=body?.chain||{},news=body?.marketNews||{},f=body?.analysis?.forensics||null;
+  const t=i?.technical||{},token=i?.token||{},parts=[];
+  parts.push(icon(e.direction)+' '+e.direction+' · '+e.subject+(e.symbol?' ('+e.symbol+')':''));
+  const why=[...(e.confirmations||[]).slice(0,4),...(e.contradictions||[]).slice(0,3).map(x=>'contro: '+x)];
+  parts.push('PERCHÉ È QUI\n'+(why.length?why.join(' · '):'I dati disponibili non spiegano ancora il movimento con sufficiente forza.'));
+  const tech=[];if(num(t.rsi14)!==null)tech.push('RSI '+num(t.rsi14).toFixed(1));if(num(t.support)!==null)tech.push('supporto '+money(t.support));if(num(t.resistance)!==null)tech.push('resistenza '+money(t.resistance));if(num(t.volumeTrend)!==null)tech.push('trend volume '+pct(t.volumeTrend));if(chart.periodChange)tech.push('periodo '+String(chart.periodChange));if(chart.days)tech.push('finestra '+chart.days+' giorni');
+  parts.push('GRAFICO E LIVELLI\n'+(tech.length?tech.join(' · '):'Livelli tecnici non sufficientemente disponibili dalla fonte corrente.'));
+  const liq=num(token.liquidityUsd??e.liquidityUsd),flow=[];if(liq!==null)flow.push('liquidità '+money(liq));const buys=num(token.buys24h),sells=num(token.sells24h);if(buys!==null&&sells!==null)flow.push('buy/sell '+buys+'/'+sells);if(num(b.volume24)!==null)flow.push('volume BNB 24h '+money(b.volume24));if(num(ch.dexVolume24)!==null)flow.push('DEX BNB Chain 24h '+money(ch.dexVolume24));
+  parts.push('LIQUIDITÀ E FLUSSI\n'+(flow.length?flow.join(' · '):'Nessun dato di liquidità/flusso abbastanza completo per attribuire il movimento.'));
+  const chain=[];if(num(b.change24)!==null)chain.push('BNB 24h '+pct(b.change24));if(num(ch.dexChange1d)!==null)chain.push('DEX 24h '+pct(ch.dexChange1d));if(num(ch.tvlChange7d)!==null)chain.push('TVL 7g '+pct(ch.tvlChange7d));if(num(ch.tvlChange30d)!==null)chain.push('TVL 30g '+pct(ch.tvlChange30d));const pos=num(news?.counts?.positive)||0,neg=num(news?.counts?.negative)||0;if(pos||neg)chain.push('news +'+pos+'/-'+neg);
+  parts.push('CONTESTO ESTERNO\n'+(chain.length?chain.join(' · '):'Il contesto chain/news non è abbastanza completo in questa chiamata.'));
+  if(f?.event){const ev=f.event,cy=f.cycles||{};parts.push('CICLO OSSERVATO\n'+String(ev.type||'evento')+' '+pct(ev.changePct)+' in '+(num(ev.durationHours)!==null?num(ev.durationHours).toFixed(1)+'h':'durata non disponibile')+(num(cy.sameTypeAvgGapHours)!==null?' · ricorrenza media '+(num(cy.sameTypeAvgGapHours)/24).toFixed(1)+' giorni':'')+'. Frequenza storica, non previsione certa.')} 
+  const trigger=[];if(num(t.resistance)!==null)trigger.push('conferma sopra '+money(t.resistance)+' con volume');if(num(t.support)!==null)trigger.push('lettura indebolita sotto '+money(t.support));if(!trigger.length)trigger.push('serve convergenza tra prezzo, volume/liquidità e dati della chain');
+  const scen=e.direction==='RIALZISTA'?'Struttura favorevole ma da confermare.':e.direction==='RIBASSISTA'?'Struttura debole: evitare di chiamare inversione finché non compaiono conferme.':'Equilibrio: al momento non c’è una rottura direzionale abbastanza supportata.';
+  parts.push('SCENARIO\n'+scen+' '+trigger.join(' · ')+'.');
+  parts.push('AFFIDABILITÀ\nQualità dati '+e.quality+'/100 ('+e.qualityLabel+'). Dati mancanti: '+((e.missing||[]).length?e.missing.join(', '):'nessuno tra quelli previsti')+'.');
+  return parts.join('\n\n');
+}
 function deterministic(body){
   if(body?.analysis?.forensics)return forensicsFallback(body);
-  const e=chooseEvaluation(body),mode=String(body?.analysisMode||'summary');const confirmations=e.confirmations.length?e.confirmations.join(' · '):'nessuna conferma forte';const contradictions=e.contradictions.length?e.contradictions.join(' · '):'nessuna contraddizione forte';const missing=e.missing.length?e.missing.join(', '):'nessun dato essenziale mancante';
+  const e=chooseEvaluation(body),mode=String(body?.analysisMode||'summary');if(mode==='chartoracle')return chartOracleFallback(body,e);const confirmations=e.confirmations.length?e.confirmations.join(' · '):'nessuna conferma forte';const contradictions=e.contradictions.length?e.contradictions.join(' · '):'nessuna contraddizione forte';const missing=e.missing.length?e.missing.join(', '):'nessun dato essenziale mancante';
   let focus='';if(mode==='risk')focus='\n\nRischio: concentra la verifica su liquidità, volatilità, struttura del pool, flussi e dati mancanti.';if(mode==='contrarian')focus='\n\nVerifica contrarian: i segnali che potrebbero rendere sbagliata questa lettura sono soprattutto quelli elencati tra le contraddizioni e le invalidazioni tecniche.';
   return `${icon(e.direction)} ${e.direction}\n${e.subject}${e.symbol?` (${e.symbol})`:''}\n\nConferme: ${confirmations}\n\nContraddizioni: ${contradictions}\n\nQualità dati: ${e.qualityLabel} (${e.quality}/100). Dati mancanti: ${missing}.\n\nCosa cambia la lettura: rottura dei livelli tecnici, inversione di volume/flussi, variazioni forti di liquidità, TVL/DEX o nuove informazioni ad alto impatto.${focus}\n\nKiber score ${e.score>=0?'+':''}${e.score}/100. È uno score di scenario, non una probabilità né una garanzia di rendimento.`;
 }
