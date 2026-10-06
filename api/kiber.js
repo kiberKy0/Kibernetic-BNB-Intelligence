@@ -76,7 +76,7 @@ async function gatewayCall(credential,{instructions,input}){
   let last=null;
   for(const model of models){
     try{
-      const r=await fetch('https://ai-gateway.vercel.sh/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+credential,'Content-Type':'application/json'},body:JSON.stringify({model,instructions,input,max_output_tokens:2600,...(useWebSearch?{tools:[{type:'web_search'}]}:{})})});
+      const r=await fetch('https://ai-gateway.vercel.sh/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+credential,'Content-Type':'application/json'},body:JSON.stringify({model,instructions,input,max_output_tokens:2600})});
       const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d?.error?.message||`AI Gateway ${r.status}`);const answer=d.output_text||((d.output||[]).flatMap(x=>x.content||[]).find(x=>x.type==='output_text')?.text)||'';if(!answer)throw new Error('Empty AI Gateway response');return{answer,provider:'vercel-ai-gateway',model};
     }catch(e){last=e}
   }
@@ -88,7 +88,7 @@ async function openaiCall(key,{instructions,input,useWebSearch=false}){
   let last=null;
   for(const model of models){
     try{
-      const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({model,instructions,input,max_output_tokens:2600})});
+      const r=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({model,instructions,input,max_output_tokens:2600,...(useWebSearch?{tools:[{type:'web_search'}]}:{})})});
       const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d?.error?.message||`OpenAI ${r.status}`);const answer=d.output_text||((d.output||[]).flatMap(x=>x.content||[]).find(x=>x.type==='output_text')?.text)||'';if(!answer)throw new Error('Empty OpenAI response');return{answer,provider:'openai',model};
     }catch(e){last=e}
   }
