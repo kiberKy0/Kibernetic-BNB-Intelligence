@@ -26,7 +26,7 @@ module.exports=async function handler(req,res){
       get('https://api.llama.fi/v2/chains'),
       get('https://stablecoins.llama.fi/stablecoinchains'),
       get('https://api.llama.fi/overview/dexs/BSC?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true'),
-      get('https://api.coingecko.com/api/v3/coins/binancecoin/market_chart?vs_currency=usd&days=90&interval=daily',cgHeaders),
+      get('https://api.coingecko.com/api/v3/coins/binancecoin/market_chart?vs_currency=usd&days=1095&interval=daily',cgHeaders),
       get('https://api.llama.fi/v2/historicalChainTvl/BSC')
     ]);
     const bnb=Array.isArray(bnbR.value)?bnbR.value[0]:null;
@@ -37,8 +37,8 @@ module.exports=async function handler(req,res){
     const stableUsd=val(stable?.totalCirculatingUSD?.peggedUSD??stable?.totalCirculatingUSD??stable?.totalCirculating?.peggedUSD);
     const dex=dexR.status==='fulfilled'&&dexR.value&&typeof dexR.value==='object'?dexR.value:{};
     const marketCap=val(bnb?.market_cap),tvl=val(chain?.tvl),dex24=val(dex?.total24h),dex7=val(dex?.total7d);
-    const bnbHistory=bnbHistR.status==='fulfilled'?normalizeSeries(bnbHistR.value?.prices||[],0,1).slice(-95):[];
-    const tvlHistory=tvlHistR.status==='fulfilled'?normalizeSeries(tvlHistR.value||[],0,1).slice(-120):[];
+    const bnbHistory=bnbHistR.status==='fulfilled'?normalizeSeries(bnbHistR.value?.prices||[],0,1).slice(-1100):[];
+    const tvlHistory=tvlHistR.status==='fulfilled'?normalizeSeries(tvlHistR.value||[],0,1).slice(-1100):[];
     const payload={
       ok:!!(bnb||chain||stable),source:'CoinGecko + DefiLlama',updatedAt:new Date().toISOString(),
       bnb:{price:val(bnb?.current_price),change24:val(bnb?.price_change_percentage_24h),marketCap,fdv:val(bnb?.fully_diluted_valuation),volume24:val(bnb?.total_volume),high24:val(bnb?.high_24h),low24:val(bnb?.low_24h)},
