@@ -1,4 +1,4 @@
-const VERSION='27.3.0';
+const VERSION='27.4.0';
 const num=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Number(v):null);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function pct(v){v=num(v);return v===null?'—':`${v>=0?'+':''}${v.toFixed(2)}%`}
@@ -39,7 +39,12 @@ function bnbEvaluation(body){
   if(ch.quality>=50){present++;score+=ch.score*.22;(ch.score>=0?confirm:contradict).push(`contesto Chain ${ch.direction.toLowerCase()}`)}else missing.push('contesto Chain');
   score=Math.round(clamp(score,-100,100));const quality=Math.round(clamp(present/total*100,0,100));return{subject:'BNB',score,direction:direction(score),quality,qualityLabel:qualityLabel(quality),confirmations:unique(confirm).slice(0,6),contradictions:unique(contradict).slice(0,6),missing:unique(missing).slice(0,6),horizon:'24-72h'};
 }
-function chooseEvaluation(body){if(body?.token?.symbol||body?.token?.name)return tokenEvaluation(body);const q=String(body?.message||'').toLowerCase();return /chain|rete|tvl|dex/.test(q)?chainEvaluation(body):bnbEvaluation(body)}
+function enrichEvaluation(e){
+  const pos=(e.confirmations||[]).length,neg=(e.contradictions||[]).length,total=pos+neg;
+  const agree=total?Math.max(pos,neg)/total:0;
+  return {...e,dataQuality:e.quality,evidenceCount:total,convergence:e.quality<40?'BASSA':agree>=.75?'ALTA':agree>=.55?'MEDIA':'BASSA'};
+}
+function chooseEvaluation(body){const e=(body?.token?.symbol||body?.token?.name)?tokenEvaluation(body):(/chain|rete|tvl|dex/.test(String(body?.message||'').toLowerCase())?chainEvaluation(body):bnbEvaluation(body));return enrichEvaluation(e)}
 function icon(d){return d==='RIALZISTA'?'🟢':d==='RIBASSISTA'?'🔴':'🟡'}
 function deterministic(body){
   if(body?.analysis?.forensics)return forensicsFallback(body);
@@ -71,13 +76,13 @@ async function gatewayCall(credential,{instructions,input}){
   let last=null;
   for(const model of models){
     try{
-      const r=await fetch('https://ai-gateway.vercel.sh/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+credential,'Content-Type':'application/json'},body:JSON.stringify({model,instructions,input,max_output_tokens:2600})});
+      const r=await fetch('https://ai-gateway.vercel.sh/v1/responses',{method:'POST',headers:{Authorization:'Bearer '+credential,'Content-Type':'application/json'},body:JSON.stringify({model,instructions,input,max_output_tokens:2600,...(useWebSearch?{tools:[{type:'web_search'}]}:{})})});
       const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d?.error?.message||`AI Gateway ${r.status}`);const answer=d.output_text||((d.output||[]).flatMap(x=>x.content||[]).find(x=>x.type==='output_text')?.text)||'';if(!answer)throw new Error('Empty AI Gateway response');return{answer,provider:'vercel-ai-gateway',model};
     }catch(e){last=e}
   }
   throw last||new Error('AI Gateway unavailable');
 }
-async function openaiCall(key,{instructions,input}){
+async function openaiCall(key,{instructions,input,useWebSearch=false}){
   const preferred=String(process.env.OPENAI_MODEL||'').trim();
   const models=[preferred,...(!preferred?['gpt-6-astra','gpt-6-sol','gpt-6-luna']:[])].filter(Boolean);
   let last=null;
@@ -94,6 +99,8 @@ async function callProvider(payload){
   if(openaiKey)attempts.push(()=>openaiCall(openaiKey,payload));if(gatewayKey)attempts.push(()=>gatewayCall(gatewayKey,payload));if(!gatewayKey&&oidc)attempts.push(()=>gatewayCall(oidc,payload));
   let last=null;for(const run of attempts){try{return await run()}catch(e){last=e}}throw last||new Error('No AI credential available');
 }
+function isCasual(q){q=String(q||'').trim().toLowerCase();return /^(ciao|salve|buongiorno|buonasera|come stai|come va|chi sei|che fai|grazie|ok|perfetto|bene)[!?., ]*$/.test(q)}
+function casualFallback(q){const x=String(q||'').toLowerCase();if(/come stai|come va/.test(x))return 'Sto bene. Sono operativo e pronto a ragionare con te. Se vuoi parlare normalmente, parliamo normalmente; se passi a BNB o a un token, cambio modalità e uso i dati disponibili.';if(/chi sei/.test(x))return 'Sono Kiber, l’assistente della piattaforma. Posso conversare normalmente e, quando la domanda riguarda mercato o BNB Chain, passare all’analisi dei dati.';if(/grazie/.test(x))return 'Figurati. Almeno una cosa oggi funziona senza aprire dodici pannelli.';return 'Ci sono. Puoi parlarmi normalmente oppure chiedermi un’analisi su BNB, BNB Chain o una moneta.'}
 function sanitizeContext(body,e){
   const token=body.token?{symbol:String(body.token.symbol||'').slice(0,30),name:String(body.token.name||'').slice(0,120),address:String(body.token.address||'').slice(0,80),price:num(body.token.price??body.token.priceUsd),change24:num(body.token.change24??body.token.priceChange?.h24),change7d:num(body.token.change7d),change30d:num(body.token.change30d),marketCap:num(body.token.marketCap??body.token.fdv),volume24:num(body.token.volume24??body.token.volume?.h24),liquidityUsd:num(body.token.liquidityUsd??body.token.liquidity?.usd),rank:num(body.token.rank),categories:Array.isArray(body.token.categories)?body.token.categories.slice(0,10):[]}:null;
   return{version:VERSION,analysisMode:String(body.analysisMode||'summary').slice(0,40),oracleEvaluation:e,bnb:body.bnb||null,chain:body.chain||null,intelligence:body.intelligence||null,token,tokenIntel:body.tokenIntel||null,marketNews:body.marketNews?.items?{counts:body.marketNews.counts||null,marketNewsBalance:body.marketNews.marketNewsBalance||null,items:body.marketNews.items.slice(0,18)}:body.marketNews||null,tokenNews:body.tokenNews?.items?{counts:body.tokenNews.counts||null,items:body.tokenNews.items.slice(0,12)}:null,analysis:body.analysis||null,conversation:(body.conversation||[]).slice(-10).map(m=>({role:m.role==='assistant'?'assistant':'user',content:String(m.content||'').slice(0,1600)}))};
@@ -101,14 +108,15 @@ function sanitizeContext(body,e){
 module.exports=async function handler(req,res){
   if(req.method==='GET'){
     const provider=process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
-    return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,capabilities:['bnb','chain','token360','scenario','risk','contrarian','newsimpact','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','data-quality','model-fallback','fallback']});
+    return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,capabilities:['conversation','bnb','chain','token360','scenario','risk','contrarian','newsimpact','chartoracle','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','web-search-when-openai','data-quality','model-fallback','fallback']});
   }
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
   try{
-    const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{},evaluation=chooseEvaluation(body),context=sanitizeContext(body,evaluation),question=String(body.message||'').slice(0,3600);
-    const instructions=`Sei Kiber AI, motore di intelligence per BNB Chain. Devi essere versatile ma rigoroso. Dai prima il verdetto quando i dati lo consentono: 🟢 RIALZISTA, 🟡 NEUTRALE o 🔴 RIBASSISTA. Subito dopo separa: 1) conferme, 2) contraddizioni, 3) rischio e qualità dei dati, 4) cosa invaliderebbe lo scenario. Usa soltanto il contesto fornito. Non inventare prezzi, holder, notizie, target, probabilità, partnership, cause o dati mancanti. Se le fonti sono incomplete o contraddittorie, privilegia NEUTRALE e dichiaralo. Lo score Kiber misura convergenza dei segnali e la qualità dati misura completezza/coerenza: nessuno dei due è probabilità di profitto. Distingui sempre BNB, BNB Chain, token, pool e protocollo. Per richieste contrarian cerca attivamente prove contro la tesi corrente. Per richieste risk evidenzia liquidità, volatilità, flussi, concentrazione, giovinezza del pool e dati mancanti. Niente ordini di acquisto o promesse di rendimento. Se analysisMode è eventforensics, cycles o futureimpact usa analysis.forensics come una ricostruzione investigativa del movimento: separa movente supportato, correlazione temporale e causalità non dimostrata; descrivi fasi UP/DOWN, volume, eventuale liquidità storica realmente archiviata, ricorrenza e limiti del campione. Non inventare liquidità passata o news che non sono nel contesto. La frequenza storica non è una previsione certa.`;
+    const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{},evaluation=chooseEvaluation(body),context=sanitizeContext(body,evaluation),question=String(body.message||'').slice(0,3600),casual=isCasual(question);
+    const instructions=`Sei Kiber AI, assistente conversazionale e motore di intelligence per BNB Chain. Hai una personalità stabile: diretto, chiaro, curioso e prudente quando i dati sono deboli. Se la domanda è conversazionale o non finanziaria, rispondi normalmente senza forzare analisi di mercato. Se la domanda è finanziaria, devi essere versatile ma rigoroso. Dai prima il verdetto quando i dati lo consentono: 🟢 RIALZISTA, 🟡 NEUTRALE o 🔴 RIBASSISTA. Subito dopo separa: 1) conferme, 2) contraddizioni, 3) rischio e qualità dei dati, 4) cosa invaliderebbe lo scenario. Usa soltanto il contesto fornito. Non inventare prezzi, holder, notizie, target, probabilità, partnership, cause o dati mancanti. Se le fonti sono incomplete o contraddittorie, privilegia NEUTRALE e dichiaralo. Lo score Kiber misura convergenza dei segnali e la qualità dati misura completezza/coerenza: nessuno dei due è probabilità di profitto. Distingui sempre BNB, BNB Chain, token, pool e protocollo. Per richieste contrarian cerca attivamente prove contro la tesi corrente. Per richieste risk evidenzia liquidità, volatilità, flussi, concentrazione, giovinezza del pool e dati mancanti. Niente ordini di acquisto o promesse di rendimento. Se analysisMode è eventforensics, cycles o futureimpact usa analysis.forensics come una ricostruzione investigativa del movimento: separa movente supportato, correlazione temporale e causalità non dimostrata; descrivi fasi UP/DOWN, volume, eventuale liquidità storica realmente archiviata, ricorrenza e limiti del campione. Non inventare liquidità passata o news che non sono nel contesto. La frequenza storica non è una previsione certa.`;
     const input=`CONTESTO KIBER ${VERSION}:\n${JSON.stringify(context)}\n\nDOMANDA:\n${question}`;
-    try{const out=await callProvider({instructions,input});return res.status(200).json({...out,evaluation,assessment:evaluation,analysisMode:context.analysisMode,version:VERSION})}
-    catch(aiError){return res.status(200).json({answer:deterministic(body),provider:'deterministic',model:null,evaluation,assessment:evaluation,analysisMode:context.analysisMode,version:VERSION,warning:String(aiError.message||aiError).slice(0,220)})}
+    const mode=String(context.analysisMode||'summary'),useWebSearch=!casual&&['token360','scenario','newsimpact','chartoracle','eventforensics','futureimpact','macro','summary'].includes(mode);
+    try{const out=await callProvider({instructions,input,useWebSearch});return res.status(200).json({...out,evaluation,assessment:evaluation,analysisMode:context.analysisMode,webSearchEnabled:useWebSearch,version:VERSION})}
+    catch(aiError){return res.status(200).json({answer:casual?casualFallback(question):deterministic(body),provider:'deterministic',model:null,evaluation,assessment:evaluation,analysisMode:context.analysisMode,webSearchEnabled:false,version:VERSION,warning:String(aiError.message||aiError).slice(0,220)})}
   }catch(e){return res.status(500).json({error:'Kiber backend error',detail:String(e.message||e).slice(0,180),version:VERSION})}
 };
