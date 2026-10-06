@@ -1,4 +1,4 @@
-const VERSION='27.2.1';
+const VERSION='27.3.0';
 const num=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Number(v):null);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function pct(v){v=num(v);return v===null?'—':`${v>=0?'+':''}${v.toFixed(2)}%`}
@@ -42,10 +42,29 @@ function bnbEvaluation(body){
 function chooseEvaluation(body){if(body?.token?.symbol||body?.token?.name)return tokenEvaluation(body);const q=String(body?.message||'').toLowerCase();return /chain|rete|tvl|dex/.test(q)?chainEvaluation(body):bnbEvaluation(body)}
 function icon(d){return d==='RIALZISTA'?'🟢':d==='RIBASSISTA'?'🔴':'🟡'}
 function deterministic(body){
+  if(body?.analysis?.forensics)return forensicsFallback(body);
   const e=chooseEvaluation(body),mode=String(body?.analysisMode||'summary');const confirmations=e.confirmations.length?e.confirmations.join(' · '):'nessuna conferma forte';const contradictions=e.contradictions.length?e.contradictions.join(' · '):'nessuna contraddizione forte';const missing=e.missing.length?e.missing.join(', '):'nessun dato essenziale mancante';
   let focus='';if(mode==='risk')focus='\n\nRischio: concentra la verifica su liquidità, volatilità, struttura del pool, flussi e dati mancanti.';if(mode==='contrarian')focus='\n\nVerifica contrarian: i segnali che potrebbero rendere sbagliata questa lettura sono soprattutto quelli elencati tra le contraddizioni e le invalidazioni tecniche.';
   return `${icon(e.direction)} ${e.direction}\n${e.subject}${e.symbol?` (${e.symbol})`:''}\n\nConferme: ${confirmations}\n\nContraddizioni: ${contradictions}\n\nQualità dati: ${e.qualityLabel} (${e.quality}/100). Dati mancanti: ${missing}.\n\nCosa cambia la lettura: rottura dei livelli tecnici, inversione di volume/flussi, variazioni forti di liquidità, TVL/DEX o nuove informazioni ad alto impatto.${focus}\n\nKiber score ${e.score>=0?'+':''}${e.score}/100. È uno score di scenario, non una probabilità né una garanzia di rendimento.`;
 }
+
+function forensicsFallback(body){
+  const f=body?.analysis?.forensics||{},ev=f.event||{},att=f.attribution||{},cy=f.cycles||{},ph=Array.isArray(f.phases)?f.phases:[];
+  const type=String(ev.type||'EVENTO'),change=num(ev.changePct),hours=num(ev.durationHours),ratio=num(ev.volumeRatio),liq=num(att.historicalLiquidity),linked=Array.isArray(att.linkedNews)?att.linkedNews:[],cls=String(att.classification||'SCONOSCIUTA');
+  const causes=Array.isArray(att.factors)&&att.factors.length?att.factors.join(' · '):'nessun movente esterno abbastanza documentato';
+  const process=ph.length?ph.map(x=>String(x.label||'fase')+' '+pct(x.changePct)).join(' → '):'fasi non sufficientemente dettagliate';
+  const gap=num(cy.sameTypeAvgGapHours),same=num(cy.sameTypeCount),mode=String(body?.analysisMode||'eventforensics');
+  let tail='';
+  if(mode==='cycles')tail='\n\nRicorrenza: '+(same===null?'—':same+' casi dello stesso tipo')+(gap===null?'':', intervallo medio '+(gap/24).toFixed(1)+' giorni')+'. È frequenza storica del campione, non una previsione certa.';
+  if(mode==='futureimpact')tail='\n\nProssimo movimento: controllare conferma o inversione di volume, livelli tecnici, liquidità, flussi e nuove informazioni ad alto impatto. Se questi segnali non convergono, il responso deve restare prudente.';
+  return type+' '+pct(change)+' in '+(hours===null?'—':hours.toFixed(1)+'h')+
+    '\n\nMovente: '+cls+'. '+causes+
+    '\n\nProcesso: '+process+
+    '\n\nVolume: '+(ratio===null?'storico non sufficiente':ratio.toFixed(2)+'× rispetto alla finestra precedente')+
+    '\n\nLiquidità storica: '+(liq===null?'non archiviata per questa data':money(liq))+
+    '\n\nNews/eventi vicini: '+linked.length+'. La vicinanza temporale è correlazione, non prova automatica di causalità.'+tail;
+}
+
 async function gatewayCall(credential,{instructions,input}){
   const preferred=String(process.env.AI_GATEWAY_MODEL||'').trim();
   const models=[preferred,...(!preferred?['openai/gpt-6-astra','openai/gpt-6-sol','openai/gpt-6-luna']:[])].filter(Boolean);
@@ -82,12 +101,12 @@ function sanitizeContext(body,e){
 module.exports=async function handler(req,res){
   if(req.method==='GET'){
     const provider=process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
-    return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,capabilities:['bnb','chain','token360','scenario','risk','contrarian','newsimpact','data-quality','model-fallback','fallback']});
+    return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,capabilities:['bnb','chain','token360','scenario','risk','contrarian','newsimpact','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','data-quality','model-fallback','fallback']});
   }
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
   try{
     const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{},evaluation=chooseEvaluation(body),context=sanitizeContext(body,evaluation),question=String(body.message||'').slice(0,3600);
-    const instructions=`Sei Kiber AI, motore di intelligence per BNB Chain. Devi essere versatile ma rigoroso. Dai prima il verdetto quando i dati lo consentono: 🟢 RIALZISTA, 🟡 NEUTRALE o 🔴 RIBASSISTA. Subito dopo separa: 1) conferme, 2) contraddizioni, 3) rischio e qualità dei dati, 4) cosa invaliderebbe lo scenario. Usa soltanto il contesto fornito. Non inventare prezzi, holder, notizie, target, probabilità, partnership, cause o dati mancanti. Se le fonti sono incomplete o contraddittorie, privilegia NEUTRALE e dichiaralo. Lo score Kiber misura convergenza dei segnali e la qualità dati misura completezza/coerenza: nessuno dei due è probabilità di profitto. Distingui sempre BNB, BNB Chain, token, pool e protocollo. Per richieste contrarian cerca attivamente prove contro la tesi corrente. Per richieste risk evidenzia liquidità, volatilità, flussi, concentrazione, giovinezza del pool e dati mancanti. Niente ordini di acquisto o promesse di rendimento.`;
+    const instructions=`Sei Kiber AI, motore di intelligence per BNB Chain. Devi essere versatile ma rigoroso. Dai prima il verdetto quando i dati lo consentono: 🟢 RIALZISTA, 🟡 NEUTRALE o 🔴 RIBASSISTA. Subito dopo separa: 1) conferme, 2) contraddizioni, 3) rischio e qualità dei dati, 4) cosa invaliderebbe lo scenario. Usa soltanto il contesto fornito. Non inventare prezzi, holder, notizie, target, probabilità, partnership, cause o dati mancanti. Se le fonti sono incomplete o contraddittorie, privilegia NEUTRALE e dichiaralo. Lo score Kiber misura convergenza dei segnali e la qualità dati misura completezza/coerenza: nessuno dei due è probabilità di profitto. Distingui sempre BNB, BNB Chain, token, pool e protocollo. Per richieste contrarian cerca attivamente prove contro la tesi corrente. Per richieste risk evidenzia liquidità, volatilità, flussi, concentrazione, giovinezza del pool e dati mancanti. Niente ordini di acquisto o promesse di rendimento. Se analysisMode è eventforensics, cycles o futureimpact usa analysis.forensics come una ricostruzione investigativa del movimento: separa movente supportato, correlazione temporale e causalità non dimostrata; descrivi fasi UP/DOWN, volume, eventuale liquidità storica realmente archiviata, ricorrenza e limiti del campione. Non inventare liquidità passata o news che non sono nel contesto. La frequenza storica non è una previsione certa.`;
     const input=`CONTESTO KIBER ${VERSION}:\n${JSON.stringify(context)}\n\nDOMANDA:\n${question}`;
     try{const out=await callProvider({instructions,input});return res.status(200).json({...out,evaluation,assessment:evaluation,analysisMode:context.analysisMode,version:VERSION})}
     catch(aiError){return res.status(200).json({answer:deterministic(body),provider:'deterministic',model:null,evaluation,assessment:evaluation,analysisMode:context.analysisMode,version:VERSION,warning:String(aiError.message||aiError).slice(0,220)})}
