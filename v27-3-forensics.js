@@ -70,6 +70,6 @@ async function ask(mode){
 function clickChart(e){const el=e.target.closest?.("#v271Chart");if(!el||!F.series.length)return;const r=el.getBoundingClientRect(),i=Math.round(clamp((e.clientX-r.left)/Math.max(1,r.width),0,1)*(F.series.length-1));let ev=F.events.find(x=>i>=x.start&&i<=x.end);if(!ev&&F.events.length)ev=[...F.events].sort((a,b)=>Math.min(Math.abs(i-a.start),Math.abs(i-a.end))-Math.min(Math.abs(i-b.start),Math.abs(i-b.end)))[0];if(ev)select(ev.id,i)}
 function sig(){const c=C();if(!c?.coin)return"";const a=series();return key(c.coin)+"|"+c.days+"|"+a.length+"|"+(a.at(-1)?.t||0)+"|"+(c.intel?.token?.liquidityUsd||"")}
 function tick(){ensure();const s=sig();if(s&&s!==F.sig){F.sig=s;F.selected=null;render()}else if(s)save()}
-function boot(){document.body.classList.add("v273");document.addEventListener("click",clickChart,true);setInterval(tick,1200);setTimeout(tick,350)}
+function boot(){document.body.classList.add("v273");window.kiberForensicsContext=()=>payload();document.addEventListener("click",clickChart,true);setInterval(tick,1200);setTimeout(tick,350)}
 document.readyState==="loading"?document.addEventListener("DOMContentLoaded",boot,{once:true}):boot();
 })();
