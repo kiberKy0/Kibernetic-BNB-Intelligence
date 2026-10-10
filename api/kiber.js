@@ -1,4 +1,4 @@
-const VERSION='27.5.0';
+const VERSION='27.5.1';
 const num=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Number(v):null);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function pct(v){v=num(v);return v===null?'—':`${v>=0?'+':''}${v.toFixed(2)}%`}
@@ -44,7 +44,7 @@ function enrichEvaluation(e){
   const agree=total?Math.max(pos,neg)/total:0;
   return {...e,dataQuality:e.quality,evidenceCount:total,convergence:e.quality<40?'BASSA':agree>=.75?'ALTA':agree>=.55?'MEDIA':'BASSA'};
 }
-function chooseEvaluation(body){const e=(body?.token?.symbol||body?.token?.name)?tokenEvaluation(body):(/chain|rete|tvl|dex/.test(String(body?.message||'').toLowerCase())?chainEvaluation(body):bnbEvaluation(body));return enrichEvaluation(e)}
+function chooseEvaluation(body){const e=(body?.token?.symbol||body?.token?.name)?tokenEvaluation(body):(body?.analysisSubject==='bnb'?bnbEvaluation(body):body?.analysisSubject==='chain'?chainEvaluation(body):(/chain|rete|tvl|dex/.test(String(body?.message||'').toLowerCase())?chainEvaluation(body):bnbEvaluation(body)));return enrichEvaluation(e)}
 function icon(d){return d==='RIALZISTA'?'🟢':d==='RIBASSISTA'?'🔴':'🟡'}
 function chartOracleFallback(body,e){
   const chart=body?.analysis?.chart||{},i=body?.tokenIntel||{},b=body?.bnb||{},ch=body?.chain||{},news=body?.marketNews||{},f=body?.analysis?.forensics||null;
@@ -55,6 +55,7 @@ function chartOracleFallback(body,e){
   const tech=[];if(num(t.rsi14)!==null)tech.push('RSI '+num(t.rsi14).toFixed(1));if(num(t.support)!==null)tech.push('supporto '+money(t.support));if(num(t.resistance)!==null)tech.push('resistenza '+money(t.resistance));if(num(t.volumeTrend)!==null)tech.push('trend volume '+pct(t.volumeTrend));if(chart.periodChange)tech.push('periodo '+String(chart.periodChange));if(chart.days)tech.push('finestra '+chart.days+' giorni');
   parts.push('GRAFICO E LIVELLI\n'+(tech.length?tech.join(' · '):'Livelli tecnici non sufficientemente disponibili dalla fonte corrente.'));
   const liq=num(token.liquidityUsd??e.liquidityUsd),flow=[];if(liq!==null)flow.push('liquidità '+money(liq));const buys=num(token.buys24h),sells=num(token.sells24h);if(buys!==null&&sells!==null)flow.push('buy/sell '+buys+'/'+sells);if(num(b.volume24)!==null)flow.push('volume BNB 24h '+money(b.volume24));if(num(ch.dexVolume24)!==null)flow.push('DEX BNB Chain 24h '+money(ch.dexVolume24));
+  if(b.source)flow.push('fonte BNB: '+b.source+(b.volumeScope?' · '+b.volumeScope:''));
   parts.push('LIQUIDITÀ E FLUSSI\n'+(flow.length?flow.join(' · '):'Nessun dato di liquidità/flusso abbastanza completo per attribuire il movimento.'));
   const chain=[];if(num(b.change24)!==null)chain.push('BNB 24h '+pct(b.change24));if(num(ch.dexChange1d)!==null)chain.push('DEX 24h '+pct(ch.dexChange1d));if(num(ch.tvlChange7d)!==null)chain.push('TVL 7g '+pct(ch.tvlChange7d));if(num(ch.tvlChange30d)!==null)chain.push('TVL 30g '+pct(ch.tvlChange30d));const pos=num(news?.counts?.positive)||0,neg=num(news?.counts?.negative)||0;if(pos||neg)chain.push('news +'+pos+'/-'+neg);
   parts.push('CONTESTO ESTERNO\n'+(chain.length?chain.join(' · '):'Il contesto chain/news non è abbastanza completo in questa chiamata.'));
@@ -122,7 +123,7 @@ function isCasual(q){q=String(q||'').trim().toLowerCase();return /^(ciao|salve|b
 function casualFallback(q){const x=String(q||'').toLowerCase();if(/come stai|come va/.test(x))return 'Sto bene. Sono operativo e pronto a ragionare con te. Se vuoi parlare normalmente, parliamo normalmente; se passi a BNB o a un token, cambio modalità e uso i dati disponibili.';if(/chi sei/.test(x))return 'Sono Kiber, l’assistente della piattaforma. Posso conversare normalmente e, quando la domanda riguarda mercato o BNB Chain, passare all’analisi dei dati.';if(/grazie/.test(x))return 'Figurati. Almeno una cosa oggi funziona senza aprire dodici pannelli.';return 'Ci sono. Puoi parlarmi normalmente oppure chiedermi un’analisi su BNB, BNB Chain o una moneta.'}
 function sanitizeContext(body,e){
   const token=body.token?{symbol:String(body.token.symbol||'').slice(0,30),name:String(body.token.name||'').slice(0,120),address:String(body.token.address||'').slice(0,80),price:num(body.token.price??body.token.priceUsd),change24:num(body.token.change24??body.token.priceChange?.h24),change7d:num(body.token.change7d),change30d:num(body.token.change30d),marketCap:num(body.token.marketCap??body.token.fdv),volume24:num(body.token.volume24??body.token.volume?.h24),liquidityUsd:num(body.token.liquidityUsd??body.token.liquidity?.usd),rank:num(body.token.rank),categories:Array.isArray(body.token.categories)?body.token.categories.slice(0,10):[]}:null;
-  return{version:VERSION,analysisMode:String(body.analysisMode||'summary').slice(0,40),oracleEvaluation:e,bnb:body.bnb||null,chain:body.chain||null,intelligence:body.intelligence||null,token,tokenIntel:body.tokenIntel||null,marketNews:body.marketNews?.items?{counts:body.marketNews.counts||null,marketNewsBalance:body.marketNews.marketNewsBalance||null,items:body.marketNews.items.slice(0,18)}:body.marketNews||null,tokenNews:body.tokenNews?.items?{counts:body.tokenNews.counts||null,items:body.tokenNews.items.slice(0,12)}:null,analysis:body.analysis||null,conversation:(body.conversation||[]).slice(-10).map(m=>({role:m.role==='assistant'?'assistant':'user',content:String(m.content||'').slice(0,1600)}))};
+  return{version:VERSION,analysisMode:String(body.analysisMode||'summary').slice(0,40),analysisSubject:body.analysisSubject||null,oracleEvaluation:e,bnb:body.bnb||null,chain:body.chain||null,intelligence:body.intelligence||null,token,tokenIntel:body.tokenIntel||null,marketNews:body.marketNews?.items?{counts:body.marketNews.counts||null,marketNewsBalance:body.marketNews.marketNewsBalance||null,items:body.marketNews.items.slice(0,18)}:body.marketNews||null,tokenNews:body.tokenNews?.items?{counts:body.tokenNews.counts||null,items:body.tokenNews.items.slice(0,12)}:null,analysis:body.analysis||null,conversation:(body.conversation||[]).slice(-10).map(m=>({role:m.role==='assistant'?'assistant':'user',content:String(m.content||'').slice(0,1600)}))};
 }
 module.exports=async function handler(req,res){
   if(req.method==='GET'){
