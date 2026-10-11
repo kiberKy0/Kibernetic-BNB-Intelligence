@@ -2,7 +2,7 @@ module.exports=async function handler(req,res){
   if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});
   res.setHeader('Cache-Control','s-maxage=90, stale-while-revalidate=240');
   const n=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Number(v):null);
-  const get=async url=>{const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'Kiber-BNB-Intelligence/24.0'}});let d=null;try{d=await r.json()}catch{}if(!r.ok)throw new Error(`${r.status} ${url}`);return d};
+  const get=async url=>{const r=await fetch(url,{signal:AbortSignal.timeout(8000),headers:{Accept:'application/json','User-Agent':'Kiber-BNB-Intelligence/24.0'}});let d=null;try{d=await r.json()}catch{}if(!r.ok)throw new Error(`${r.status} ${url}`);return d};
   const ageHours=iso=>{const t=Date.parse(iso||'');return Number.isFinite(t)?Math.max(0,(Date.now()-t)/36e5):null};
   const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
 
@@ -59,7 +59,7 @@ module.exports=async function handler(req,res){
     const pools=(poolsR.status==='fulfilled'&&Array.isArray(poolsR.value?.data)?poolsR.value.data:[]).map(normalizePool).sort((a,b)=>b.attentionScore-a.attentionScore);
     const feesMap=feeIndex(feesR.status==='fulfilled'?feesR.value:null);
     const protocolsAll=protocolsR.status==='fulfilled'&&Array.isArray(protocolsR.value)?protocolsR.value:[];
-    const protocols=protocolsAll.filter(x=>(Array.isArray(x?.chains)?x.chains:[]).some(c=>String(c).toLowerCase()==='bsc')).map(x=>normalizeProtocol(x,feesMap)).sort((a,b)=>(b.fundamentalScore-a.fundamentalScore)||((b.tvl||0)-(a.tvl||0))).slice(0,30);
+    const protocols=protocolsAll.filter(x=>(Array.isArray(x?.chains)?x.chains:[]).some(c=>['bsc','binance','bnb chain','bnb smart chain'].includes(String(c).toLowerCase()))).map(x=>normalizeProtocol(x,feesMap)).sort((a,b)=>(b.fundamentalScore-a.fundamentalScore)||((b.tvl||0)-(a.tvl||0))).slice(0,30);
     const dex=dexR.status==='fulfilled'&&dexR.value&&typeof dexR.value==='object'?dexR.value:{};
     const attention=pools.filter(x=>x.attentionScore>=45).slice(0,10);
     const events=[];
