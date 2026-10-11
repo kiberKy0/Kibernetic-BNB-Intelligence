@@ -113,7 +113,7 @@ async function loadChart(){
   const token=++S.chartSeq,el=$('v271Chart'),coin=S.coin,days=S.days;if(!el)return;destroyChart();S.chartLoading=true;S.chartData=null;el.innerHTML='<div class="v271-loading">Aggiornamento grafico…</div>';
   try{
     const [chartR,intelR]=await Promise.allSettled([coin?.id?json(`/api/coingecko?type=coin_chart&id=${encodeURIComponent(coin.id)}&days=${days}&v=280`,{cache:'no-store'}):Promise.resolve(null),coin?.address&&days<=30?json(`/api/token-intel-v26?address=${encodeURIComponent(coin.address)}&period=${periodForIntel(days)}&v=280`,{cache:'no-store'}):Promise.resolve(null)]);
-    if(token!==S.chartSeq)return;S.chartData=chartR.status==='fulfilled'?chartR.value:null;
+    if(token!==S.chartSeq)return;let chartData=chartR.status==='fulfilled'?chartR.value:null;if(coin?.id==='binancecoin'&&!(chartData?.points?.length>=2)){try{const fallback=await json('/api/coingecko?type=bnb_ohlc&days='+days,{cache:'no-store'});chartData=window.KiberHistory?.closedBNB(fallback)||null}catch{chartData=null}}if(token!==S.chartSeq)return;S.chartData=chartData;
     if(coin?.address&&days<=30)S.intel=intelR.status==='fulfilled'&&intelR.value?intelR.value:{...S.intel,technical:{candles:[]}};
     S.chartLoading=false;renderCoin();await loadLib();if(token!==S.chartSeq)return;renderChart();
   }catch(e){if(token!==S.chartSeq)return;S.chartLoading=false;renderFallbackChart()}

@@ -1,0 +1,4 @@
+(function(root,factory){const value=factory();if(typeof module==='object'&&module.exports)module.exports=value;else root.KiberHistory=value})(typeof window==='object'?window:globalThis,function(){
+'use strict';
+function closedBNB(d,now=Date.now()){const step={'15m':900,'1h':3600,'4h':14400,'1d':86400}[d?.interval];if(!step||!String(d?.source||'').includes('Binance'))return null;const map=new Map();for(const x of d.candles||[]){const t=Number(x.t)*1000+step*1000,p=x.close==null?null:Number(x.close),volume=x.quoteVolume==null?null:Number(x.quoteVolume);if(Number.isFinite(t)&&t<=now&&Number.isFinite(p)&&p>0)map.set(t,{t,p,volume:Number.isFinite(volume)?volume:null})}const points=[...map.values()].sort((a,b)=>a.t-b.t);return points.length>=2?{points,source:d.source+' · barre chiuse',stepSeconds:step,volumeKind:'bar'}:null}
+return{closedBNB};});
