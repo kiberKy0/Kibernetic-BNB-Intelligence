@@ -30,11 +30,12 @@ test('Rapid chart period changes ignore the older response and disconnect observ
  const data={source:'Binance',candles:[1,2,3].map(t=>({t,open:1,high:2,low:1,close:2}))};pending[1]({ok:true,json:async()=>data});await recent;pending[0]({ok:true,json:async()=>data});await old;
  assert.deepEqual(renders,[7]);assert.equal(disconnected,1);
 });
-test('Overlapping Analyze calls cannot overwrite the latest subject',async()=>{
- const pending=[];const nodes={v275SheetAnswer:{classList:{add(){},remove(){}},textContent:''},v275SheetMeta:{textContent:''}};
- const c={module:{exports:{}},AbortSignal,console,window:{},document:{getElementById:id=>nodes[id],querySelector:()=>null},fetch:()=>new Promise(resolve=>pending.push(resolve))};vm.createContext(c);
- let source=fs.readFileSync(path.join(root,'v27-4-oracle.js'),'utf8');source=source.replace("document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();","ensureSheet=()=>{};marketContext=async()=>({});module.exports={run,state};");vm.runInContext(source,c);
- const {run}=c.module.exports;const old=run('main');await Promise.resolve();const recent=run('chain');await Promise.resolve();pending[1]({ok:true,json:async()=>({answer:'Chain latest',provider:'deterministic'})});await recent;pending[0]({ok:true,json:async()=>({answer:'BNB old',provider:'deterministic'})});await old;assert.equal(nodes.v275SheetAnswer.textContent,'Chain latest');
+test('Analyze forwards an isolated token and chart context to the shared chat',()=>{
+ const calls=[],coin={coin:{id:'cake',name:'CAKE'},days:7,chartData:{source:'pool'}};
+ const c={module:{exports:{}},window:{kiberTokenContext:()=>coin,v268OpenChat:(...args)=>calls.push(args)},document:{getElementById:id=>({textContent:'12%'}),querySelector:()=>null}};vm.createContext(c);
+ let source=fs.readFileSync(path.join(root,'v27-4-oracle.js'),'utf8');source=source.replace("document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();","module.exports={openSheet};");vm.runInContext(source,c);
+ c.module.exports.openSheet('token');coin.coin.name='Changed';c.module.exports.openSheet('chain');
+ assert.equal(calls[0][2].subject,'token');assert.equal(calls[0][2].tokenContext.coin.name,'CAKE');assert.equal(calls[0][2].chart.days,7);assert.equal(calls[0][1],true);assert.equal(calls[1][2].subject,'chain');assert.equal(calls[1][2].tokenContext,null);
 });
 test('Changes compares the selected asset and never substitutes Chain TVL for token liquidity',()=>{const c=load('api/kiber.js');const body={analysisSubject:'token',analysisMode:'changes',token:{name:'CAKE'},analysis:{previous:{at:1,price:2,liquidity:100,tvl:500},current:{at:2,price:3,liquidity:90,tvl:900}}};const answer=c.deterministic(body);assert.match(answer,/50.00%/);assert.match(answer,/-10.00%/);assert.doesNotMatch(answer,/TVL/);assert.match(c.deterministic({...body,analysis:{}}),/lettura precedente/)});
 test('Liquidity answer uses token figures and labels missing pool data',()=>{const c=load('api/kiber.js');const answer=c.deterministic({analysisSubject:'token',analysisMode:'liquidity',token:{name:'CAKE',volume24:42},bnb:{volume24:999999}});assert.match(answer,/42/);assert.doesNotMatch(answer,/999/);assert.match(answer,/Liquidità pool: —/)});

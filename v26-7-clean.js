@@ -35,6 +35,7 @@
     ];
     cards.slice(0,4).forEach((c,i)=>{c.dataset.v267='1';q('b',c).textContent=data[i][0];q('p',c).textContent=data[i][1];});
     cards[0].dataset.v241Open='market';
+    cards[1].classList.add('v277-duplicate-scanner');
     cards[1].onclick=e=>{e.preventDefault();openMarketSub('analysis')};
     cards[2].onclick=e=>{e.preventDefault();openMarketSub('watch')};
     cards[3].dataset.v241Open='intelligence';

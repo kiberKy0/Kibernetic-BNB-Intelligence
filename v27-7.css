@@ -5,3 +5,11 @@
 #v24Pane-chain .v24-ai-action{display:none!important}
 
 #v23AddToken{display:none!important}.v266-forecast[role=button]{cursor:pointer}.v266-forecast[role=button]:focus-visible{outline:2px solid #52d8ff;outline-offset:4px}
+
+/* V27.7.1: one workspace at a time, one contextual chat.
+   Legacy nodes used by older data renderers stay hidden for compatibility. */
+body.v266[data-v241-view]:not([data-v241-view="home"]) #v241Home{display:none!important}
+.v277-duplicate-scanner,.v268-quick,#v271Monitor,#v271WhyAi,#alertsBtn{display:none!important}
+#v266Home>.v266-now>.v266-title,.v266-ai-copy{display:none!important}
+body.v267 .v241-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:600px){body.v267 .v241-cards{grid-template-columns:1fr}}
