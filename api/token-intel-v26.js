@@ -3,7 +3,7 @@ const n=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Numb
 const median=a=>{const x=a.filter(Number.isFinite).sort((p,q)=>p-q);if(!x.length)return null;const m=Math.floor(x.length/2);return x.length%2?x[m]:(x[m-1]+x[m])/2};
 const quantile=(a,q)=>{const x=a.filter(Number.isFinite).sort((p,q)=>p-q);if(!x.length)return null;const p=(x.length-1)*q,b=Math.floor(p),r=p-b;return x[b+1]!==undefined?x[b]+r*(x[b+1]-x[b]):x[b]};
 const ema=(a,p)=>{if(!a.length)return[];const k=2/(p+1),out=[a[0]];for(let i=1;i<a.length;i++)out.push(a[i]*k+out[i-1]*(1-k));return out};
-function rsi(a,p=14){if(a.length<=p)return null;let g=0,l=0;for(let i=a.length-p;i<a.length;i++){const d=a[i]-a[i-1];if(d>=0)g+=d;else l-=d}if(l===0)return 100;const rs=(g/p)/(l/p);return 100-(100/(1+rs))}
+function rsi(a,p=14){if(a.length<=p)return null;let g=0,l=0;for(let i=1;i<=p;i++){const d=a[i]-a[i-1];g+=Math.max(0,d);l+=Math.max(0,-d)}g/=p;l/=p;for(let i=p+1;i<a.length;i++){const d=a[i]-a[i-1];g=(g*(p-1)+Math.max(0,d))/p;l=(l*(p-1)+Math.max(0,-d))/p}if(g===0&&l===0)return 50;if(l===0)return 100;return 100-100/(1+g/l)}
 function safeRatio(a,b){return Number.isFinite(a)&&Number.isFinite(b)&&b!==0?a/b:null}
 function ageHours(ms){return Number.isFinite(ms)?Math.max(0,(Date.now()-ms)/36e5):null}
 async function get(url,headers={}){const r=await fetch(url,{headers:{Accept:'application/json','User-Agent':'Kiber-BNB-Chain/26.0',...headers}});let d=null;try{d=await r.json()}catch{}if(!r.ok)throw new Error(`${r.status} ${url}`);return d}
@@ -17,7 +17,7 @@ function technical(candles){
   const tail=Math.min(32,close.length),recentVol=vol.slice(-tail),oldVol=vol.slice(-tail*2,-tail),rv=recentVol.reduce((a,b)=>a+b,0)/(recentVol.length||1),ov=oldVol.length?oldVol.reduce((a,b)=>a+b,0)/oldVol.length:null;
   const recentHigh=high.slice(-Math.min(32,high.length)),recentLow=low.slice(-Math.min(32,low.length));
   return {
-    candles:sorted.slice(-180),ema20:e20.at(-1)??null,ema50:e50.at(-1)??null,rsi14:rsi(close),volatility:sd,
+    candles:sorted.slice(-180),ema20:close.length>=20?e20.at(-1):null,ema50:close.length>=50?e50.at(-1):null,rsi14:rsi(close),volatility:sd,
     support:quantile(recentLow,.18),resistance:quantile(recentHigh,.82),supportMajor:Math.min(...low),resistanceMajor:Math.max(...high),
     volumeTrend:ov&&ov>0?(rv/ov-1)*100:null,momentum:(close.at(-1)/close[0]-1)*100,
     lastClose:close.at(-1),lastVolume:vol.at(-1)??null

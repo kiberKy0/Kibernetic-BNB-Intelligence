@@ -90,7 +90,7 @@ module.exports = async function handler(req,res){
       const p=Array.isArray(d?.prices)?d.prices:[],v=Array.isArray(d?.total_volumes)?d.total_volumes:[];
       const step=Math.max(1,Math.floor(p.length/Math.max(24,Math.min(180,p.length))));
       const candles=[];
-      for(let i=0;i<p.length;i+=step){const s=p.slice(i,i+step);if(!s.length)continue;const vals=s.map(x=>n(x?.[1])).filter(x=>x!==null);if(!vals.length)continue;const vol=v.slice(i,i+step).reduce((a,x)=>a+(n(x?.[1])||0),0);candles.push({t:Math.floor(Number(s[0][0])/1000),open:vals[0],high:Math.max(...vals),low:Math.min(...vals),close:vals.at(-1),volume:null,quoteVolume:vol||null})}
+      for(let i=0;i<p.length;i+=step){const s=p.slice(i,i+step);if(!s.length)continue;const vals=s.map(x=>n(x?.[1])).filter(x=>x!==null);if(!vals.length)continue;candles.push({t:Math.floor(Number(s[0][0])/1000),open:vals[0],high:Math.max(...vals),low:Math.min(...vals),close:vals.at(-1),volume:null,quoteVolume:null})}
       return res.status(200).json({ok:true,asset:'BNB',pair:'BNB/USD',days:cfg.days,interval:'aggregated',candles,source:key?'CoinGecko Demo API fallback':'CoinGecko public API fallback',updatedAt:new Date().toISOString()});
     }
 
