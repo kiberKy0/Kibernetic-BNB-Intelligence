@@ -27,3 +27,5 @@ Dataset BNB/USDT Binance: 3.262 candele giornaliere dal novembre 2017. Valutazio
 3. Validazione multi-token su periodi rialzisti/ribassisti/range, benchmark di base sullo stesso sottoinsieme di punti, copertura, errori e calibrazione prima di esporre probabilità.
 4. Eventuale strategia operativa con gas, commissioni, slippage e regole di esecuzione; distinta dalla statistica di prezzo.
 5. AI come spiegazione/interrogazione dei risultati strutturati. La chiave OpenAI non sostituisce dati storici né validazione.
+
+V27.9.1: lo snapshot corrente aggiunto da CoinGecko prima del completamento dell’intervallo regolare è escluso dal confronto; il riquadro dichiara il timestamp effettivo usato. Gli intervalli interni irregolari restano motivo di astensione.

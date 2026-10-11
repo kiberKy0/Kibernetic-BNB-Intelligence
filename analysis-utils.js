@@ -11,7 +11,9 @@ if(trend)add(ext,null);return out}
 function recurrence(events,type,asOf){const a=events.filter(e=>e.type===type&&e.confirmedAt!==null&&e.confirmedAt<=asOf),max=a.length?Math.max(...a.map(e=>Math.abs(e.change))):null,cut=a.length?Math.abs(a.map(e=>e.change).sort((a,b)=>Math.abs(a)-Math.abs(b))[Math.floor((a.length-1)*.8)]):null,strong=a.filter(e=>Math.abs(e.change)>=cut),g=strong.slice(1).map((e,i)=>(e.startTime-strong[i].startTime)/36e5);return{count:a.length,max,record:a.find(e=>Math.abs(e.change)===max)||null,strongCount:strong.length,cut,gapMedian:median(g),gapMin:g.length?Math.min(...g):null,gapMax:g.length?Math.max(...g):null,sinceLast:strong.length?(asOf-strong.at(-1).endTime)/36e5:null}}
 // Forecast analogues compare observable windows, not retrospectively identified extrema.
 function forecast(input){
- const a=clean(input),lookback=24,horizon=6,step=median(a.slice(1).map((x,i)=>x.t-a[i].t));
+ const raw=clean(input),lookback=24,horizon=6,step=median(raw.slice(1).map((x,i)=>x.t-raw[i].t)),a=[...raw];
+ // CoinGecko appends a current snapshot before its regular interval is complete.
+ if(a.length>1&&step>0&&(a.at(-1).t-a.at(-2).t)<step*.9)a.pop();
  const base={status:'insufficient',validated:false,asOf:a.at(-1)?.t??null,horizonHours:step>0?horizon*step/36e5:null,lookbackBars:lookback,horizonBars:horizon,count:0,counts:{up:0,down:0,range:0},cases:[],medianReturn:null,returnLow:null,returnHigh:null,scenario:null,reason:'Servono almeno 24 osservazioni regolari prima del punto.'};
  if(a.length<lookback||!(step>0))return base;
  function regular(w){return w.slice(1).every((x,i)=>Math.abs((x.t-w[i].t)/step-1)<.1)}
