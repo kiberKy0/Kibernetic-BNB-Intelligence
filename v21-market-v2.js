@@ -66,6 +66,7 @@
 
   function bindSearch(){const b=$('searchBtn'),i=$('tokenSearch');if(b)b.onclick=searchCatalog;if(i)i.onkeydown=e=>{if(e.key==='Enter')searchCatalog()}}
 
+  window.kiberCatalogContext=()=>V21.items.map(x=>({...x}));
   function boot(){hardenProfile();setVersion();buildCatalog();ensureDossier();bindSearch();setTimeout(()=>{hardenProfile();ensureDossier()},400);setTimeout(()=>{hardenProfile();ensureDossier()},1200);loadCatalog()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
