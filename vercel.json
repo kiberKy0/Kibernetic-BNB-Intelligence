@@ -3,6 +3,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/api/evidence-v281",
+      "destination": "/api/coingecko?type=evidence-v281"
+    },
+    {
       "source": "/api/forecast-v28",
       "destination": "/api/coingecko?type=forecast-v28"
     },

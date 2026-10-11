@@ -97,7 +97,7 @@ module.exports=async function handler(req,res){
       invalidation:outlook.direction==='Rialzista'?(support!==null?`Scenario rialzista indebolito sotto ${support}`:'perdita supporto'):outlook.direction==='Ribassista'?(resistance!==null?`Scenario ribassista indebolito sopra ${resistance}`:'recupero resistenza'):'Attendere convergenza tra trend, volume e flussi'
     };
     return res.status(200).json({
-      version:'26.0',updatedAt:new Date().toISOString(),period,
+      execution:require('../server/evidence-v281.cjs').execution(best),version:'26.0',updatedAt:new Date().toISOString(),period,
       token:{address,name:best.baseToken?.name||'',symbol:best.baseToken?.symbol||'',priceUsd:price,marketCap:n(best.marketCap),fdv:n(best.fdv),liquidityUsd:n(best.liquidity?.usd),volume24h:n(best.volume?.h24),change24h:n(best.priceChange?.h24),change6h:n(best.priceChange?.h6),change1h:n(best.priceChange?.h1),buys24h:n(best.txns?.h24?.buys),sells24h:n(best.txns?.h24?.sells),pairCreatedAt:best.pairCreatedAt||null,pairAddress:pool,dexId:best.dexId||'',pairCount:bscPairs.length,websites:(best.info?.websites||[]).slice(0,5),socials:(best.info?.socials||[]).slice(0,5),imageUrl:best.info?.imageUrl||null,boosts:n(best.boosts?.active)},
       technical:{ema20:tech.ema20,ema50:tech.ema50,rsi14:tech.rsi14,volatility:tech.volatility,volumeTrend:tech.volumeTrend,momentum:tech.momentum,support:tech.support,resistance:tech.resistance,supportMajor:tech.supportMajor,resistanceMajor:tech.resistanceMajor,candles:tech.candles},
       outlook:{...outlook,horizon:'24-72h',triggers,note:'Stima di scenario basata su dati tecnici e on-chain osservabili. Non è una probabilità certa né un segnale automatico di acquisto/vendita.'},
