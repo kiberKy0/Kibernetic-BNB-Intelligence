@@ -3,7 +3,7 @@ const headers={apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'applicatio
 const root='https://kibernetic-bnb-intelligence.vercel.app', table='kibernetic_v281_reports';
 const assets=[{id:'binancecoin',symbol:'BNB',source:'binance',step:14400,address:'0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c'},{id:'pancakeswap-token',symbol:'CAKE',source:'coingecko',step:3600,address:'0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82'},{id:'chainlink',symbol:'LINK',source:'coingecko',step:3600,address:'0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd'}];
 const num=(v:any)=>v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v):null;
-async function rest(path:string,options:RequestInit={}){const r=await fetch(BASE+'/rest/v1/'+path,{...options,headers:{...headers,...options.headers},signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('Database '+r.status);return r.status===204?null:r.json()}
+async function rest(path:string,options:RequestInit={}){const r=await fetch(BASE+'/rest/v1/'+path,{...options,headers:{...headers,...options.headers},signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('Database '+r.status);const text=await r.text();return text?JSON.parse(text):null}
 async function get(url:string,timeout=10000){const r=await fetch(url,{signal:AbortSignal.timeout(timeout)});if(!r.ok)throw Error('Provider '+r.status);return r.json()}
 function output(d:any,status=200){return new Response(JSON.stringify(d),{status,headers:{'Content-Type':'application/json','Cache-Control':'no-store'}})}
 async function collect(){const captured_at=new Date().toISOString(),bucket=new Date(Math.floor(Date.now()/3600000)*3600000).toISOString(),rows:any[]=[],errors:string[]=[];
@@ -17,7 +17,7 @@ async function collect(){const captured_at=new Date().toISOString(),bucket=new D
 }
 Deno.serve(async(req)=>{try{if(req.method==='POST'){
  const token=req.headers.get('Authorization')?.replace(/^Bearer /,'')||'';if(token.length<20)return output({error:'Unauthorized'},401);const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token)))).map(x=>x.toString(16).padStart(2,'0')).join('');const control=await rest('kibernetic_v281_control?select=job_name&job_name=eq.collector&secret_hash=eq.'+digest);if(!control.length)return output({error:'Unauthorized'},401);
- const recent=await rest('kibernetic_v281_snapshots?select=captured_at&order=captured_at.desc&limit=1');if(recent[0]&&Date.now()-Date.parse(recent[0].captured_at)<300000)return output({skipped:true});return output({ok:true,...await collect()});
+ const recent=await rest('kibernetic_v281_snapshots?select=captured_at&order=captured_at.desc&limit=1');const today=await rest(table+'?select=asset&captured_at=gte.'+new Date().toISOString().slice(0,10)+'T00:00:00Z');if(recent[0]&&Date.now()-Date.parse(recent[0].captured_at)<300000&&today.length>=assets.length)return output({skipped:true});return output({ok:true,...await collect()});
  }if(req.method!=='GET')return output({error:'Method not allowed'},405);
  const q=new URL(req.url).searchParams,t=Number(q.get('asOf')||Date.now()),address=(q.get('address')||'').toLowerCase();if(!Number.isFinite(t)||t<1230768000000||t>Date.now()||address&&!/^0x[a-f0-9]{40}$/.test(address))return output({error:'Invalid point'},400);const at=new Date(t).toISOString(),day=at.slice(0,10),a=assets.find(x=>x.address===address);
  const [legacy,snapshots,reports,news,forward]=await Promise.all([

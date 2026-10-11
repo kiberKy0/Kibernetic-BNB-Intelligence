@@ -17,4 +17,4 @@ OpenAI credential reuse decision; actual router quotes by amount/route; genuine 
 
 ## Verification
 
-51 tests: existing 45 plus six checks for gaps/missing volume, aligned benchmarks, no future candle, pool-liquidity versus quote distinction, chronological cost deduction and invalid archive timestamps. Live GET/POST boundaries, collector inserts, production APIs and graph-point UI must also be checked.
+54 tests: existing 45 plus nine checks for gaps/missing volume, aligned benchmarks, no future candle, pool-liquidity versus quote distinction, chronological cost deduction and invalid archive timestamps, collector authentication, empty insert responses and future-outcome hiding. Live GET/POST boundaries, collector inserts, production APIs and graph-point UI must also be checked.
