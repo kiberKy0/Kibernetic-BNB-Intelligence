@@ -5,7 +5,7 @@ module.exports = async function handler(req,res){
   const headers={Accept:'application/json','User-Agent':'Kiber-BNB-Intelligence/27.1'};
   if(key) headers['x-cg-demo-api-key']=key;
   const get=async (url,h=headers)=>{
-    const r=await fetch(url,{headers:h});
+    const r=await fetch(url,{headers:h,signal:AbortSignal.timeout(9000)});
     let d=null; try{d=await r.json()}catch{}
     if(!r.ok){const e=new Error(d?.status?.error_message||d?.error||d?.msg||`Upstream ${r.status}`);e.status=r.status;throw e}
     return d;
@@ -62,7 +62,7 @@ module.exports = async function handler(req,res){
     if(type==='coin_chart'){
       const id=String(req.query?.id||'').trim();
       if(!validId(id))return res.status(400).json({error:'Invalid CoinGecko id'});
-      const allowed=[1,7,30,90,365,1095],asked=Math.max(1,Number(req.query?.days||30)||30),days=allowed.reduce((best,x)=>Math.abs(x-asked)<Math.abs(best-asked)?x:best,30);
+      const allowed=[1,7,30,90,365,1095],asked=Math.max(1,Number(req.query?.days||30)||30),days=req.query?.days==='max'?'max':allowed.reduce((best,x)=>Math.abs(x-asked)<Math.abs(best-asked)?x:best,30);
       res.setHeader('Cache-Control','s-maxage=45, stale-while-revalidate=120');
       const d=await get(`https://api.coingecko.com/api/v3/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=${days}`);
       const prices=Array.isArray(d?.prices)?d.prices:[],caps=Array.isArray(d?.market_caps)?d.market_caps:[],vols=Array.isArray(d?.total_volumes)?d.total_volumes:[];

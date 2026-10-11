@@ -106,7 +106,7 @@ function renderChart(){
     S.series=S.chart.addSeries(LC.AreaSeries,{lineColor:'#59d7ff',topColor:'rgba(89,215,255,.28)',bottomColor:'rgba(89,215,255,.02)',lineWidth:2,priceLineVisible:true,lastValueVisible:true});S.series.setData(pts.map(x=>({time:x.time,value:x.value})));
     S.volume=S.chart.addSeries(LC.HistogramSeries,{priceFormat:{type:'volume'},priceScaleId:'',lastValueVisible:false,priceLineVisible:false});S.volume.priceScale().applyOptions({scaleMargins:{top:.82,bottom:0}});S.volume.setData(pts.map(x=>({time:x.time,value:x.volume||0,color:'rgba(73,151,194,.22)'})));chartMetrics(pts);$('v271Source').textContent=S.chartData?.source||'CoinGecko';$('v271ChartTitle').textContent='Prezzo di mercato · storico verificabile';
   }
-  S.chart.timeScale().fitContent();S._ro=new ResizeObserver(()=>S.chart?.applyOptions({width:el.clientWidth}));S._ro.observe(el);
+  S.chart.subscribeClick(param=>{if(typeof param.time==='number')window.kiberSelectChartTime?.(param.time*1000)});S.chart.timeScale().fitContent();S._ro=new ResizeObserver(()=>S.chart?.applyOptions({width:el.clientWidth}));S._ro.observe(el);
 }
 async function loadChart(){
   const token=++S.chartSeq,el=$('v271Chart');if(!el)return;el.innerHTML='<div class="v271-loading">Aggiornamento grafico…</div>';

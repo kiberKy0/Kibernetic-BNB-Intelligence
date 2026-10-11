@@ -22,13 +22,22 @@ function classify(title,source){
   return {impact:high?'alto':(positive||negative?'medio':'basso'),tone:positive&&!negative?'positivo':negative&&!positive?'negativo':'neutrale/misto',trust:official,category};
 }
 async function rss(url,sourceOverride,limit=4){
-  const r=await fetch(url,{headers:{'User-Agent':'Kiber-BNB-Chain/26.6 https://kiber.blog','Accept':'application/rss+xml,text/xml;q=0.9,*/*;q=0.8'}});if(!r.ok)throw new Error(String(r.status));
+  const r=await fetch(url,{signal:AbortSignal.timeout(8000),headers:{'User-Agent':'Kiber-BNB-Chain/26.6 https://kiber.blog','Accept':'application/rss+xml,text/xml;q=0.9,*/*;q=0.8'}});if(!r.ok)throw new Error(String(r.status));
   const xml=await r.text(),out=[];for(const m of xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)){const b=m[1],title=ex(b,'title');if(!title)continue;out.push({title,url:ex(b,'link'),published:ex(b,'pubDate'),source:sourceOverride||ex(b,'source')||'News feed'});if(out.length>=limit)break}return out;
 }
 module.exports=async function handler(req,res){
   if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});
   res.setHeader('Cache-Control','s-maxage=120, stale-while-revalidate=420');
   const symbol=safe(req.query?.symbol).replace(/[^A-Za-z0-9._-]/g,''),name=safe(req.query?.name).replace(/["<>]/g,'');const tokenQ=[name,symbol].filter(Boolean).join(' ');
+  if(req.query?.date){
+    const day=String(req.query.date),start=Date.parse(day+'T00:00:00Z');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(start)||new Date(start).toISOString().slice(0,10)!==day||start>Date.now())return res.status(400).json({error:'Invalid historical date'});
+    const end=start+86400000,next=new Date(end).toISOString().slice(0,10),filter=' after:'+day+' before:'+next;
+    const queries=[['token',(name?'"'+name+'"':symbol)+' crypto'],['BNB Chain','BNB Chain Binance'],['macro','crypto Federal Reserve regulation']].filter(([,q])=>q.trim()!=='crypto');
+    const results=await Promise.allSettled(queries.map(async([group,q])=>(await rss('https://news.google.com/rss/search?q='+encodeURIComponent(q+filter)+'&hl=en&gl=US&ceid=US:en',null,12)).map(x=>({...x,group,...classify(x.title,x.source),sector:sectorGuess(x.title)}))));
+    const seen=new Set(),items=results.flatMap(x=>x.status==='fulfilled'?x.value:[]).filter(x=>{const t=Date.parse(x.published),k=x.title.toLowerCase();if(!Number.isFinite(t)||t<start||t>=end||seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>Date.parse(a.published)-Date.parse(b.published));
+    return res.status(200).json({version:'27.8',date:day,timezone:'UTC',items,source:'Google News RSS dated search',partial:results.some(x=>x.status==='rejected'),note:items.length?'Notizie indicizzate del giorno UTC; ricerca non esaustiva. Le notizie dopo il punto sono contesto successivo, non segnali disponibili prima.':'Nessuna notizia del giorno recuperata dalla ricerca indicizzata. Non equivale ad assenza di eventi.'});
+  }
   const baseQueries=['BNB Chain crypto when:1d','Binance BNB announcement when:1d','crypto regulation SEC when:1d','crypto Federal Reserve macro when:1d'];
   const calls=baseQueries.map(q=>rss('https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl=en&gl=US&ceid=US:en').then(a=>a.map(x=>({...x,sector:sectorGuess(x.title)}))).catch(()=>[]));
   for(const [sector,q] of SECTORS){calls.push(rss('https://news.google.com/rss/search?q='+encodeURIComponent(q+' crypto blockchain when:3d')+'&hl=en&gl=US&ceid=US:en').then(a=>a.map(x=>({...x,sector}))).catch(()=>[]))}
