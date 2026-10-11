@@ -13,3 +13,5 @@ body.v266[data-v241-view]:not([data-v241-view="home"]) #v241Home{display:none!im
 #v266Home>.v266-now>.v266-title,.v266-ai-copy{display:none!important}
 body.v267 .v241-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media(max-width:600px){body.v267 .v241-cards{grid-template-columns:1fr}}
+
+#v21CatalogList .v22-detail-btn,#v21CatalogList .v22-details{display:none!important}
