@@ -22,3 +22,17 @@ test('All price providers unavailable leave explicit missing data and preserve C
 test('Short TVL history must not be called 30-day performance',async()=>{const r=await chain({history:false});assert.equal(r.body.chain.tvlChange30d,null)});
 test('Explicit BNB target overrides incidental Chain words in prompt',()=>{const c=load('api/kiber.js');const b={analysisSubject:'bnb',message:'BNB, DEX, TVL e BNB Chain',bnb:{change24:2,volume24:1e8},chain:{dexChange1d:-30}};assert.equal(c.chooseEvaluation(b).subject,'BNB');assert.equal(c.chooseEvaluation({...b,analysisSubject:'chain'}).subject,'BNB Chain');assert.equal(c.chooseEvaluation({...b,token:{symbol:'CAKE',name:'PancakeSwap'}}).subject,'PancakeSwap')});
 test('V18 initializes on V20 markup with no legacy appStatus',()=>{const changed={};const elements={changedBtn:changed};const c=load('v18.js',{localStorage:{getItem:()=>null},state:{news:[]},setTimeout:()=>{},document:{title:'',querySelector:()=>null},$:id=>elements[id]||null});let started=0;c.ensureDossierPanel=()=>started++;c.renderDossier=()=>{};c.v18EnsureChart=()=>{};c.loadAlerts=()=>{};c.v18Start();assert.equal(started,1);assert.equal(typeof changed.onclick,'function')});
+test('Rapid chart period changes ignore the older response and disconnect observers',async()=>{
+ const pending=[],renders=[];const el={innerHTML:''};let disconnected=0;
+ const c={module:{exports:{}},AbortSignal,console,window:{LightweightCharts:{}},document:{getElementById:()=>el},fetch:()=>new Promise(resolve=>pending.push(resolve)),setTimeout:()=>0,clearTimeout:()=>{},renders};
+ vm.createContext(c);let source=fs.readFileSync(path.join(root,'v26-9.js'),'utf8');source=source.replace("document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();","render=()=>renders.push(S.days);metrics=()=>{};module.exports={S,refresh};");vm.runInContext(source,c);
+ const {S,refresh}=c.module.exports;S.ro={disconnect(){disconnected++}};S.days=30;const old=refresh();S.days=7;const recent=refresh();
+ const data={source:'Binance',candles:[1,2,3].map(t=>({t,open:1,high:2,low:1,close:2}))};pending[1]({ok:true,json:async()=>data});await recent;pending[0]({ok:true,json:async()=>data});await old;
+ assert.deepEqual(renders,[7]);assert.equal(disconnected,1);
+});
+test('Overlapping Analyze calls cannot overwrite the latest subject',async()=>{
+ const pending=[];const nodes={v275SheetAnswer:{classList:{add(){},remove(){}},textContent:''},v275SheetMeta:{textContent:''}};
+ const c={module:{exports:{}},AbortSignal,console,window:{},document:{getElementById:id=>nodes[id],querySelector:()=>null},fetch:()=>new Promise(resolve=>pending.push(resolve))};vm.createContext(c);
+ let source=fs.readFileSync(path.join(root,'v27-4-oracle.js'),'utf8');source=source.replace("document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();","ensureSheet=()=>{};marketContext=async()=>({});module.exports={run,state};");vm.runInContext(source,c);
+ const {run}=c.module.exports;const old=run('main');await Promise.resolve();const recent=run('chain');await Promise.resolve();pending[1]({ok:true,json:async()=>({answer:'Chain latest',provider:'deterministic'})});await recent;pending[0]({ok:true,json:async()=>({answer:'BNB old',provider:'deterministic'})});await old;assert.equal(nodes.v275SheetAnswer.textContent,'Chain latest');
+});
