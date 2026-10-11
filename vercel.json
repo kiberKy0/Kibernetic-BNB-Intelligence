@@ -3,6 +3,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/api/forecast-v28",
+      "destination": "/api/coingecko?type=forecast-v28"
+    },
+    {
       "source": "/",
       "destination": "/index.html"
     }
@@ -125,7 +129,7 @@
     }
   ],
   "functions": {
-    "api/forecast-v28.js": {
+    "api/coingecko.js": {
       "maxDuration": 30
     }
   }
