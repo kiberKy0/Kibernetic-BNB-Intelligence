@@ -30,3 +30,15 @@ https://docs.coingecko.com/reference/pool-ohlcv-contract-address
 https://docs.coingecko.com/reference/coins-id-market-chart-range
 https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/rest-api/market
 https://docs.gopluslabs.io/reference/tokensecurityusingget_1
+
+## Guida decisionale e verifica integrata (11 ottobre 2026)
+
+La lettura iniziale separa analisi del movimento, prospettiva storica e guida condizionata. La guida indica acquisto da valutare, vendita da valutare per chi possiede il token, oppure attesa. Include motivazioni, livelli di conferma, invalidazione e orizzonte del confronto. Non esegue ordini. Scenari discordanti, storico inadeguato, liquidità mancante o ridotta, rischio di vendita segnalato, confronto di base non superato e variazione centrale inferiore ai costi ipotizzati impediscono una lettura favorevole all'acquisto. Lo 0,60% è un costo teorico; gas, tasse e quotazione effettiva restano da verificare.
+
+La verifica cronologica ora valuta anche le distribuzioni dei precedenti nei punti senza segnale. Riporta Brier multicategoria 0–2 (più basso è meglio), stesso punteggio per una baseline storica, errore assoluto della variazione mediana, copertura dell'intervallo centrale e frequenze stimate/osservate in gruppi. Le frequenze sono smussate con add-one; non sono probabilità calibrate. Nessuna soglia direzionale è stata ridotta per far comparire segnali. La validazione resta descrittiva, con `validated: false` e `calibrated: false`.
+
+Riferimenti metodologici primari: https://scikit-learn.org/stable/modules/model_evaluation.html e https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html.
+
+I dati archiviati vengono filtrati per token e data di acquisizione prima del punto scelto. La variazione di liquidità viene calcolata solo per snapshot dello stesso pool. Conteggi buy/sell e volume 24 ore restano finestre mobili, non flussi monetari. Le notizie archiviate devono essere state pubblicate e acquisite entro il punto. Nessun dato mancante viene ricostruito artificialmente.
+
+Il collector orario aggiunge contratti abilitati nei monitorati cloud al pannello BNB/CAKE/LINK, fino a 12 asset per ciclo. Snapshot in parallelo; massimo 3 rapporti nuovi per ciclo, con budget di 125 secondi e rinvio del lavoro restante. Registra gli esiti successivi anche per le astensioni. Per i pool DEX, l'esito usa il pool archiviato prima della registrazione. L'archivio cresce dall'attivazione; non copre automaticamente il passato né tutti i token della chain. I monitorati soltanto locali non vengono inviati al cloud da questo aggiornamento.
