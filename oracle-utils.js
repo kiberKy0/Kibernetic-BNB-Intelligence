@@ -22,7 +22,7 @@ function historicalData(a,identity,address){
  const archive=a?.evidence?.archive,asOf=a?.asOf||0,addr=String(address||'').toLowerCase(),valid=x=>Number.isFinite(Date.parse(x.captured_at))&&Date.parse(x.captured_at)<=asOf;
  const snapshots=(archive?.snapshots||[]).filter(x=>(x.asset===identity||(addr&&x.asset==='address:'+addr))&&valid(x)),legacy=(archive?.legacySnapshots||[]).filter(valid),rows=(snapshots.length?snapshots:legacy).slice().sort((x,y)=>Date.parse(y.captured_at)-Date.parse(x.captured_at));
  const latest=rows[0]||null,oldest=rows.at(-1)||null,samePool=latest?.pool_address&&oldest?.pool_address&&latest.pool_address.toLowerCase()===oldest.pool_address.toLowerCase();
- const liquidityChange=samePool&&n(oldest?.liquidity_usd)>0&&n(latest?.liquidity_usd)!==null?(latest.liquidity_usd/oldest.liquidity_usd-1)*100:null;
+ const liquidityChange=rows.length>1&&Date.parse(oldest.captured_at)<Date.parse(latest.captured_at)&&samePool&&n(oldest?.liquidity_usd)>0&&n(latest?.liquidity_usd)!==null?(latest.liquidity_usd/oldest.liquidity_usd-1)*100:null;
  return {available:!!archive?.available,count:rows.length,latest,liquidityChange,ageHours:latest?(asOf-Date.parse(latest.captured_at))/36e5:null,news:(archive?.news||[]).filter(x=>Date.parse(x.published_at)<=asOf&&Date.parse(x.created_at)<=asOf),note:rows.length?'Osservazioni acquisite prima del punto; scambi e acquisti/vendite sono conteggi mobili 24 ore.':'Nessuna osservazione archiviata per questo token prima del punto.'};
 }
 function decision(a,context={}){
