@@ -76,14 +76,15 @@ function factor(label,value,note){return `<div class="v271-factor"><span>${esc(l
 function renderFactors(){
   const c=S.coin||{},i=S.intel||{},t=i.technical||{},o=i.outlook||{};let h='';
   h+=factor('Variazione 24h',pct(c.change24),'movimento prezzo');h+=factor('Variazione 7g',pct(c.change7d),'trend breve');
-  h+=factor('RSI 14',n(t.rsi14)===null?'—':Number(t.rsi14).toFixed(1),'momentum tecnico');h+=factor('Supporto',money(t.support),'livello osservato');h+=factor('Resistenza',money(t.resistance),'livello osservato');h+=factor('Liquidità BSC',money(i?.token?.liquidityUsd),'profondità del pool');
+  h+=factor('RSI 14',n(t.rsi14)===null?'—':Number(t.rsi14).toFixed(1),'momentum tecnico');h+=factor('Supporto',money(t.support),'livello osservato');h+=factor('Resistenza',money(t.resistance),'livello osservato');h+=factor('Liquidità BSC',money(i?.token?.liquidityUsd),'valore totale nel pool · non profondità eseguibile');
+  const security=i.security;if(security?.available){h+=factor('Holder attuali',security.holderCount==null?'—':Number(security.holderCount).toLocaleString('it-IT'),'GoPlus · numero di indirizzi, non persone');const risk=security.honeypot===true?'Rischio honeypot segnalato':security.cannotSellAll===true?'Restrizioni di vendita segnalate':'Controlli da approfondire';h+=factor('Contratto · controlli attuali',risk,(security.mintable===true?'Emissione di nuovi token possibile. ':'')+'GoPlus · non è un audit completo');h+=factor('Tasse acquisto / vendita',(security.buyTaxPct==null?'—':security.buyTaxPct.toFixed(2)+'%')+' / '+(security.sellTaxPct==null?'—':security.sellTaxPct.toFixed(2)+'%'),'Valori mancanti non significano tassa zero')}else if(c.address)h+=factor('Contratto · controlli attuali','Non disponibili','Nessuna sicurezza dedotta dai dati mancanti');
   const drivers=(o.drivers||[]).slice(0,3),warnings=(o.warnings||[]).slice(0,3);if(drivers.length||warnings.length)h+=`<div class="v271-factor wide"><span>LETTURA ON-CHAIN</span><b>${esc([...drivers,...warnings].join(' · '))}</b><small>DEX Screener + GeckoTerminal</small></div>`;
   $('v271Factors').innerHTML=h;
-  const items=(S.news?.items||[]).slice(0,5);$('v271News').innerHTML=items.length?`<div class="v271-news-title">Notizie collegate alla moneta</div>${items.map(x=>`<a href="${esc(x.url||'#')}" target="_blank" rel="noopener"><b>${esc(x.title||'Notizia')}</b><span>${esc(x.source||'Fonte')} · ${esc(x.impact||'basso')} impatto · ${esc(x.tone||'misto')}</span></a>`).join('')}`:'<div class="v271-news-empty">Nessuna notizia specifica abbastanza rilevante trovata adesso.</div>';
+  const items=(S.news?.items||[]).filter(x=>{const title=String(x.title||'').toLowerCase(),name=String(c.name||'').toLowerCase(),symbol=String(c.symbol||'').toLowerCase();return name.length>2&&title.includes(name)||symbol.length>1&&title.split(/[^a-z0-9]+/).includes(symbol)}).slice(0,5);$('v271News').innerHTML=items.length?`<div class="v271-news-title">Notizie collegate alla moneta</div>${items.map(x=>`<a href="${esc(x.url||'#')}" target="_blank" rel="noopener"><b>${esc(x.title||'Notizia')}</b><span>${esc(x.source||'Fonte')} · ${esc(x.impact||'basso')} impatto · ${esc(x.tone||'misto')}</span></a>`).join('')}`:'<div class="v271-news-empty">Nessuna notizia specifica abbastanza rilevante trovata adesso.</div>';
 }
 
 function destroyChart(){S._selectionCleanup?.();S._selectionCleanup=null;try{S._ro?.disconnect()}catch{}S._ro=null;try{S.chart?.remove()}catch{}S.chart=S.series=S.volume=null}
-function loadLib(){return new Promise((ok,no)=>{if(window.LightweightCharts)return ok();const existing=q('script[data-v271-chartlib]');if(existing){existing.addEventListener('load',ok,{once:true});existing.addEventListener('error',no,{once:true});return}const s=document.createElement('script');s.dataset.v271Chartlib='1';s.src='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.9/dist/lightweight-charts.standalone.production.js';s.async=true;s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
+function loadLib(){return new Promise((ok,no)=>{if(window.LightweightCharts)return ok();let s=q('script[data-v271-chartlib]'),done=false;const finish=error=>{if(done)return;done=true;clearTimeout(timer);if(error){s?.remove();no(error)}else ok()},timer=setTimeout(()=>finish(new Error('Chart library timeout')),12000);if(s){s.addEventListener('load',()=>finish(),{once:true});s.addEventListener('error',()=>finish(new Error('Chart library unavailable')),{once:true});return}s=document.createElement('script');s.dataset.v271Chartlib='1';s.src='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.9/dist/lightweight-charts.standalone.production.js';s.async=true;s.onload=()=>finish();s.onerror=()=>finish(new Error('Chart library unavailable'));document.head.appendChild(s)})}
 function chartMetrics(points){
   const prices=points.map(x=>n(x.p??x.close)).filter(v=>v!==null);if(!prices.length)return;const first=prices[0],last=prices.at(-1),hi=Math.max(...prices),lo=Math.min(...prices),chg=first?((last/first)-1)*100:null;$('v271High').textContent=money(hi);$('v271Low').textContent=money(lo);$('v271PeriodChange').textContent=pct(chg)
 }
@@ -109,12 +110,13 @@ function renderChart(){
   const selectedPoints=useCandles?candles.map(x=>({t:x.time*1000,p:x.close,v:x.volume})):(S.chartData?.points||[]).map(x=>({t:Number(x.t),p:Number(x.p),v:x.volume}));S._selectionCleanup=window.KiberChart?.bind(S.chart,el,selectedPoints,t=>window.kiberSelectChartTime?.(t));S.chart.timeScale().fitContent();S._ro=new ResizeObserver(()=>S.chart?.applyOptions({width:el.clientWidth}));S._ro.observe(el);
 }
 async function loadChart(){
-  const token=++S.chartSeq,el=$('v271Chart');if(!el)return;el.innerHTML='<div class="v271-loading">Aggiornamento grafico…</div>';
+  const token=++S.chartSeq,el=$('v271Chart'),coin=S.coin,days=S.days;if(!el)return;destroyChart();S.chartLoading=true;S.chartData=null;el.innerHTML='<div class="v271-loading">Aggiornamento grafico…</div>';
   try{
-    if(S.coin?.id)S.chartData=await json(`/api/coingecko?type=coin_chart&id=${encodeURIComponent(S.coin.id)}&days=${S.days}&v=271`,{cache:'no-store'});else S.chartData=null;
-    if(S.coin?.address&&S.days<=30){try{S.intel=await json(`/api/token-intel-v26?address=${encodeURIComponent(S.coin.address)}&period=${periodForIntel(S.days)}&v=271`,{cache:'no-store'})}catch{}}
-    if(token!==S.chartSeq)return;renderCoin();await loadLib();if(token!==S.chartSeq)return;renderChart();
-  }catch(e){if(token!==S.chartSeq)return;try{await loadLib();renderChart()}catch{renderFallbackChart()}}
+    const [chartR,intelR]=await Promise.allSettled([coin?.id?json(`/api/coingecko?type=coin_chart&id=${encodeURIComponent(coin.id)}&days=${days}&v=280`,{cache:'no-store'}):Promise.resolve(null),coin?.address&&days<=30?json(`/api/token-intel-v26?address=${encodeURIComponent(coin.address)}&period=${periodForIntel(days)}&v=280`,{cache:'no-store'}):Promise.resolve(null)]);
+    if(token!==S.chartSeq)return;S.chartData=chartR.status==='fulfilled'?chartR.value:null;
+    if(coin?.address&&days<=30)S.intel=intelR.status==='fulfilled'&&intelR.value?intelR.value:{...S.intel,technical:{candles:[]}};
+    S.chartLoading=false;renderCoin();await loadLib();if(token!==S.chartSeq)return;renderChart();
+  }catch(e){if(token!==S.chartSeq)return;S.chartLoading=false;renderFallbackChart()}
 }
 function changePeriod(days){if(![1,7,30,90,365,1095].includes(days))return;S.days=days;qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===days));if(!S.coin?.id&&days>30){S.days=30;qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===30));const el=$('v271Chart');if(el)el.innerHTML='<div class="v271-error">Storico 1A/3A non disponibile per questo contratto dalle fonti DEX correnti. Kiber usa 30G finché non colleghiamo uno storico più profondo.</div>';setTimeout(loadChart,900);return}loadChart()}
 
@@ -149,6 +151,6 @@ function intercept(e){
   const chain=e.target.closest?.('#marketList .token-row[data-address]');if(chain){e.preventDefault();e.stopImmediatePropagation();openByAddress(chain.dataset.address);return}
   const emerg=e.target.closest?.('[data-v26-token]');if(emerg&&!emerg.closest('#v271TokenView')){e.preventDefault();e.stopImmediatePropagation();openByAddress(emerg.dataset.v26Token)}
 }
-function boot(){mark();ensurePanel();document.addEventListener('click',intercept,true);window.openToken=address=>openByAddress(address);window.kiberOpenCoin=id=>openById(id);window.kiberOpenToken=address=>openByAddress(address);window.kiberTokenContext=()=>({coin:S.coin,intel:S.intel,news:S.news,chartData:S.chartData,days:S.days,forecast:basicForecast()})}
+function boot(){mark();ensurePanel();document.addEventListener('click',intercept,true);window.openToken=address=>openByAddress(address);window.kiberOpenCoin=id=>openById(id);window.kiberOpenToken=address=>openByAddress(address);window.kiberTokenContext=()=>({coin:S.coin,intel:S.intel,news:S.news,chartData:S.chartData,chartLoading:S.chartLoading,days:S.days,forecast:basicForecast()})}
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();
 })();

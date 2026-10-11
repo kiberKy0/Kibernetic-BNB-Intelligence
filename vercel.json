@@ -2,58 +2,131 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    {"source": "/", "destination": "/index.html"}
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        {"key": "X-Content-Type-Options", "value": "nosniff"},
-        {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"},
-        {"key": "X-Frame-Options", "value": "SAMEORIGIN"},
-        {"key": "Permissions-Policy", "value": "geolocation=(), camera=(), microphone=()"},
-        {"key": "Content-Security-Policy", "value": "default-src 'self'; connect-src 'self' https://*.supabase.co https://api.binance.com https://api.coingecko.com https://tokens.pancakeswap.finance https://api.geckoterminal.com https://api.dexscreener.com https://cdn.jsdelivr.net; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; frame-src 'self'; frame-ancestors 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'"}
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(), camera=(), microphone=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; connect-src 'self' https://*.supabase.co https://api.binance.com https://api.coingecko.com https://tokens.pancakeswap.finance https://api.geckoterminal.com https://api.dexscreener.com https://cdn.jsdelivr.net; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; frame-src 'self'; frame-ancestors 'self'; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'"
+        }
       ]
     },
     {
       "source": "/",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/index.html",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/v21-clean.html",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/v24.html",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/v24.js",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/v24.css",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/v20-production.html",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/v23-fix.js",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/v23-fix.css",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     },
     {
       "source": "/sw-v17.js",
-      "headers": [{"key": "Cache-Control", "value": "no-cache"}]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
     }
-  ]
+  ],
+  "functions": {
+    "api/forecast-v28.js": {
+      "maxDuration": 30
+    }
+  }
 }
