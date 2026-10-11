@@ -72,7 +72,7 @@ module.exports = async function handler(req,res){
 
     if(type==='bnb_ohlc'){
       const requested=Math.max(1,Math.min(1095,Number(req.query?.days||30)||30));
-      const cfg=requested<=1?{days:1,interval:'15m',limit:96}:requested<=7?{days:7,interval:'1h',limit:168}:requested<=30?{days:30,interval:'4h',limit:180}:requested<=90?{days:90,interval:'1d',limit:90}:requested<=365?{days:365,interval:'1d',limit:365}:{days:1095,interval:'1d',limit:1095};
+      const cfg=req.query?.days==='max'?{days:4000,interval:'1d',limit:4000}:requested<=1?{days:1,interval:'15m',limit:96}:requested<=7?{days:7,interval:'1h',limit:168}:requested<=30?{days:30,interval:'4h',limit:180}:requested<=90?{days:90,interval:'1d',limit:90}:requested<=365?{days:365,interval:'1d',limit:365}:{days:1095,interval:'1d',limit:1095};
       res.setHeader('Cache-Control','s-maxage=20, stale-while-revalidate=60');
       try{
         let raw=[];let remaining=cfg.limit,endTime=null;
