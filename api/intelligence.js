@@ -1,4 +1,5 @@
 module.exports=async function handler(req,res){
+  if(req.query?.type==='sectors')return require('../server/sectors-v277.cjs')(req,res);
   if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});
   res.setHeader('Cache-Control','s-maxage=90, stale-while-revalidate=240');
   const n=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Number(v):null);
