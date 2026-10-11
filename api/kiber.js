@@ -8,7 +8,7 @@ function qualityLabel(score){return score>=80?'ALTA':score>=55?'MEDIA':'BASSA'}
 function unique(a){return [...new Set(a.filter(Boolean))]}
 
 function tokenEvaluation(body){
-  const t=body?.token||{},i=body?.tokenIntel||{},news=body?.tokenNews||body?.marketNews||{};
+  const t=body?.token||{},i=body?.tokenIntel||{},news=body?.tokenNews||{};
   let score=0,present=0;const total=10,confirm=[],contradict=[],missing=[];
   const add=(v,w,cap,pos,neg)=>{v=num(v);if(v===null){missing.push(pos.split(' ')[0]);return}present++;const d=clamp(v*w,-cap,cap);score+=d;if(d>2)confirm.push(pos.replace('{v}',pct(v)));else if(d<-2)contradict.push(neg.replace('{v}',pct(v)))};
   add(t.change24,4,24,'24h {v}','24h {v}');
@@ -54,7 +54,7 @@ function chartOracleFallback(body,e){
   parts.push('PERCHÉ È QUI\n'+(why.length?why.join(' · '):'I dati disponibili non spiegano ancora il movimento con sufficiente forza.'));
   const tech=[];if(num(t.rsi14)!==null)tech.push('RSI '+num(t.rsi14).toFixed(1));if(num(t.support)!==null)tech.push('supporto '+money(t.support));if(num(t.resistance)!==null)tech.push('resistenza '+money(t.resistance));if(num(t.volumeTrend)!==null)tech.push('trend volume '+pct(t.volumeTrend));if(chart.periodChange)tech.push('periodo '+String(chart.periodChange));if(chart.days)tech.push('finestra '+chart.days+' giorni');
   parts.push('GRAFICO E LIVELLI\n'+(tech.length?tech.join(' · '):'Livelli tecnici non sufficientemente disponibili dalla fonte corrente.'));
-  const liq=num(token.liquidityUsd??e.liquidityUsd),flow=[];if(liq!==null)flow.push('liquidità '+money(liq));const buys=num(token.buys24h),sells=num(token.sells24h);if(buys!==null&&sells!==null)flow.push('buy/sell '+buys+'/'+sells);if(body.analysisSubject==='token'){flow.push('volume token 24h '+money(body.token?.volume24??token.volume24h));}else if(num(b.volume24)!==null)flow.push('volume BNB 24h '+money(b.volume24));if(num(ch.dexVolume24)!==null)flow.push('DEX BNB Chain 24h '+money(ch.dexVolume24));
+  const liq=num(token.liquidityUsd??e.liquidityUsd),flow=[];if(liq!==null)flow.push('liquidità '+money(liq));const buys=num(token.buys24h),sells=num(token.sells24h);if(buys!==null&&sells!==null)flow.push('buy/sell '+buys+'/'+sells);if(body.analysisSubject==='token'){flow.push('volume token 24h '+money(body.token?.volume24??token.volume24h));}else if(num(b.volume24)!==null)flow.push('volume BNB 24h '+money(b.volume24));if(num(ch.dexVolume24)!==null)flow.push('Contesto esterno: DEX BNB Chain 24h '+money(ch.dexVolume24));
   if(body.analysisSubject!=='token'&&b.source)flow.push('fonte BNB: '+b.source+(b.volumeScope?' · '+b.volumeScope:''));
   parts.push('LIQUIDITÀ E FLUSSI\n'+(flow.length?flow.join(' · '):'Nessun dato di liquidità/flusso abbastanza completo per attribuire il movimento.'));
   const chain=[];if(num(b.change24)!==null)chain.push('BNB 24h '+pct(b.change24));if(num(ch.dexChange1d)!==null)chain.push('DEX 24h '+pct(ch.dexChange1d));if(num(ch.tvlChange7d)!==null)chain.push('TVL 7g '+pct(ch.tvlChange7d));if(num(ch.tvlChange30d)!==null)chain.push('TVL 30g '+pct(ch.tvlChange30d));const pos=num(news?.counts?.positive)||0,neg=num(news?.counts?.negative)||0;if(pos||neg)chain.push('news +'+pos+'/-'+neg);
