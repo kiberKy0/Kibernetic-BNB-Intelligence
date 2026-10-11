@@ -17,7 +17,7 @@ function ensureSheet(){
  document.body.appendChild(s);s.addEventListener('click',e=>{if(e.target.closest('[data-v275-close]'))closeSheet()});$('v275Again').onclick=()=>state.current&&run(state.current);$('v275Chat').onclick=()=>{closeSheet();window.v268OpenChat?.('Approfondisci l’analisi del grafico che sto guardando. Spiegami movente, liquidità, cicli, news, macro, scenario futuro e cosa invaliderebbe la lettura.',false)}
 }
 function closeSheet(){const s=$('v275Sheet');if(!s)return;s.classList.remove('open');s.setAttribute('aria-hidden','true');document.body.classList.remove('v275-sheet-open')}
-function openSheet(type){ensureSheet();state.current=type;const names={main:'BNB · analisi del grafico',chain:'BNB Chain · analisi del grafico',token:'Token · analisi del grafico'};$('v275SheetTitle').textContent=names[type]||'Analisi grafico';$('v275Sheet').classList.add('open');$('v275Sheet').setAttribute('aria-hidden','false');document.body.classList.add('v275-sheet-open');run(type)}
+function openSheet(type){const tc=type==='token'?window.kiberTokenContext?.():null;const scope={subject:type==='main'?'bnb':type==='chain'?'chain':'token',tokenContext:tc?JSON.parse(JSON.stringify(tc)):null,chart:{days:daysFor(type),source:type==='token'?tc?.chartData?.source:null,periodChange:type==='token'?$('v271PeriodChange')?.textContent:type==='chain'?$('v26fGraphMove')?.textContent:$('v269Change')?.textContent}};window.v268OpenChat?.('Analizza '+(tc?.coin?.name||(type==='chain'?'BNB Chain':'BNB'))+' sul grafico selezionato.',true,scope)}
 function makeButton(id,type){
  if($(id))return $(id);const b=document.createElement('button');b.id=id;b.type='button';b.className='v275-analyze';b.setAttribute('aria-label','Analizza con Kiber');b.innerHTML='<span class="v275-analyze-icon"><img src="assets/kiber-logo.svg?v=275" alt=""></span><span>Analizza</span>';b.onclick=()=>openSheet(type);return b
 }
@@ -42,6 +42,6 @@ async function run(type){
  }catch(e){if(request!==state.request)return;ans.textContent='Analisi temporaneamente non disponibile.';meta.textContent='Errore di collegamento al motore Kiber.'}finally{if(request===state.request){ans.classList.remove('loading');state.busy=false}}
 }
 function tick(){profile();ensureButtons();syncAlertButton()}
-function boot(){document.body.classList.add('v275');ensureSheet();setTimeout(tick,700);setInterval(tick,2000)}
+function boot(){document.body.classList.add('v275');setTimeout(tick,700);setInterval(tick,2000)}
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();
 })();
