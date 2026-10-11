@@ -8,7 +8,7 @@ function qualityLabel(score){return score>=80?'ALTA':score>=55?'MEDIA':'BASSA'}
 function unique(a){return [...new Set(a.filter(Boolean))]}
 
 function tokenEvaluation(body){
-  const t=body?.token||{},i=body?.tokenIntel||{},news=body?.tokenNews||{};
+  const t=body?.token||{},i=body?.tokenIntel||{},rawNews=body?.tokenNews||{};const relevant=(rawNews.items||[]).filter(x=>String(x.title||x.headline||'').toLowerCase().includes(String(t.name||'__missing__').toLowerCase()));const news=relevant.length?{items:relevant}:{};
   let score=0,present=0;const total=10,confirm=[],contradict=[],missing=[];
   const add=(v,w,cap,pos,neg)=>{v=num(v);if(v===null){missing.push(pos.split(' ')[0]);return}present++;const d=clamp(v*w,-cap,cap);score+=d;if(d>2)confirm.push(pos.replace('{v}',pct(v)));else if(d<-2)contradict.push(neg.replace('{v}',pct(v)))};
   add(t.change24,4,24,'24h {v}','24h {v}');
@@ -52,7 +52,8 @@ function chartOracleFallback(body,e){
   parts.push(icon(e.direction)+' '+e.direction+' · '+e.subject+(e.symbol?' ('+e.symbol+')':''));
   const why=[...(e.confirmations||[]).slice(0,4),...(e.contradictions||[]).slice(0,3).map(x=>'contro: '+x)];
   parts.push('PERCHÉ È QUI\n'+(why.length?why.join(' · '):'I dati disponibili non spiegano ancora il movimento con sufficiente forza.'));
-  const tech=[];if(num(t.rsi14)!==null)tech.push('RSI '+num(t.rsi14).toFixed(1));if(num(t.support)!==null)tech.push('supporto '+money(t.support));if(num(t.resistance)!==null)tech.push('resistenza '+money(t.resistance));if(num(t.volumeTrend)!==null)tech.push('trend volume '+pct(t.volumeTrend));if(chart.periodChange)tech.push('periodo '+String(chart.periodChange));if(chart.days)tech.push('finestra '+chart.days+' giorni');
+  const tech=[];if(num(t.rsi14)!==null)tech.push('RSI '+num(t.rsi14).toFixed(1));if(num(t.support)!==null)tech.push('supporto '+money(t.support));if(num(t.resistance)!==null)tech.push('resistenza '+money(t.resistance));if(num(t.volumeTrend)!==null)tech.push('trend volume '+pct(t.volumeTrend));if(chart.periodChange&&chart.periodChange!=='—')tech.push('periodo '+String(chart.periodChange));if(chart.days)tech.push('finestra '+chart.days+' giorni');
+  if(body.analysisSubject==='token'&&!chart.source)tech.unshift('Storico del token non disponibile dalla fonte corrente');
   parts.push('GRAFICO E LIVELLI\n'+(tech.length?tech.join(' · '):'Livelli tecnici non sufficientemente disponibili dalla fonte corrente.'));
   const liq=num(token.liquidityUsd??e.liquidityUsd),flow=[];if(liq!==null)flow.push('liquidità '+money(liq));const buys=num(token.buys24h),sells=num(token.sells24h);if(buys!==null&&sells!==null)flow.push('buy/sell '+buys+'/'+sells);if(body.analysisSubject==='token'){flow.push('volume token 24h '+money(body.token?.volume24??token.volume24h));}else if(num(b.volume24)!==null)flow.push('volume BNB 24h '+money(b.volume24));if(num(ch.dexVolume24)!==null)flow.push('Contesto esterno: DEX BNB Chain 24h '+money(ch.dexVolume24));
   if(body.analysisSubject!=='token'&&b.source)flow.push('fonte BNB: '+b.source+(b.volumeScope?' · '+b.volumeScope:''));
@@ -64,7 +65,7 @@ function chartOracleFallback(body,e){
   const scen=e.direction==='RIALZISTA'?'Struttura favorevole ma da confermare.':e.direction==='RIBASSISTA'?'Struttura debole: evitare di chiamare inversione finché non compaiono conferme.':'Equilibrio: al momento non c’è una rottura direzionale abbastanza supportata.';
   parts.push('SCENARIO\n'+scen+' '+trigger.join(' · ')+'.');
   parts.push('AFFIDABILITÀ\nQualità dati '+e.quality+'/100 ('+e.qualityLabel+'). Dati mancanti: '+((e.missing||[]).length?e.missing.join(', '):'nessuno tra quelli previsti')+'.');
-  parts.push('FONTI\nGrafico: '+(chart.source||b.historySource||b.source||'non disponibile')+' · aggiornamento: '+(body.token?.lastUpdated||b.updatedAt||'non disponibile')+'. Fonti e mercati diversi possono mostrare prezzi diversi.');
+  parts.push('FONTI\nGrafico: '+(body.analysisSubject==='token'?(chart.source||'storico token non disponibile'):(chart.source||b.historySource||b.source||'non disponibile'))+' · aggiornamento: '+(body.analysisSubject==='token'?(body.token?.lastUpdated||'non disponibile'):(b.updatedAt||'non disponibile'))+'. Fonti e mercati diversi possono mostrare prezzi diversi.');
   return parts.join('\n\n');
 }
 function deterministic(body){
