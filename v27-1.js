@@ -82,7 +82,7 @@ function renderFactors(){
   const items=(S.news?.items||[]).slice(0,5);$('v271News').innerHTML=items.length?`<div class="v271-news-title">Notizie collegate alla moneta</div>${items.map(x=>`<a href="${esc(x.url||'#')}" target="_blank" rel="noopener"><b>${esc(x.title||'Notizia')}</b><span>${esc(x.source||'Fonte')} · ${esc(x.impact||'basso')} impatto · ${esc(x.tone||'misto')}</span></a>`).join('')}`:'<div class="v271-news-empty">Nessuna notizia specifica abbastanza rilevante trovata adesso.</div>';
 }
 
-function destroyChart(){try{S._ro?.disconnect()}catch{}S._ro=null;try{S.chart?.remove()}catch{}S.chart=S.series=S.volume=null}
+function destroyChart(){S._selectionCleanup?.();S._selectionCleanup=null;try{S._ro?.disconnect()}catch{}S._ro=null;try{S.chart?.remove()}catch{}S.chart=S.series=S.volume=null}
 function loadLib(){return new Promise((ok,no)=>{if(window.LightweightCharts)return ok();const existing=q('script[data-v271-chartlib]');if(existing){existing.addEventListener('load',ok,{once:true});existing.addEventListener('error',no,{once:true});return}const s=document.createElement('script');s.dataset.v271Chartlib='1';s.src='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.9/dist/lightweight-charts.standalone.production.js';s.async=true;s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
 function chartMetrics(points){
   const prices=points.map(x=>n(x.p??x.close)).filter(v=>v!==null);if(!prices.length)return;const first=prices[0],last=prices.at(-1),hi=Math.max(...prices),lo=Math.min(...prices),chg=first?((last/first)-1)*100:null;$('v271High').textContent=money(hi);$('v271Low').textContent=money(lo);$('v271PeriodChange').textContent=pct(chg)
@@ -95,7 +95,7 @@ function renderFallbackChart(){
 }
 function renderChart(){
   const el=$('v271Chart');if(!el)return;const LC=window.LightweightCharts;if(!LC){renderFallbackChart();return}destroyChart();el.innerHTML='';
-  S.chart=LC.createChart(el,{width:el.clientWidth,height:390,layout:{background:{type:'solid',color:'#04111d'},textColor:'#7895aa',fontFamily:'system-ui,-apple-system,sans-serif'},grid:{vertLines:{color:'rgba(110,150,175,.06)'},horzLines:{color:'rgba(110,150,175,.08)'}},rightPriceScale:{borderColor:'rgba(110,150,175,.15)'},timeScale:{borderColor:'rgba(110,150,175,.15)',timeVisible:S.days<=7,secondsVisible:false},crosshair:{mode:LC.CrosshairMode?.Normal??0},localization:{locale:'it-IT',priceFormatter:p=>money(p)}});
+  S.chart=LC.createChart(el,{width:el.clientWidth,height:390,layout:{background:{type:'solid',color:'#04111d'},textColor:'#7895aa',fontFamily:'system-ui,-apple-system,sans-serif'},grid:{vertLines:{color:'rgba(110,150,175,.06)'},horzLines:{color:'rgba(110,150,175,.08)'}},rightPriceScale:{borderColor:'rgba(110,150,175,.15)'},timeScale:{borderColor:'rgba(110,150,175,.15)',timeVisible:S.days<=30,secondsVisible:false,tickMarkFormatter:(time,type,locale)=>window.KiberChart?.tick(time,type,locale)},crosshair:{mode:LC.CrosshairMode?.Normal??0},localization:{locale:'it-IT',timeFormatter:time=>new Date(Number(time)*1000).toLocaleString('it-IT'),priceFormatter:p=>money(p)}});
   const candles=(S.intel?.technical?.candles||[]).map(x=>({time:Number(x?.[0]),open:n(x?.[1]),high:n(x?.[2]),low:n(x?.[3]),close:n(x?.[4]),volume:n(x?.[5])})).filter(x=>Number.isFinite(x.time)&&[x.open,x.high,x.low,x.close].every(v=>v!==null));
   const useCandles=candles.length>=4&&S.days<=30;
   if(useCandles){
@@ -106,7 +106,7 @@ function renderChart(){
     S.series=S.chart.addSeries(LC.AreaSeries,{lineColor:'#59d7ff',topColor:'rgba(89,215,255,.28)',bottomColor:'rgba(89,215,255,.02)',lineWidth:2,priceLineVisible:true,lastValueVisible:true});S.series.setData(pts.map(x=>({time:x.time,value:x.value})));
     S.volume=S.chart.addSeries(LC.HistogramSeries,{priceFormat:{type:'volume'},priceScaleId:'',lastValueVisible:false,priceLineVisible:false});S.volume.priceScale().applyOptions({scaleMargins:{top:.82,bottom:0}});S.volume.setData(pts.map(x=>({time:x.time,value:x.volume||0,color:'rgba(73,151,194,.22)'})));chartMetrics(pts);$('v271Source').textContent=S.chartData?.source||'CoinGecko';$('v271ChartTitle').textContent='Prezzo di mercato · storico verificabile';
   }
-  S.chart.subscribeClick(param=>{if(typeof param.time==='number')window.kiberSelectChartTime?.(param.time*1000)});S.chart.timeScale().fitContent();S._ro=new ResizeObserver(()=>S.chart?.applyOptions({width:el.clientWidth}));S._ro.observe(el);
+  const selectedPoints=useCandles?candles.map(x=>({t:x.time*1000,p:x.close,v:x.volume})):(S.chartData?.points||[]).map(x=>({t:Number(x.t),p:Number(x.p),v:x.volume}));S._selectionCleanup=window.KiberChart?.bind(S.chart,el,selectedPoints,t=>window.kiberSelectChartTime?.(t));S.chart.timeScale().fitContent();S._ro=new ResizeObserver(()=>S.chart?.applyOptions({width:el.clientWidth}));S._ro.observe(el);
 }
 async function loadChart(){
   const token=++S.chartSeq,el=$('v271Chart');if(!el)return;el.innerHTML='<div class="v271-loading">Aggiornamento grafico…</div>';
