@@ -67,7 +67,7 @@ Queste correzioni non costituiscono una riscrittura completa dei moduli storici.
 
 ### Verifica dopo la pubblicazione
 
-84 test passati. Nel browser pubblico: navigazione senza Dossier duplicato; confronto di Aave V3, LayerZero V2 e Morpho Blue con risposta specifica e commissioni mancanti esplicite; apertura di un token da una nuova coppia con contratto corretto ma storico DEX assente; apertura Chainlink con grafico disponibile e analisi della selezione del 28 settembre alle 09:00. Questi esempi verificano percorsi rappresentativi, non tutti gli asset. Durante il cambio token è stata corretta anche l’identità residua nell’intestazione e rimossa la campanella precedente fino al caricamento del nuovo token.
+84 test passati anche nel workflow GitHub “Verify oracle”. Eliminato il vecchio deploy automatico GitHub Pages: falliva nella configurazione Pages e pubblicava soltanto file statici, senza le API Vercel necessarie. Vercel rimane il percorso di pubblicazione della piattaforma. Nel browser pubblico: navigazione senza Dossier duplicato; confronto di Aave V3, LayerZero V2 e Morpho Blue con risposta specifica e commissioni mancanti esplicite; apertura di un token da una nuova coppia con contratto corretto ma storico DEX assente; apertura Chainlink con grafico disponibile e analisi della selezione del 28 settembre alle 09:00. Questi esempi verificano percorsi rappresentativi, non tutti gli asset. Durante il cambio token è stata corretta anche l’identità residua nell’intestazione e rimossa la campanella precedente fino al caricamento del nuovo token.
 
 ## Come funziona l’analisi e cosa può davvero prevedere
 
