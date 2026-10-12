@@ -3,6 +3,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/api/oracle-live",
+      "destination": "/api/coingecko?type=oracle-live"
+    },
+    {
       "source": "/api/evidence-v281",
       "destination": "/api/coingecko?type=evidence-v281"
     },

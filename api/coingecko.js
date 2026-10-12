@@ -1,4 +1,5 @@
 module.exports = async function handler(req,res){
+  if(req.query?.type==='oracle-live') return require('../server/cloud-refresh.cjs').handler(req,res);
   if(req.query?.type==='evidence-v281') return require('../server/evidence-handler.cjs')(req,res);
   if(req.query?.type==='forecast-v28') return require('../server/forecast-handler.cjs')(req,res);
   if(req.method!=='GET') return res.status(405).json({error:'Method not allowed'});
