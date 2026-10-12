@@ -65,6 +65,10 @@ Dati puntuali e non promesse di disponibilità futura. Il JSON del catalogo cons
 
 Queste correzioni non costituiscono una riscrittura completa dei moduli storici. I file di compatibilità rimangono, anche quando i relativi elementi duplicati non sono più mostrati.
 
+### Verifica dopo la pubblicazione
+
+84 test passati. Nel browser pubblico: navigazione senza Dossier duplicato; confronto di Aave V3, LayerZero V2 e Morpho Blue con risposta specifica e commissioni mancanti esplicite; apertura di un token da una nuova coppia con contratto corretto ma storico DEX assente; apertura Chainlink con grafico disponibile e analisi della selezione del 28 settembre alle 09:00. Questi esempi verificano percorsi rappresentativi, non tutti gli asset. Durante il cambio token è stata corretta anche l’identità residua nell’intestazione e rimossa la campanella precedente fino al caricamento del nuovo token.
+
 ## Come funziona l’analisi e cosa può davvero prevedere
 
 | Componente | Cosa calcola | Lettura corretta | Miglioramento necessario |
