@@ -133,6 +133,7 @@ module.exports = async function handler(req,res){
     return res.status(404).json({error:'Unknown type'});
   }catch(e){
     const status=Number(e.status)||502;
+    res.setHeader('Cache-Control','no-store, max-age=0');
     return res.status(status===401||status===429?503:502).json({error:String(e.message||e),needsKey:!key,upstreamStatus:status,source:'Kiber Market Proxy'});
   }
 };
