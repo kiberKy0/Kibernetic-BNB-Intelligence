@@ -10,6 +10,7 @@ box.onclick=e=>{const b=e.target.closest('[data-zoom]');if(!b)return;const scale
 box.querySelector('.kiber-chart-point').textContent='Ultimi movimenti · seleziona un momento sul grafico';
 if(Number.isFinite(selectedTime))show(nearest(points,selectedTime));
 return()=>{disposed=true;clearTimeout(timer);el.removeEventListener('pointerdown',pointer);el.removeEventListener('pointermove',pointer);el.removeEventListener('pointerup',release);el.removeEventListener('pointercancel',release);chart.unsubscribeCrosshairMove(move);chart.unsubscribeClick(click);box.remove()}}
+function isFallback(el){return !!el&&!el.querySelector('table')&&!!el.querySelector(':scope > svg')}
 function tick(time,type,locale){const date=typeof time==='number'?new Date(time*1000):new Date(Date.UTC(time.year,time.month-1,time.day));return date.toLocaleString(locale||'it-IT',type>=3?{hour:'2-digit',minute:'2-digit'}:{day:'2-digit',month:'short',...(type===0?{year:'numeric'}:{})})}
-return{nearest,resolve,bind,tick};
+return{nearest,resolve,bind,tick,isFallback};
 });
