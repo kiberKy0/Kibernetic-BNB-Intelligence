@@ -28,7 +28,7 @@ async function runSearch(raw){
   const term=String(raw||'').trim(),box=$('v272SearchResults');if(!term||!box||state.searchBusy)return;
   if(validAddress(term)){closeOverlay();window.kiberOpenToken?.(term);return}
   state.searchBusy=true;box.innerHTML='<div class="v272-loading">Ricerca CoinGecko…</div>';
-  try{const d=await j('/api/coingecko?type=find&q='+encodeURIComponent(term)+'&v=272');const items=(d.items||[]).slice(0,12);box.innerHTML=items.length?items.map(x=>`<button class="v272-result" data-v272-id="${esc(x.id)}" data-v277-name="${esc(x.name)}" data-v277-symbol="${esc(x.symbol)}"><img src="${esc(x.image||'')}" alt=""><div><b>${esc(x.symbol||'')} · ${esc(x.name||'')}</b><small>${x.price==null?'Prezzo —':'$'+Number(x.price).toLocaleString('it-IT',{maximumFractionDigits:Number(x.price)<1?8:2})} · rank ${esc(x.rank??'—')}</small></div><span>Analizza →</span></button>`).join(''):'<div class="v272-note">Nessun risultato abbastanza preciso.</div>';qa('[data-v272-id]',box).forEach(b=>b.onclick=()=>{const id=b.dataset.v272Id;closeOverlay();window.kiberOpenCoin?.(id)})}catch(e){box.innerHTML='<div class="v272-error">Ricerca temporaneamente non disponibile. Riprova tra poco.</div>'}finally{state.searchBusy=false}
+  try{const d=await j('/api/coingecko?type=find&q='+encodeURIComponent(term)+'&v=272');const items=(d.items||[]).slice(0,12);state.searchItems=items;box.innerHTML=items.length?items.map(x=>`<button class="v272-result" data-v272-id="${esc(x.id)}" data-v277-name="${esc(x.name)}" data-v277-symbol="${esc(x.symbol)}"><img src="${esc(x.image||'')}" alt=""><div><b>${esc(x.symbol||'')} · ${esc(x.name||'')}</b><small>${x.price==null?'Prezzo —':'$'+Number(x.price).toLocaleString('it-IT',{maximumFractionDigits:Number(x.price)<1?8:2})} · rank ${esc(x.rank??'—')}</small></div><span>Analizza →</span></button>`).join(''):'<div class="v272-note">Nessun risultato abbastanza preciso.</div>';qa('[data-v272-id]',box).forEach(b=>b.onclick=()=>{const id=b.dataset.v272Id;closeOverlay();window.kiberOpenCoin?.(id)})}catch(e){box.innerHTML='<div class="v272-error">Ricerca temporaneamente non disponibile. Riprova tra poco.</div>'}finally{state.searchBusy=false}
 }
 async function health(force=false){
   if(!force&&state.health&&Date.now()-state.healthAt<60000)return state.health;
@@ -70,7 +70,7 @@ function interceptSearch(e){
 function keys(e){
   if(e.key!=='Enter')return;const el=e.target;if(el?.id==='tokenSearch'||el?.id==='v241MarketInput'){e.preventDefault();e.stopImmediatePropagation();searchDialog(el.value||'')}
 }
-function boot(){
+function boot(){window.kiberSearchContext=()=>state.searchItems||[];
   mark();ensureOverlay();ensureTools();wireCards();renderWatch();document.addEventListener('click',interceptSearch,true);document.addEventListener('keydown',keys,true);
   window.addEventListener('storage',renderWatch);window.addEventListener('kiber-watch-change',renderWatch);setTimeout(()=>{ensureTools();wireCards();renderWatch();health().catch(()=>{})},900);setInterval(()=>{mark();ensureTools();wireCards();renderWatch()},3500);
 }

@@ -1,46 +1,25 @@
 # Kibernetic BNB Intelligence
 
-**V17 Production Candidate** del progetto Kibernetic BNB Intelligence.
+Versione 28.3: scanner e analisi dei token dell’ecosistema BNB. Il grafico, i movimenti UP/DOWN, i precedenti storici e gli scenari condizionati sono riuniti nella scheda del token. Kiber locale spiega i dati disponibili; OpenAI è rimandata a un’integrazione successiva.
 
-## Obiettivo
-Raccogliere dati di mercato, storico, settori, news, macro e regolamentazione BNB Chain e trasformarli in informazioni più semplici da leggere: fatti osservati, segnali, rischi, ipotesi e fattori da monitorare.
+La pagina principale carica il frontend storico dentro un iframe e applica i moduli successivi. Non è ancora una riscrittura consolidata. Le API Vercel aggregano dati pubblici; Supabase conserva snapshot e rapporti con lavori pianificati.
 
-## V17
-- Interfaccia standalone senza iframe/versioni annidate
-- Ricerca token BNB Chain
-- Aggregazione multi-pool per prezzo, liquidità, volume e flussi
-- Risk Score scomposto per componenti
-- Profilo progetto e classificazione settore con livello di confidenza
-- Storico 24H / 7G / 1M / 1A / 3A quando disponibile
-- Watchlist senza duplicati con sincronizzazione cloud anonima
-- Monitor server H24 ogni 15 minuti
-- Snapshot storici e confronto “cosa è cambiato da ieri”
-- Alert server per prezzo, liquidità, volume e rischio
-- News Intelligence deduplicata con impatto e “perché conta”
-- Dollaro / macro e SEC Monitor
-- Profilo, avatar e temi
-- PWA / service worker notifiche
-- Kiber locale; endpoint Kiber AI già predisposto lato server
-- Checkout Kibernetic PRO predisposto per Stripe
+## Stato verificato
 
-## Backend
-Supabase Edge Functions:
-- `kibernetic-data`: feed mercato/news/macro
-- `kibernetic-intelligence`: token multi-pool, progetto, storico, news e alert
-- `kibernetic-cloud`: dispositivo anonimo e watchlist cloud
-- `kibernetic-monitor`: raccolta H24 e news pipeline
+- [Mappa completa e confronto competitivo](docs/mappa-piattaforma-2026-10-12.md)
+- [Verifica del catalogo](docs/catalog-audit-2026-10-12.json): 250 ID inventariati, 116 richieste completate, 32 grafici disponibili, 84 errori del fornitore, 134 non verificati dopo il limite di richieste. Nessuna garanzia di funzionamento per ogni moneta.
+- [Inventario statico dei moduli](docs/runtime-inventory-2026-10-12.json)
+- La categoria CoinGecko “BNB Chain Ecosystem” non dimostra la presenza di un contratto BSC.
+- Le previsioni sono scenari sperimentali: attendibilità e vantaggio dopo i costi non sono dimostrati.
+- I token monitorati nel browser e quelli raccolti dal server non hanno ancora una copertura unica.
+- Nessuna compravendita o automazione finanziaria è attivata. OpenAI non è attiva.
 
-Il monitor viene eseguito automaticamente tramite `pg_cron` + `pg_net`.
+## Verifica del codice
 
-## Production
-`v17-production.html` è la candidate da testare prima di sostituire definitivamente la pagina principale.
+```sh
+node --test tests/*.test.cjs
+```
 
-Il file `vercel.json` è già preparato per servire V17 come root una volta importato il repository in Vercel.
+Lo script `python3 scripts/audit-catalog.py catalog.json` verifica i grafici a 30 giorni di uno snapshot pubblico del catalogo, interrompendo nuove verifiche quando incontra un limite del fornitore. Non avviarlo ripetutamente durante un rate limit.
 
-## Integrazioni ancora da autorizzare
-Per attivare completamente queste funzioni servono credenziali esterne che non devono essere salvate nel repository:
-- `OPENAI_API_KEY` per Kiber AI
-- Stripe (`STRIPE_SECRET_KEY` + `STRIPE_PRICE_ID`) per PRO €3,50/mese
-
-## Principio dati
-Le stime Kibernetic sono strumenti informativi. Correlazione temporale, news e movimenti di prezzo non vengono presentati automaticamente come rapporti causali certi.
+Sito: https://kibernetic-bnb-intelligence.vercel.app/

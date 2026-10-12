@@ -19,7 +19,7 @@ module.exports=async function handler(req,res){
     const tx=buys1+sells1;if(tx>=500)score+=18;else if(tx>=100)score+=12;else if(tx>=25)score+=6;
     if(age!==null&&age<=24)score+=10;
     const net=buys1-sells1;if(Math.abs(net)>=50)score+=6;
-    return {id:x?.id||'',name:a.name||'',address:a.address||'',poolCreatedAt:a.pool_created_at||null,ageHours:age,priceUsd:n(a.base_token_price_usd),marketCap:n(a.market_cap_usd),fdv:n(a.fdv_usd),liquidityUsd:liq,volume1h:vol1,volume24h:vol24,change1h:chg1,change24h:chg24,buys1h:buys1,sells1h:sells1,buys24h:buys24,sells24h:sells24,attentionScore:clamp(Math.round(score)),source:'GeckoTerminal'};
+    return {id:x?.id||'',name:a.name||'',address:a.address||'',tokenAddress:require('../intelligence-utils.js').poolTokenAddress(x),poolCreatedAt:a.pool_created_at||null,ageHours:age,priceUsd:n(a.base_token_price_usd),marketCap:n(a.market_cap_usd),fdv:n(a.fdv_usd),liquidityUsd:liq,volume1h:vol1,volume24h:vol24,change1h:chg1,change24h:chg24,buys1h:buys1,sells1h:sells1,buys24h:buys24,sells24h:sells24,attentionScore:clamp(Math.round(score)),source:'GeckoTerminal'};
   }
 
   function feeIndex(fees){
@@ -60,13 +60,13 @@ module.exports=async function handler(req,res){
     const pools=(poolsR.status==='fulfilled'&&Array.isArray(poolsR.value?.data)?poolsR.value.data:[]).map(normalizePool).sort((a,b)=>b.attentionScore-a.attentionScore);
     const feesMap=feeIndex(feesR.status==='fulfilled'?feesR.value:null);
     const protocolsAll=protocolsR.status==='fulfilled'&&Array.isArray(protocolsR.value)?protocolsR.value:[];
-    const protocols=protocolsAll.filter(x=>(Array.isArray(x?.chains)?x.chains:[]).some(c=>['bsc','binance','bnb chain','bnb smart chain'].includes(String(c).toLowerCase()))).map(x=>normalizeProtocol(x,feesMap)).sort((a,b)=>(b.fundamentalScore-a.fundamentalScore)||((b.tvl||0)-(a.tvl||0))).slice(0,30);
+    const protocols=protocolsAll.filter(x=>!['CEX','Risk Curators'].includes(x.category)&&(Array.isArray(x?.chains)?x.chains:[]).some(c=>['bsc','binance','bnb chain','bnb smart chain'].includes(String(c).toLowerCase()))).map(x=>normalizeProtocol(x,feesMap)).sort((a,b)=>(b.tvl||0)-(a.tvl||0)).slice(0,30);
     const dex=dexR.status==='fulfilled'&&dexR.value&&typeof dexR.value==='object'?dexR.value:{};
     const attention=pools.filter(x=>x.attentionScore>=45).slice(0,10);
     const events=[];
     if(n(bsc.tvl)!==null)events.push({type:'chain',level:'info',title:'BNB Chain Pulse',text:`TVL rilevato: ${Math.round(n(bsc.tvl))} USD. Il valore viene confrontato con attività DEX e protocolli.`});
     if(attention.length)events.push({type:'market',level:attention[0].attentionScore>=70?'high':'medium',title:'DEX Radar',text:`${attention.length} nuovi pool superano la soglia di attenzione Kiber; il punteggio massimo è ${attention[0].attentionScore}/100.`});
-    if(protocols.length)events.push({type:'fundamentals',level:'info',title:'Fundamentals',text:`${protocols.length} protocolli BSC classificati. Primo per punteggio Kiber: ${protocols[0].name} (${protocols[0].fundamentalScore}/100).`});
+    if(protocols.length)events.push({type:'fundamentals',level:'info',title:'Fundamentals',text:`${protocols.length} protocolli BSC classificati. Campione ordinato per TVL complessivo; primo: ${protocols[0].name}.`});
 
     return res.status(200).json({
       version:'24.0',updatedAt:new Date().toISOString(),source:['DefiLlama','GeckoTerminal'],

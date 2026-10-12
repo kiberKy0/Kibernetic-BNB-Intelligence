@@ -109,6 +109,7 @@ module.exports = async function handler(req,res){
     }
 
     if(type==='bsc'){
+      res.setHeader('Cache-Control','s-maxage=120, stale-while-revalidate=60');
       const page=Math.max(1,Math.min(5,Number(req.query?.page||1)||1));
       const per=Math.max(25,Math.min(250,Number(req.query?.per_page||250)||250));
       const d=await markets(`category=binance-smart-chain&order=market_cap_desc&per_page=${per}&page=${page}`);

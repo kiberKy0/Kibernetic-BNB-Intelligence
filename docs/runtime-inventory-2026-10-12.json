@@ -1,0 +1,1028 @@
+{
+  "loaded_scripts": [
+    "request-dedupe.js",
+    "v22-coingecko-bridge.js",
+    "v21-market-v2.js",
+    "v21-cleanup.js",
+    "v21-sectors.js",
+    "v21-kiber-context.js",
+    "v22-classifica.js",
+    "v23-experience.js",
+    "v23-fix.js",
+    "intelligence-utils.js",
+    "v24.js",
+    "v24-profile-fix.js",
+    "v24-1-ui-fixed.js",
+    "v24-1-brand.js",
+    "v26.js",
+    "v26-brand.js",
+    "v26-6.js",
+    "v26-6-token.js",
+    "v26-7-clean.js",
+    "v26-8.js",
+    "chart-interaction.js",
+    "v26-9.js",
+    "market-history-utils.js",
+    "token-loading-utils.js",
+    "v27-1.js",
+    "v27-2-oracle.js",
+    "analysis-utils.js",
+    "v27-3-forensics.js",
+    "v27-4-oracle.js",
+    "v27-6.js",
+    "watch-utils.js",
+    "v27-7.js",
+    "evidence-ui.js",
+    "v28-main-forecast.js",
+    "access-guide.js",
+    "oracle-utils.js",
+    "oracle-auto.js",
+    "live-status.js",
+    "ui-cleanup.js",
+    "v17.js",
+    "v18.js",
+    "v19.js",
+    "v20-brand.js"
+  ],
+  "script_count": 43,
+  "modules": [
+    {
+      "file": "request-dedupe.js",
+      "intervals_ms": [],
+      "api_references": [
+        "/api/chain",
+        "/api/coingecko",
+        "/api/discovery-v26",
+        "/api/evidence-v281",
+        "/api/forecast-v28",
+        "/api/intelligence",
+        "/api/news-v26",
+        "/api/oracle-live",
+        "/api/token-intel-v26"
+      ],
+      "button_ids": []
+    },
+    {
+      "file": "v22-coingecko-bridge.js",
+      "intervals_ms": [],
+      "api_references": [
+        "/api/coingecko"
+      ],
+      "button_ids": []
+    },
+    {
+      "file": "v21-market-v2.js",
+      "intervals_ms": [],
+      "api_references": [
+        "/api/v3"
+      ],
+      "button_ids": [
+        "labSub",
+        "marketCount",
+        "marketList",
+        "searchBtn",
+        "themeSelect",
+        "tokenSearch",
+        "v20Status",
+        "v21CatalogList",
+        "v21Meta",
+        "v21Sort",
+        "v21Status",
+        "v21Tools"
+      ]
+    },
+    {
+      "file": "v21-cleanup.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": [
+        "avatar",
+        "avatarSelect",
+        "section-dossier",
+        "themeSelect",
+        "v21AvatarGrid",
+        "v21AvatarTitle",
+        "v21ModeHelp"
+      ]
+    },
+    {
+      "file": "v21-sectors.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": [
+        "chatInput",
+        "chatMessages",
+        "section-sectors",
+        "sectorAskKiber",
+        "sectorBook",
+        "sectorBookIndex",
+        "sectorBookText",
+        "sectorBookTitle",
+        "sectorCountNav",
+        "sectorDots",
+        "sectorNext",
+        "sectorPageLabel",
+        "sectorPrev"
+      ]
+    },
+    {
+      "file": "v21-kiber-context.js",
+      "intervals_ms": [],
+      "api_references": [
+        "/api/kiber"
+      ],
+      "button_ids": [
+        "v21KiberThinking"
+      ]
+    },
+    {
+      "file": "v22-classifica.js",
+      "intervals_ms": [
+        "15000"
+      ],
+      "api_references": [],
+      "button_ids": [
+        "v22Status"
+      ]
+    },
+    {
+      "file": "v23-experience.js",
+      "intervals_ms": [
+        "2500"
+      ],
+      "api_references": [
+        "/api/kiber"
+      ],
+      "button_ids": [
+        "v23AddToken",
+        "v23AddTokenBtn",
+        "v23AddTokenState",
+        "v23AiContext",
+        "v23AiIntro",
+        "v23ProfileAvatar",
+        "v23ProfileMode",
+        "v23ProfileName",
+        "v23ProfilePreview",
+        "v23TokenAddress"
+      ]
+    },
+    {
+      "file": "v23-fix.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": [
+        "chartStory",
+        "labContent",
+        "priceChart",
+        "v19ChartCanvas",
+        "v19ChartShell",
+        "v20Status",
+        "v21Status",
+        "v22Status",
+        "v23Status"
+      ]
+    },
+    {
+      "file": "intelligence-utils.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v24.js",
+      "intervals_ms": [
+        "120000"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/intelligence",
+        "/api/kiber",
+        "/api/provider-status"
+      ],
+      "button_ids": [
+        "avatar",
+        "avatarSelect",
+        "bnbChange",
+        "bnbPrice",
+        "hubNav",
+        "v20Status",
+        "v21AvatarGrid",
+        "v21AvatarTitle",
+        "v21Status",
+        "v22Status",
+        "v23ProfileAvatar",
+        "v23Status",
+        "v24Ai-",
+        "v24Ai-chain",
+        "v24Ai-compare",
+        "v24Ai-fundamentals",
+        "v24Ai-market",
+        "v24BnbCap",
+        "v24BnbDex",
+        "v24BnbGrid",
+        "v24BnbStable",
+        "v24BnbTvl",
+        "v24Center",
+        "v24Events",
+        "v24HubBtn",
+        "v24Pane-chain",
+        "v24Pane-compare",
+        "v24Pane-connectors",
+        "v24Pane-fundamentals",
+        "v24Pane-market",
+        "v24Status",
+        "v24Tabs"
+      ]
+    },
+    {
+      "file": "v24-profile-fix.js",
+      "intervals_ms": [
+        "3000"
+      ],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v24-1-ui-fixed.js",
+      "intervals_ms": [
+        "4000",
+        "5000",
+        "120000"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/intelligence"
+      ],
+      "button_ids": [
+        "alertCount",
+        "chatInput",
+        "chatSend",
+        "searchBtn",
+        "section-dossier",
+        "section-kiber",
+        "section-lab",
+        "section-macro",
+        "section-market",
+        "section-news",
+        "section-sectors",
+        "section-watch",
+        "tokenSearch",
+        "v20Status",
+        "v21Status",
+        "v22Status",
+        "v23Status",
+        "v241Alerts",
+        "v241Back",
+        "v241Bnb",
+        "v241BnbMove",
+        "v241Details",
+        "v241Dex",
+        "v241DexMove",
+        "v241Dot",
+        "v241Headline",
+        "v241Home",
+        "v241MarketGo",
+        "v241MarketInput",
+        "v241MarketSearch",
+        "v241Signal",
+        "v241Signals",
+        "v241Status",
+        "v241Subnav",
+        "v241Summary",
+        "v241Tvl",
+        "v241Updated",
+        "v241Watch",
+        "v241Why",
+        "v241WorkTitle",
+        "v241Workbar",
+        "v24Center",
+        "v24Status",
+        "watchTotal",
+        "watchTotal2"
+      ]
+    },
+    {
+      "file": "v24-1-brand.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v26.js",
+      "intervals_ms": [
+        "900",
+        "180000"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/discovery-v26",
+        "/api/intelligence",
+        "/api/kiber",
+        "/api/news-v26",
+        "/api/token-intel-v26"
+      ],
+      "button_ids": [
+        "labContent",
+        "v241Home",
+        "v26AiResult",
+        "v26Chart",
+        "v26ChartStory",
+        "v26Direction",
+        "v26DirectionScore",
+        "v26Ema20",
+        "v26Ema50",
+        "v26Emerging",
+        "v26Evidence",
+        "v26HighNews",
+        "v26HomeDirection",
+        "v26HomeScore",
+        "v26HomeWhy",
+        "v26MarketRadar",
+        "v26Quality",
+        "v26QualityLabel",
+        "v26RadarBody",
+        "v26Resistance",
+        "v26Rsi",
+        "v26Support",
+        "v26TokenFoot",
+        "v26TokenIntel",
+        "v26TokenMeta",
+        "v26TokenNews",
+        "v26TokenTitle",
+        "v26Vol",
+        "v26VolTrend"
+      ]
+    },
+    {
+      "file": "v26-brand.js",
+      "intervals_ms": [
+        "4200"
+      ],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v26-6.js",
+      "intervals_ms": [
+        "180"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/discovery-v26",
+        "/api/intelligence",
+        "/api/kiber",
+        "/api/news-v26"
+      ],
+      "button_ids": [
+        "avatar",
+        "newsList",
+        "newsTabs",
+        "profileBtn",
+        "profileDrawer",
+        "profileName",
+        "profileNameTop",
+        "section-kiber",
+        "sw",
+        "v241Home",
+        "v24Center",
+        "v266Answer",
+        "v266Area",
+        "v266Ask",
+        "v266BnbPill",
+        "v266BnbPrice",
+        "v266BnbWhy",
+        "v266ChainPill",
+        "v266ChainTvl",
+        "v266ChainWhy",
+        "v266Chart",
+        "v266GraphName",
+        "v266GraphPill",
+        "v266GraphWhy",
+        "v266Home",
+        "v266Mic",
+        "v266NewsFilters",
+        "v266NewsList",
+        "v266NewsMeta",
+        "v266ProfileMini",
+        "v266Projects",
+        "v266SectorGrid",
+        "v266SectorSummary",
+        "v266Send"
+      ]
+    },
+    {
+      "file": "v26-6-token.js",
+      "intervals_ms": [
+        "800"
+      ],
+      "api_references": [],
+      "button_ids": [
+        "chartStory",
+        "labContent",
+        "labName",
+        "v266TokenBadge",
+        "v266TokenDetailBtn",
+        "v266TokenName",
+        "v266TokenSummary",
+        "v266TokenWhy",
+        "v266TokenWhyBtn",
+        "v26ChartStory",
+        "v26Direction",
+        "v26TokenIntel"
+      ]
+    },
+    {
+      "file": "v26-7-clean.js",
+      "intervals_ms": [
+        "5000"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/coingecko"
+      ],
+      "button_ids": [
+        "v266Answer",
+        "v266Ask",
+        "v266Send",
+        "v267Area",
+        "v267Change",
+        "v267Chart",
+        "v267ChartWhy",
+        "v267ChartWrap",
+        "v267Cross",
+        "v267Dot",
+        "v267Follow",
+        "v267FollowSend",
+        "v267High",
+        "v267KiberBody",
+        "v267KiberClose",
+        "v267KiberQuery",
+        "v267KiberSheet",
+        "v267Low",
+        "v267Now",
+        "v267Source",
+        "v267Tip"
+      ]
+    },
+    {
+      "file": "v26-8.js",
+      "intervals_ms": [
+        "4000"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/coingecko",
+        "/api/intelligence",
+        "/api/kiber",
+        "/api/news-v26",
+        "/api/token-intel-v26"
+      ],
+      "button_ids": [
+        "v266Ask",
+        "v266BnbPill",
+        "v266BnbPrice",
+        "v266BnbWhy",
+        "v266ChainPill",
+        "v266ChainTvl",
+        "v266ChainWhy",
+        "v266Mic",
+        "v266Send",
+        "v268Area",
+        "v268Back",
+        "v268Change",
+        "v268Chart",
+        "v268Chat",
+        "v268Cross",
+        "v268Dot",
+        "v268Forecast",
+        "v268High",
+        "v268Input",
+        "v268Low",
+        "v268Messages",
+        "v268Mic",
+        "v268Mode",
+        "v268Now",
+        "v268Send",
+        "v268Source",
+        "v268Stage",
+        "v268Status",
+        "v268Tip",
+        "v268Vol",
+        "v268Why"
+      ]
+    },
+    {
+      "file": "chart-interaction.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v26-9.js",
+      "intervals_ms": [
+        "60000",
+        "60000",
+        "5000"
+      ],
+      "api_references": [
+        "/api/coingecko",
+        "/api/kiber"
+      ],
+      "button_ids": [
+        "profileBtn",
+        "v266Ask",
+        "v266BnbPill",
+        "v266Mic",
+        "v266Send",
+        "v268Mode",
+        "v268Status",
+        "v269AskChart",
+        "v269Change",
+        "v269Chart",
+        "v269Forecast",
+        "v269High",
+        "v269Last",
+        "v269Low",
+        "v269Source",
+        "v278MainPoint"
+      ]
+    },
+    {
+      "file": "market-history-utils.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "token-loading-utils.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v27-1.js",
+      "intervals_ms": [
+        "60000"
+      ],
+      "api_references": [
+        "/api/coingecko",
+        "/api/kiber",
+        "/api/news-v26",
+        "/api/token-intel-v26"
+      ],
+      "button_ids": [
+        "kiberAutoToken",
+        "v27124",
+        "v2717",
+        "v271AiAnswer",
+        "v271Back",
+        "v271Cap",
+        "v271Chart",
+        "v271ChartTitle",
+        "v271Close",
+        "v271Factors",
+        "v271FactorsBox",
+        "v271Forecast",
+        "v271High",
+        "v271KiberBox",
+        "v271Liq",
+        "v271Logo",
+        "v271Low",
+        "v271Meta",
+        "v271Monitor",
+        "v271Name",
+        "v271News",
+        "v271PeriodChange",
+        "v271Price",
+        "v271Refresh",
+        "v271Source",
+        "v271Symbol",
+        "v271TokenView",
+        "v271TopName",
+        "v271Vol24",
+        "v271Why",
+        "v271WhyAi",
+        "v272Evidence"
+      ]
+    },
+    {
+      "file": "v27-2-oracle.js",
+      "intervals_ms": [
+        "3500"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/coingecko",
+        "/api/intelligence",
+        "/api/kiber",
+        "/api/news-v26"
+      ],
+      "button_ids": [
+        "alertsBtn",
+        "profileBtn",
+        "section-watch",
+        "tokenSearch",
+        "v241Home",
+        "v241MarketInput",
+        "v266Home",
+        "v268Chat",
+        "v272Body",
+        "v272Close",
+        "v272Health",
+        "v272HealthDot",
+        "v272HealthText",
+        "v272Overlay",
+        "v272RefreshHealth",
+        "v272Search",
+        "v272SearchGo",
+        "v272SearchInput",
+        "v272SearchResults",
+        "v272Title",
+        "v272Tools",
+        "v272WatchBridge"
+      ]
+    },
+    {
+      "file": "analysis-utils.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v27-3-forensics.js",
+      "intervals_ms": [
+        "1200"
+      ],
+      "api_references": [
+        "/api/coingecko",
+        "/api/evidence-v281",
+        "/api/forecast-v28",
+        "/api/news-v26"
+      ],
+      "button_ids": [
+        "v273Events",
+        "v273Forensics",
+        "v273Head",
+        "v273Sel",
+        "v273Tip"
+      ]
+    },
+    {
+      "file": "v27-4-oracle.js",
+      "intervals_ms": [
+        "2000"
+      ],
+      "api_references": [],
+      "button_ids": [
+        "avatarSelect",
+        "profileName",
+        "profileNameTop",
+        "v269Change",
+        "v269Chart",
+        "v26fGraphMove",
+        "v271Chart",
+        "v271PeriodChange",
+        "v275ChainAnalyze",
+        "v275MainAnalyze",
+        "v275TokenAnalyze"
+      ]
+    },
+    {
+      "file": "v27-6.js",
+      "intervals_ms": [
+        "2000",
+        "1000",
+        "60000"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/coingecko",
+        "/api/discovery-v26",
+        "/api/intelligence",
+        "/api/token-intel-v26"
+      ],
+      "button_ids": [
+        "v24Pane-chain",
+        "v271Monitor",
+        "v275ChainAnalyze",
+        "v275MainAnalyze",
+        "v275TokenAnalyze",
+        "v276AlertButton",
+        "v276Alerts",
+        "v276Asset",
+        "v276BnbAlerts",
+        "v276ChainAnalyze",
+        "v276ChainPeriods",
+        "v276ChainStats",
+        "v276ChainSvg",
+        "v276ChainView",
+        "v276Ecosystem",
+        "v276Notice",
+        "v276Remove",
+        "v276Result",
+        "v276Save",
+        "v276Threshold",
+        "v281AlertLabel",
+        "v281AlertMode"
+      ]
+    },
+    {
+      "file": "watch-utils.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v27-7.js",
+      "intervals_ms": [
+        "1500",
+        "60000"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/coingecko",
+        "/api/intelligence",
+        "/api/news-v26",
+        "/api/token-intel-v26"
+      ],
+      "button_ids": [
+        "v266BnbPrice",
+        "v266ChainTvl",
+        "v271Name",
+        "v276ChainAnalyze",
+        "v277BnbBell",
+        "v277Notice",
+        "v277Notifications",
+        "v277Refresh",
+        "v277Rows",
+        "v277SectorRetry",
+        "v277Sectors",
+        "v277TokenBell",
+        "v277Watch"
+      ]
+    },
+    {
+      "file": "evidence-ui.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "v28-main-forecast.js",
+      "intervals_ms": [
+        "1200"
+      ],
+      "api_references": [
+        "/api/evidence-v281",
+        "/api/forecast-v28"
+      ],
+      "button_ids": [
+        "v28MainForecast"
+      ]
+    },
+    {
+      "file": "access-guide.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": [
+        "kiberAccessGuide"
+      ]
+    },
+    {
+      "file": "oracle-utils.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    },
+    {
+      "file": "oracle-auto.js",
+      "intervals_ms": [
+        "700",
+        "60000"
+      ],
+      "api_references": [
+        "/api/chain",
+        "/api/coingecko",
+        "/api/news-v26"
+      ],
+      "button_ids": [
+        "kiberAutoToken",
+        "v271TokenView"
+      ]
+    },
+    {
+      "file": "live-status.js",
+      "intervals_ms": [
+        "60000"
+      ],
+      "api_references": [
+        "/api/oracle-live"
+      ],
+      "button_ids": [
+        "kiberLiveStatus"
+      ]
+    },
+    {
+      "file": "ui-cleanup.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": [
+        "v266Ask",
+        "v266Send",
+        "v268Send",
+        "v272Body"
+      ]
+    },
+    {
+      "file": "v17.js",
+      "intervals_ms": [],
+      "api_references": [
+        "/api/create-checkout",
+        "/api/kiber",
+        "/api/v3"
+      ],
+      "button_ids": [
+        "alertCount",
+        "alertsBtn",
+        "alertsClose",
+        "alertsDrawer",
+        "alertsList",
+        "appStatus",
+        "askKiberBtn",
+        "avatar",
+        "avatarSelect",
+        "bnbChange",
+        "bnbPrice",
+        "changedBtn",
+        "changesBox",
+        "chartMax",
+        "chartMin",
+        "chartMove",
+        "chartRange",
+        "chartStory",
+        "chatInput",
+        "chatMessages",
+        "chatMode",
+        "chatSend",
+        "enableNotifications",
+        "filterCap",
+        "filterMove",
+        "filterSector",
+        "gDirection",
+        "gDrawdown",
+        "gPoints",
+        "gVolatility",
+        "highNews",
+        "labContent",
+        "labEmpty",
+        "labName",
+        "labNavState",
+        "labSector",
+        "labSub",
+        "latestNewsCard",
+        "latestNewsMeta",
+        "latestNewsTitle",
+        "mChange",
+        "mFlow",
+        "mLiquidity",
+        "mPools",
+        "mPrice",
+        "mVolume",
+        "marketCount",
+        "marketList",
+        "memorySummary",
+        "modal",
+        "modalBody",
+        "modalClose",
+        "monitorMeta",
+        "monitorState",
+        "newsCountNav",
+        "newsList",
+        "priceLine",
+        "proBtn",
+        "proState",
+        "profileBtn",
+        "profileClose",
+        "profileDrawer",
+        "profileName",
+        "profileNameTop",
+        "projectDescription",
+        "projectLinks",
+        "projectTitle",
+        "riskExplain",
+        "riskGrid",
+        "saveProfile",
+        "searchBtn",
+        "secList",
+        "section-",
+        "sectorCards",
+        "sectorConfidence",
+        "sectorCountNav",
+        "themeSelect",
+        "tokenNewsList",
+        "tokenSearch",
+        "usdEur",
+        "usdStrength",
+        "viewMode",
+        "watchBreadth",
+        "watchBtn",
+        "watchCountNav",
+        "watchDown",
+        "watchList",
+        "watchRiskHigh",
+        "watchTotal",
+        "watchTotal2",
+        "watchUp"
+      ]
+    },
+    {
+      "file": "v18.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": [
+        "alertCount",
+        "alertsList",
+        "analyzePointBtn",
+        "appStatus",
+        "askPointKiber",
+        "changedBtn",
+        "changesBox",
+        "chartCursorDot",
+        "chartCursorLine",
+        "chartMax",
+        "chartMin",
+        "chartMove",
+        "chartRange",
+        "chartStory",
+        "dossierCountNav",
+        "dossierNews",
+        "dossierOutput",
+        "dossierTokens",
+        "dossierWatchChoices",
+        "gDirection",
+        "gDrawdown",
+        "gPoints",
+        "gVolatility",
+        "hubNav",
+        "newsList",
+        "pointAnalysis",
+        "pointInspector",
+        "pointLiquidity",
+        "pointLock",
+        "pointOhl",
+        "pointPrice",
+        "pointVolume",
+        "pointWhen",
+        "priceArea",
+        "priceChart",
+        "priceLine",
+        "runDossier",
+        "section-dossier",
+        "section-kiber",
+        "tokenNewsList",
+        "v18Gradient",
+        "volumeBars"
+      ]
+    },
+    {
+      "file": "v19.js",
+      "intervals_ms": [
+        "1500"
+      ],
+      "api_references": [],
+      "button_ids": [
+        "analyzePointBtn",
+        "appStatus",
+        "askPointKiber",
+        "chartMove",
+        "chartRange",
+        "chartStory",
+        "gDirection",
+        "gDrawdown",
+        "gPoints",
+        "gVolatility",
+        "monitorState",
+        "pointAnalysis",
+        "pointInspector",
+        "pointLiquidity",
+        "pointLock",
+        "pointOhl",
+        "pointPrice",
+        "pointVolume",
+        "pointWhen",
+        "priceChart",
+        "v19ChartCanvas",
+        "v19ChartShell",
+        "v19EventCount",
+        "v19MetricMessage",
+        "v19TimelineList"
+      ]
+    },
+    {
+      "file": "v20-brand.js",
+      "intervals_ms": [],
+      "api_references": [],
+      "button_ids": []
+    }
+  ]
+}
