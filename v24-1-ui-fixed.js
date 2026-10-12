@@ -47,7 +47,7 @@
     S.view=view||'home';S.sub=sub||null;document.body.dataset.v241View=S.view;const title=id('v241WorkTitle');
     if(S.view==='home'){setPanel(null);if(title)title.textContent='Home';return}
     if(S.view==='market'){
-      const key=S.sub||'catalog';subnav([{key:'catalog',label:'Mercato'},{key:'analysis',label:'Analisi token'},{key:'watch',label:'Monitorati'}],key);const panel=key==='analysis'?id('section-lab'):key==='watch'?id('section-watch'):id('section-market');setPanel(panel);if(title)title.textContent=key==='analysis'?'Analisi token':key==='watch'?'Monitorati':'Mercato';if(key==='catalog')ensureMarketSearch(panel);
+      const key=S.sub==='watch'?'watch':'catalog';subnav([{key:'catalog',label:'Mercato'},{key:'watch',label:'Monitorati'}],key);const panel=key==='watch'?id('section-watch'):id('section-market');setPanel(panel);if(title)title.textContent=key==='watch'?'Monitorati':'Mercato';if(key==='catalog')ensureMarketSearch(panel);
     }else if(S.view==='intelligence'){
       const key=S.sub||'chain';subnav([{key:'chain',label:'Stato BNB Chain'},{key:'market',label:'Nuove coppie'},{key:'fundamentals',label:'Protocolli'},{key:'compare',label:'Confronta'},{key:'sectors',label:'Settori'}],key);
       if(key==='sectors'){setPanel(id('section-sectors'));if(title)title.textContent='Intelligence · Settori'}

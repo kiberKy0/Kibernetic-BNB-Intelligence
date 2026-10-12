@@ -1,0 +1,86 @@
+[
+  {
+    "path": "/api/oracle-live",
+    "checked_at": "2026-10-12T18:31:40.676663+00:00",
+    "http_status": 200,
+    "market": {
+      "last_success": "2026-10-12T18:31:00.493+00:00",
+      "status": "ok",
+      "detail": {
+        "missing": 0,
+        "captured": 4,
+        "requested": 4,
+        "duration_ms": 487,
+        "retention_hours": 24,
+        "provider_requests": 1
+      }
+    },
+    "state": {
+      "last_attempt": "2026-10-12T18:31:00.253+00:00",
+      "last_success": "2026-10-12T18:31:04.638+00:00",
+      "status": "ok",
+      "detail": {
+        "feeds_ok": 1,
+        "news_seen": 12,
+        "duration_ms": 4462,
+        "report_asset": "address:0xcae117ca6bc8a341d2e7207f30e180f0e5618b9d",
+        "feed_requests": 1,
+        "report_status": "ok"
+      }
+    }
+  },
+  {
+    "path": "/api/coingecko?type=bnb_ohlc&days=1",
+    "checked_at": "2026-10-12T18:31:40.677200+00:00",
+    "http_status": 200,
+    "source": "Binance Spot public market data",
+    "interval": "15m",
+    "count": 96,
+    "valid": true
+  },
+  {
+    "path": "/api/coingecko?type=bnb_ohlc&days=7",
+    "checked_at": "2026-10-12T18:31:46.435235+00:00",
+    "http_status": 200,
+    "source": "Binance Spot public market data",
+    "interval": "1h",
+    "count": 168,
+    "valid": true
+  },
+  {
+    "path": "/api/coingecko?type=bnb_ohlc&days=30",
+    "checked_at": "2026-10-12T18:31:46.966808+00:00",
+    "http_status": 200,
+    "source": "Binance Spot public market data",
+    "interval": "4h",
+    "count": 180,
+    "valid": true
+  },
+  {
+    "path": "/api/coingecko?type=bnb_ohlc&days=90",
+    "checked_at": "2026-10-12T18:31:53.041069+00:00",
+    "http_status": 200,
+    "source": "Binance Spot public market data",
+    "interval": "1d",
+    "count": 90,
+    "valid": true
+  },
+  {
+    "path": "/api/coingecko?type=bnb_ohlc&days=365",
+    "checked_at": "2026-10-12T18:31:53.090645+00:00",
+    "http_status": 200,
+    "source": "Binance Spot public market data",
+    "interval": "1d",
+    "count": 365,
+    "valid": true
+  },
+  {
+    "path": "/api/coingecko?type=bnb_ohlc&days=1095",
+    "checked_at": "2026-10-12T18:31:59.556819+00:00",
+    "http_status": 200,
+    "source": "Binance Spot public market data",
+    "interval": "1d",
+    "count": 1095,
+    "valid": true
+  }
+]

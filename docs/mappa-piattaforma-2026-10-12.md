@@ -156,3 +156,51 @@ La forza possibile di Kiber è la semplicità della lettura contestuale. La pres
 - Nansen: https://docs.nansen.ai/api/token-god-mode/holders
 - Santiment: https://academy.santiment.net/metrics/exchange-funds-flow/
 - GoPlus: https://docs.gopluslabs.io/reference/response-details
+
+
+## Secondo controllo — sera del 12 ottobre, versione audit3
+
+Il catalogo corrente restituisce ancora 250 monete, con API CoinGecko non autenticata. Nel browser sono state caricate tutte le 250 righe: 250 ID distinti, 250 comandi Apri token e 250 campanelle. Questo verifica la struttura dell’intero catalogo, non lo storico o la previsione di ogni moneta.
+
+Il secondo passaggio sui grafici riutilizza i 32 esiti disponibili del primo controllo e aggiunge 9 grafici disponibili: 41 complessivi osservati nei due passaggi. Una nuova richiesta ha restituito un limite del fornitore; 208 righe restano non ricontrollate in questo passaggio. La verifica live si è fermata al limite, senza trasformare un errore del provider in un difetto del token. I dati originali e quelli serali sono in JSON separati per non confondere i risultati.
+
+### Altre correzioni
+
+- Tolta la navigazione “Analisi token” verso il vecchio Laboratorio vuoto. La scheda moderna si apre scegliendo una moneta; i vecchi richiami alla pagina analysis tornano al Mercato.
+- “Aggiorna” conserva ID o contratto richiesto anche se l’apertura fallisce. Prima, senza `coin`, non faceva niente. Due test di regressione riproducono il guasto per ID e contratto.
+- Analizza disabilitato durante il caricamento e dopo un’apertura senza dati del token. Nessuna risposta generica spacciata per analisi della moneta non aperta.
+- Stato sistema chiarisce che verifica collegamenti, non tutti i grafici e dati. “OpenAI non collegata” sostituisce la dicitura ambigua “IA esterna in fallback”.
+- Ordine e fonte CoinGecko nascosti nella modalità On-chain, dove non governano la lista. Il testo della modalità cambia insieme alla lista.
+- Corretto “1 token seguito”; volume mobile CoinGecko escluso anche dai dati passati alla selezione del grafico.
+
+### Registro dei percorsi dei comandi
+
+| Gruppo di comandi | Confine dati | Evidenza | Stato |
+|---|---|---|---|
+| Carica altri 60 / ultimi 10 | Catalogo → DOM | Caricate 250/250 righe senza ID duplicati | Verificato nel browser |
+| Ordinamento variazione | Dati catalogo → lista | Cambio opzione e lista corrispondente | Verificato nel browser; null resta dato assente |
+| Classifica / On-chain | Catalogo vs feed DEX | Cambio lista e 51 contratti validi con 51 campanelle | Verificato nel browser |
+| Filtro variazione on-chain | Feed DEX → filtro | Selezione +5% riduce a 10 righe nel controllo | Verificato nel browser; numero variabile col mercato |
+| Analisi token legacy | Navigazione → laboratorio vuoto | Schermata senza token e duplicata rispetto allo scanner | Voce eliminata |
+| Apri token catalogo / coppia | ID o contratto → scanner | Controlli del primo audit e struttura di tutte le 250 righe | Percorso verificato; non ogni feed individuale |
+| Aggiorna dopo errore | Identità richiesta → nuova richiesta | Due test con errore 503 e secondo tentativo allo stesso asset | Corretto e testato |
+| Periodi BNB | API → candele | Controllo delle sei risoluzioni nel JSON endpoint serale | Esito riportato per periodo |
+| Punto / zoom / Analizza | Grafico → contesto → chat | Selezione storica Chainlink del primo audit | Verificato su percorso rappresentativo |
+| Previsione / approfondimento | Modello → dati e condizioni | Test assenza di dati futuri, esiti e costi | Logica verificata; efficacia predittiva non dimostrata |
+| Campanella / rimozione | Token → lista locale | Aggiunta e rimozione Chainlink nel primo audit | Verificato; copertura cloud non automatica |
+| Imposta avvisi | Token → dialogo locale | Tipi percentuale/sopra/sotto e limite pagina aperta | Dialogo verificato; consegna H24 incompleta |
+| Abilita notifiche | Browser → autorizzazione → consegna | Non attivata una nuova autorizzazione in questo audit | Consegna non certificata |
+| Confronta protocolli | Selezione → risposta locale | Risposta dei tre protocolli scelti nel primo audit | Verificato |
+| Ricerca / profilo / ritorno | Input e navigazione | Percorsi del primo audit e revisione sorgenti | Copertura rappresentativa, non prova universale |
+
+### Competitività per strategia
+
+- **Lettura dei movimenti:** utile e coerente con lo scopo educativo. Mancano annotazioni professionali e controllo completo di qualità/frequenza del feed.
+- **Precedenti e ricorrenze:** funzione distintiva potenziale, ma il campione è limitato alla copertura acquisita. Un pattern simile non implica lo stesso esito; occorre misurare stabilità e prestazioni su dati successivi.
+- **Breakout e inversioni:** il sistema propone condizioni, non esegue strategie. Prima di presentare “compra/vendi” come risultato affidabile servono conferma, invalidazione, costi e verifica indipendente.
+- **Liquidità e rischio:** la fotografia attuale aiuta la selezione, ma non sostituisce profondità del mercato, quote per importo, concentrazione degli holder o audit del contratto.
+- **Analisi della chain:** TVL e volume spiegano contesto e settori; non vanno confusi con liquidità negoziabile o prezzo del token.
+- **Notizie:** associazione automatica utile, ancora con copertura storica incompleta; assenza di articoli recuperati non significa assenza di eventi.
+- **Guida semplificata:** è il vantaggio di prodotto da sviluppare. Entro dieci secondi il cliente deve vedere movimento, scenario, motivi, livelli e qualità, poi scegliere se approfondire.
+
+I maggiori concorrenti hanno capacità specifiche verificabili nella loro documentazione: TradingView backtest, test in tempo reale e avvisi server; DEX Screener dati di coppie e pool; Nansen distribuzione degli holder, movimenti e segmenti di wallet; CoinGecko portafoglio e avvisi. Kiber non deve duplicare tutte le loro schermate: deve integrare i dati necessari in un percorso più comprensibile, dopo aver verificato diritti d’uso, copertura e costi.

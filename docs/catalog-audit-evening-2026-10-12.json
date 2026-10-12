@@ -1,0 +1,2290 @@
+{
+  "started_at": "2026-10-12T18:26:56.789137+00:00",
+  "checked_at": "2026-10-12T18:27:42.975047+00:00",
+  "scope": "BNB Chain Ecosystem",
+  "catalog_count": 250,
+  "checked": 42,
+  "complete": false,
+  "reused_available": 32,
+  "stop_reason": "provider_rate_limit",
+  "notes": [
+    "Only the 250 assets returned by this catalog snapshot, not all BNB Chain contracts.",
+    "Charts tested at 30 days; other periods and every asset detail/pool/security endpoint are not exhaustively tested.",
+    "No contract address is inferred from ecosystem membership."
+  ],
+  "assets": [
+    {
+      "id": "binancecoin",
+      "symbol": "BNB",
+      "name": "BNB",
+      "catalog_price": 749.21,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806110000,
+      "duration_seconds": 6.37,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "chainlink",
+      "symbol": "LINK",
+      "name": "Chainlink",
+      "catalog_price": 13.31,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806150000,
+      "duration_seconds": 3.49,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "wrapped-bitcoin",
+      "symbol": "WBTC",
+      "name": "Wrapped Bitcoin",
+      "catalog_price": 83216,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806150000,
+      "duration_seconds": 6.82,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "wrapped-beacon-eth",
+      "symbol": "WBETH",
+      "name": "Wrapped Beacon ETH",
+      "catalog_price": 2816.8,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806150000,
+      "duration_seconds": 3.98,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "binance-bridged-usdt-bnb-smart-chain",
+      "symbol": "BSC-USD",
+      "name": "Binance Bridged USDT (BNB Smart Chain)",
+      "catalog_price": 0.999348,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806160000,
+      "duration_seconds": 6.45,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "wrapped-eeth",
+      "symbol": "WEETH",
+      "name": "Wrapped eETH",
+      "catalog_price": 2810.7,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806160000,
+      "duration_seconds": 3.48,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "ethena-usde",
+      "symbol": "USDE",
+      "name": "Ethena USDe",
+      "catalog_price": 0.99952,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806160000,
+      "duration_seconds": 6.11,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "uniswap",
+      "symbol": "UNI",
+      "name": "Uniswap",
+      "catalog_price": 7.55,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806140000,
+      "duration_seconds": 3.14,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "bitway",
+      "symbol": "BTW",
+      "name": "Bitway",
+      "catalog_price": 1.74,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806170000,
+      "duration_seconds": 6.16,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "usd1-wlfi",
+      "symbol": "USD1",
+      "name": "USD1",
+      "catalog_price": 0.999217,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806170000,
+      "duration_seconds": 3.2,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "the-open-network",
+      "symbol": "GRAM",
+      "name": "Gram (prev. Toncoin)",
+      "catalog_price": 1.38,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829520000,
+      "duration_seconds": 6.16
+    },
+    {
+      "id": "aave",
+      "symbol": "AAVE",
+      "name": "Aave",
+      "catalog_price": 160.75,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829540000,
+      "duration_seconds": 1.22
+    },
+    {
+      "id": "hashnote-usyc",
+      "symbol": "USYC",
+      "name": "Circle USYC",
+      "catalog_price": 1.14,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829550000,
+      "duration_seconds": 6.13
+    },
+    {
+      "id": "ondo-us-dollar-yield",
+      "symbol": "USDY",
+      "name": "Ondo US Dollar Yield",
+      "catalog_price": 1.15,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829550000,
+      "duration_seconds": 1.26
+    },
+    {
+      "id": "blackrock-usd-institutional-digital-liquidity-fund",
+      "symbol": "BUIDL",
+      "name": "BlackRock USD Institutional Digital Liquidity Fund",
+      "catalog_price": 1,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829560000,
+      "duration_seconds": 6.37
+    },
+    {
+      "id": "memecore",
+      "symbol": "M",
+      "name": "MemeCore",
+      "catalog_price": 0.931705,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829560000,
+      "duration_seconds": 1.48
+    },
+    {
+      "id": "aster-2",
+      "symbol": "ASTER",
+      "name": "Aster",
+      "catalog_price": 0.698562,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829570000,
+      "duration_seconds": 6.05
+    },
+    {
+      "id": "falcon-finance",
+      "symbol": "USDF",
+      "name": "Falcon USD",
+      "catalog_price": 0.994609,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829570000,
+      "duration_seconds": 1.76
+    },
+    {
+      "id": "world-liberty-financial",
+      "symbol": "WLFI",
+      "name": "World Liberty Financial",
+      "catalog_price": 0.056821,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789239600000,
+      "to_ms": 1791829580000,
+      "duration_seconds": 6.01
+    },
+    {
+      "id": "usdd",
+      "symbol": "USDD",
+      "name": "USDD",
+      "catalog_price": 0.998527,
+      "bsc_address_verified": false,
+      "chart_status": "provider_error",
+      "http_status": 503,
+      "upstream_status": 429,
+      "error": "You've exceeded the Rate Limit. Please visit https://www.coingecko.com/en/api/pricing to subscribe to our API plans for higher rate limits.",
+      "duration_seconds": 0.92
+    },
+    {
+      "id": "pepe",
+      "symbol": "PEPE",
+      "name": "Pepe",
+      "catalog_price": 4.19e-06,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806210000,
+      "duration_seconds": 6.27,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "binance-bridged-usdc-bnb-smart-chain",
+      "symbol": "USDC",
+      "name": "Binance Bridged USDC (BNB Smart Chain)",
+      "catalog_price": 0.999743,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806210000,
+      "duration_seconds": 3.29,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "united-stables",
+      "symbol": "U",
+      "name": "United Stables",
+      "catalog_price": 0.999087,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-weth",
+      "symbol": "WETH",
+      "name": "Binance-Peg WETH",
+      "catalog_price": 2512.1,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "htx-dao",
+      "symbol": "HTX",
+      "name": "HTX DAO",
+      "catalog_price": 1.67e-06,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "wrapped-one",
+      "symbol": "WONE",
+      "name": "Wrapped One",
+      "catalog_price": 0.571127,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "ethena-staked-usde",
+      "symbol": "SUSDE",
+      "name": "Ethena Staked USDe",
+      "catalog_price": 1.25,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "wbnb",
+      "symbol": "WBNB",
+      "name": "Wrapped BNB",
+      "catalog_price": 742.93,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "cosmos",
+      "symbol": "ATOM",
+      "name": "Cosmos Hub",
+      "catalog_price": 1.84,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "layerzero",
+      "symbol": "ZRO",
+      "name": "LayerZero",
+      "catalog_price": 2.19,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "lombard-staked-btc",
+      "symbol": "LBTC",
+      "name": "Lombard BTC",
+      "catalog_price": 82695,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "midnight-3",
+      "symbol": "NIGHT",
+      "name": "Midnight",
+      "catalog_price": 0.04639551,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "injective-protocol",
+      "symbol": "INJ",
+      "name": "Injective",
+      "catalog_price": 7.58,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "stable-2",
+      "symbol": "STABLE",
+      "name": "​​Stable",
+      "catalog_price": 0.02731508,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "pancakeswap-token",
+      "symbol": "CAKE",
+      "name": "PancakeSwap",
+      "catalog_price": 2.3,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "beldex",
+      "symbol": "BDX",
+      "name": "Beldex",
+      "catalog_price": 0.088469,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "ignition-fbtc",
+      "symbol": "FBTC",
+      "name": "Function FBTC",
+      "catalog_price": 82443,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "janus-henderson-anemoy-aaa-clo-fund",
+      "symbol": "JAAA",
+      "name": "Janus Henderson Anemoy AAA CLO Fund",
+      "catalog_price": 1.052,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "bianrensheng",
+      "symbol": "币安人生",
+      "name": "币安人生 (BinanceLife)",
+      "catalog_price": 0.575647,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "merlin-s-seal-btc",
+      "symbol": "M-BTC",
+      "name": "Merlin's Seal BTC",
+      "catalog_price": 58393,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "akedo",
+      "symbol": "AKE",
+      "name": "Akedo",
+      "catalog_price": 0.02424007,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "usual-usd",
+      "symbol": "USD0",
+      "name": "Usual USD",
+      "catalog_price": 0.998575,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "solv-btc",
+      "symbol": "SOLVBTC",
+      "name": "Solv Protocol BTC",
+      "catalog_price": 83102,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806270000,
+      "duration_seconds": 3.28,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "fetch-ai",
+      "symbol": "FET",
+      "name": "Artificial Superintelligence Alliance",
+      "catalog_price": 0.230595,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806270000,
+      "duration_seconds": 6.17,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "true-usd",
+      "symbol": "TUSD",
+      "name": "TrueUSD",
+      "catalog_price": 0.999169,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806290000,
+      "duration_seconds": 3.32,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "pudgy-penguins",
+      "symbol": "PENGU",
+      "name": "Pudgy Penguins",
+      "catalog_price": 0.00803803,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806270000,
+      "duration_seconds": 6.19,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "binance-peg-xrp",
+      "symbol": "XRP",
+      "name": "Binance-Peg XRP",
+      "catalog_price": 1.36,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "falcon-finance-ff",
+      "symbol": "FF",
+      "name": "Falcon Finance",
+      "catalog_price": 0.113809,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "plasma",
+      "symbol": "XPL",
+      "name": "Plasma",
+      "catalog_price": 0.083563,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "bittorrent",
+      "symbol": "BTT",
+      "name": "BitTorrent",
+      "catalog_price": 3.73673e-07,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "pendle",
+      "symbol": "PENDLE",
+      "name": "Pendle",
+      "catalog_price": 2.1,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "lorenzo-wrapped-bitcoin",
+      "symbol": "ENZOBTC",
+      "name": "Lorenzo Wrapped Bitcoin",
+      "catalog_price": 82583,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 431,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791468000000,
+      "duration_seconds": 3.23,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "pieverse",
+      "symbol": "PIEVERSE",
+      "name": "Pieverse",
+      "catalog_price": 1.29,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806310000,
+      "duration_seconds": 6.26,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "first-digital-usd",
+      "symbol": "FDUSD",
+      "name": "First Digital USD",
+      "catalog_price": 0.997486,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806320000,
+      "duration_seconds": 6.34,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "unibase",
+      "symbol": "UB",
+      "name": "Unibase",
+      "catalog_price": 0.136782,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806310000,
+      "duration_seconds": 3.3,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "re-protocol-reusd",
+      "symbol": "REUSD",
+      "name": "Re Protocol reUSD",
+      "catalog_price": 1.11,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806320000,
+      "duration_seconds": 3.36,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "apxusd",
+      "symbol": "APXUSD",
+      "name": "apxUSD",
+      "catalog_price": 0.990866,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "kite-2",
+      "symbol": "KITE",
+      "name": "Kite",
+      "catalog_price": 0.125228,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "syrupusdt",
+      "symbol": "SYRUPUSDT",
+      "name": "syrupUSDT",
+      "catalog_price": 1.15,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "bonk",
+      "symbol": "BONK",
+      "name": "Bonk",
+      "catalog_price": 3.3e-06,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "gate-wrapped-btc",
+      "symbol": "GTBTC",
+      "name": "Gate Wrapped BTC",
+      "catalog_price": 82790,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-busd",
+      "symbol": "BUSD",
+      "name": "Binance-Peg BUSD",
+      "catalog_price": 1.005,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-zcash-token",
+      "symbol": "ZEC",
+      "name": "Binance-Peg ZEC",
+      "catalog_price": 1233.75,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "floki",
+      "symbol": "FLOKI",
+      "name": "FLOKI",
+      "catalog_price": 2.635e-05,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "universal-btc",
+      "symbol": "UNIBTC",
+      "name": "Universal BTC",
+      "catalog_price": 81821,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "compound-governance-token",
+      "symbol": "COMP",
+      "name": "Compound",
+      "catalog_price": 23.83,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "apenft",
+      "symbol": "NFT",
+      "name": "AINFT",
+      "catalog_price": 2.3789e-07,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "venus-usdt",
+      "symbol": "VUSDT",
+      "name": "Venus USDT",
+      "catalog_price": 0.02653394,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "savings-usdd",
+      "symbol": "SUSDD",
+      "name": "Savings USDD",
+      "catalog_price": 1.059,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "crvusd",
+      "symbol": "CRVUSD",
+      "name": "crvUSD",
+      "catalog_price": 0.999043,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "trust-wallet-token",
+      "symbol": "TWT",
+      "name": "Trust Wallet",
+      "catalog_price": 0.529079,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "frax",
+      "symbol": "FRAX",
+      "name": "Legacy Frax Dollar",
+      "catalog_price": 0.991067,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-dogecoin",
+      "symbol": "DOGE",
+      "name": "Binance-Peg Dogecoin",
+      "catalog_price": 0.084658,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "bnb48-club-token",
+      "symbol": "KOGE",
+      "name": "KOGE",
+      "catalog_price": 64.09,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "axie-infinity",
+      "symbol": "AXS",
+      "name": "Axie Infinity",
+      "catalog_price": 1.2,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "zama",
+      "symbol": "ZAMA",
+      "name": "Zama",
+      "catalog_price": 0.077128,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "agora-dollar",
+      "symbol": "AUSD",
+      "name": "AUSD",
+      "catalog_price": 0.999187,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 720,
+      "source": "CoinGecko public API",
+      "from_ms": 1789218000000,
+      "to_ms": 1791806380000,
+      "duration_seconds": 3.43,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "useless-3",
+      "symbol": "USELESS",
+      "name": "Useless Coin",
+      "catalog_price": 0.190053,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 720,
+      "source": "CoinGecko public API",
+      "from_ms": 1789218000000,
+      "to_ms": 1791806380000,
+      "duration_seconds": 6.33,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "chain-2",
+      "symbol": "XCN",
+      "name": "Onyxcoin",
+      "catalog_price": 0.00450197,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806390000,
+      "duration_seconds": 6.48,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "non-playable-coin",
+      "symbol": "NPC",
+      "name": "Non-Playable Coin",
+      "catalog_price": 0.02153703,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806390000,
+      "duration_seconds": 3.47,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "apyusd",
+      "symbol": "APYUSD",
+      "name": "apyUSD",
+      "catalog_price": 1.4,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "zero-gravity",
+      "symbol": "0G",
+      "name": "0G",
+      "catalog_price": 0.260872,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "coco-2",
+      "symbol": "COCO",
+      "name": "coco",
+      "catalog_price": 0.156452,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "frax-ether",
+      "symbol": "FRXETH",
+      "name": "Frax Ether",
+      "catalog_price": 2506.91,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "gmt-token",
+      "symbol": "GOMINING",
+      "name": "GoMining Token",
+      "catalog_price": 0.378282,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "apecoin",
+      "symbol": "APE",
+      "name": "ApeCoin",
+      "catalog_price": 0.152153,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "cap-4",
+      "symbol": "CAP",
+      "name": "Cap",
+      "catalog_price": 0.096503,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "circle-internet-group-bstock",
+      "symbol": "CRCLB",
+      "name": "Circle Internet Group (bStocks Tokenized Stock)",
+      "catalog_price": 83.3,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "beam-2",
+      "symbol": "BEAM",
+      "name": "Beam",
+      "catalog_price": 0.00284295,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "aioz-network",
+      "symbol": "AIOZ",
+      "name": "AIOZ Network",
+      "catalog_price": 0.11355,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "quack-ai",
+      "symbol": "Q",
+      "name": "Quack AI",
+      "catalog_price": 0.03065548,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "build-on",
+      "symbol": "B",
+      "name": "BUILDon",
+      "catalog_price": 0.144284,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "plume",
+      "symbol": "PLUME",
+      "name": "Plume",
+      "catalog_price": 0.02148088,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "dgrid-ai",
+      "symbol": "DGAI",
+      "name": "DGrid AI",
+      "catalog_price": 0.939314,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "ultima",
+      "symbol": "ULTIMA",
+      "name": "Ultima",
+      "catalog_price": 1631.59,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "1inch",
+      "symbol": "1INCH",
+      "name": "1INCH",
+      "catalog_price": 0.097385,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "safepal",
+      "symbol": "SFP",
+      "name": "SafePal",
+      "catalog_price": 0.273672,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "bedrock-token",
+      "symbol": "BR",
+      "name": "Bedrock",
+      "catalog_price": 0.459448,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-sol",
+      "symbol": "SOL",
+      "name": "Binance-Peg SOL",
+      "catalog_price": 107.43,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "microstrategy-xstock",
+      "symbol": "MSTRX",
+      "name": "MicroStrategy xStock",
+      "catalog_price": 152.87,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "tether-gold-tokens",
+      "symbol": "XAUT0",
+      "name": "Tether Gold Tokens",
+      "catalog_price": 4164.92,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "wrapped-savings-rusd",
+      "symbol": "WSRUSD",
+      "name": "Wrapped Savings rUSD",
+      "catalog_price": 1.1,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 720,
+      "source": "CoinGecko public API",
+      "from_ms": 1789218000000,
+      "to_ms": 1791806460000,
+      "duration_seconds": 6.47,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "astherus-usdf",
+      "symbol": "USDF",
+      "name": "Aster USDF",
+      "catalog_price": 0.997683,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "genius-3",
+      "symbol": "GENIUS",
+      "name": "Genius",
+      "catalog_price": 0.336769,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 720,
+      "source": "CoinGecko public API",
+      "from_ms": 1789218000000,
+      "to_ms": 1791806460000,
+      "duration_seconds": 3.5,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "renzo-restaked-eth",
+      "symbol": "EZETH",
+      "name": "Renzo Restaked ETH",
+      "catalog_price": 2724.42,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "staked-frax-ether",
+      "symbol": "SFRXETH",
+      "name": "Staked Frax Ether",
+      "catalog_price": 2934.57,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-cardano",
+      "symbol": "ADA",
+      "name": "Binance-Peg Cardano",
+      "catalog_price": 0.249362,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 720,
+      "source": "CoinGecko public API",
+      "from_ms": 1789218000000,
+      "to_ms": 1791806460000,
+      "duration_seconds": 8.56,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "four",
+      "symbol": "FORM",
+      "name": "Four",
+      "catalog_price": 0.284612,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "peaq-2",
+      "symbol": "PEAQ",
+      "name": "peaq",
+      "catalog_price": 0.04113835,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "frax-usd",
+      "symbol": "FRXUSD",
+      "name": "Frax USD",
+      "catalog_price": 0.999646,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "openledger-2",
+      "symbol": "OPEN",
+      "name": "OpenLedger",
+      "catalog_price": 0.105435,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "soon-2",
+      "symbol": "SOON",
+      "name": "SOON",
+      "catalog_price": 0.302533,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "cheems-token",
+      "symbol": "CHEEMS",
+      "name": "Cheems Token",
+      "catalog_price": 5.12761e-07,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 721,
+      "source": "CoinGecko public API",
+      "from_ms": 1789214400000,
+      "to_ms": 1791806500000,
+      "duration_seconds": 5.32,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "unity-usd",
+      "symbol": "UUSD",
+      "name": "Unity USD",
+      "catalog_price": 0.998662,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 720,
+      "source": "CoinGecko public API",
+      "from_ms": 1789218000000,
+      "to_ms": 1791806510000,
+      "duration_seconds": 3.84,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "circle-internet-group-ondo-tokenized-stock",
+      "symbol": "CRCLON",
+      "name": "Circle Internet Group (Ondo Tokenized Stock)",
+      "catalog_price": 83.39,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "saturn-dollar",
+      "symbol": "USDAT",
+      "name": "Saturn Dollar",
+      "catalog_price": 0.999437,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 720,
+      "source": "CoinGecko public API",
+      "from_ms": 1789218000000,
+      "to_ms": 1791806510000,
+      "duration_seconds": 6.4,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "prometeus",
+      "symbol": "PROM",
+      "name": "Prom",
+      "catalog_price": 5.26,
+      "bsc_address_verified": false,
+      "chart_status": "available",
+      "points": 720,
+      "source": "CoinGecko public API",
+      "from_ms": 1789218000000,
+      "to_ms": 1791806510000,
+      "duration_seconds": 3.48,
+      "catalog_valid": true,
+      "network_scope": "ecosystem membership; contract not verified by this test"
+    },
+    {
+      "id": "circle-xstock",
+      "symbol": "CRCLX",
+      "name": "Circle xStock",
+      "catalog_price": 83.32,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "spacex-bstocks-tokenized-stock",
+      "symbol": "SPCXB",
+      "name": "SpaceX (bStocks Tokenized Stock)",
+      "catalog_price": 163.92,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "usda-3",
+      "symbol": "USDA",
+      "name": "USDA",
+      "catalog_price": 0.995896,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "velo",
+      "symbol": "VELO",
+      "name": "Velo",
+      "catalog_price": 0.00489071,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "marscoin-4",
+      "symbol": "MARSCOIN",
+      "name": "MarsCoin",
+      "catalog_price": 0.085548,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "cow-protocol",
+      "symbol": "COW",
+      "name": "CoW Protocol",
+      "catalog_price": 0.144939,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "zignaly",
+      "symbol": "ZIG",
+      "name": "ZIG Finance",
+      "catalog_price": 0.058626,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "solv-protocol-solvbtc-bbn",
+      "symbol": "XSOLVBTC",
+      "name": "Solv Protocol Staked BTC",
+      "catalog_price": 81616,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "staked-usd1",
+      "symbol": "SUSD1+",
+      "name": "staked USD1+",
+      "catalog_price": 1.028,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "flying-tulip",
+      "symbol": "FT",
+      "name": "Flying Tulip",
+      "catalog_price": 0.161764,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "unifai-network",
+      "symbol": "UAI",
+      "name": "UnifAI Network",
+      "catalog_price": 0.324381,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "o1-exchange",
+      "symbol": "O",
+      "name": "o1.exchange",
+      "catalog_price": 0.482521,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "helio-protocol-hay",
+      "symbol": "LISUSD",
+      "name": "Lista USD",
+      "catalog_price": 0.995939,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "zetachain",
+      "symbol": "ZETA",
+      "name": "ZetaChain",
+      "catalog_price": 0.04556522,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "axelar",
+      "symbol": "AXL",
+      "name": "Axelar",
+      "catalog_price": 0.059471,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "apes-2-2",
+      "symbol": "APES",
+      "name": "APES",
+      "catalog_price": 0.081866,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "kava",
+      "symbol": "KAVA",
+      "name": "Kava",
+      "catalog_price": 0.067996,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "niu-lai",
+      "symbol": "牛来",
+      "name": "牛来 (Niu Lai)",
+      "catalog_price": 0.072545,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "tagger",
+      "symbol": "TAG",
+      "name": "TAGGER",
+      "catalog_price": 0.00066667,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "strategy-stretch-preferred-ondo-tokenized",
+      "symbol": "STRCON",
+      "name": "Strategy Stretch Preferred (Ondo Tokenized)",
+      "catalog_price": 105.88,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "mubarak",
+      "symbol": "MUBARAK",
+      "name": "Mubarak",
+      "catalog_price": 0.072065,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "ishares-core-s-p-500-etf-ondo-tokenized-etf",
+      "symbol": "IVVON",
+      "name": "iShares Core S&P 500 ETF (Ondo Tokenized ETF)",
+      "catalog_price": 790.64,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "tesla-xstock",
+      "symbol": "TSLAX",
+      "name": "Tesla xStock",
+      "catalog_price": 379.23,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "astherus-staked-bnb",
+      "symbol": "ASBNB",
+      "name": "Aster Staked BNB",
+      "catalog_price": 791.6,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "dola-usd",
+      "symbol": "DOLA",
+      "name": "DOLA",
+      "catalog_price": 0.996875,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-near-protocol",
+      "symbol": "NEAR",
+      "name": "Binance-Peg NEAR Protocol",
+      "catalog_price": 5.44,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "baby-doge-coin",
+      "symbol": "BABYDOGE",
+      "name": "Baby Doge Coin",
+      "catalog_price": 3.79811e-10,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "unipoly",
+      "symbol": "UNP",
+      "name": "Unipoly",
+      "catalog_price": 0.249845,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "zilliqa",
+      "symbol": "ZIL",
+      "name": "Zilliqa",
+      "catalog_price": 0.00356763,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "oasis-network",
+      "symbol": "ROSE",
+      "name": "Oasis",
+      "catalog_price": 0.00850578,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "project-galaxy",
+      "symbol": "GAL",
+      "name": "GAL (migrated to Gravity - G)",
+      "catalog_price": 0.53203,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "sushi",
+      "symbol": "SUSHI",
+      "name": "Sushi",
+      "catalog_price": 0.236268,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "banana-for-scale-2",
+      "symbol": "BANANAS31",
+      "name": "Banana For Scale",
+      "catalog_price": 0.0067603,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "ondo-u-s-dollar-token",
+      "symbol": "USDON",
+      "name": "Ondo U.S. Dollar Token",
+      "catalog_price": 1,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "noxo",
+      "symbol": "NOXO",
+      "name": "NOXO",
+      "catalog_price": 0.400747,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "cross-2",
+      "symbol": "ONE",
+      "name": "ONEchain",
+      "catalog_price": 0.124824,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "mindwavedao",
+      "symbol": "NILA",
+      "name": "MindWaveDAO",
+      "catalog_price": 0.07885,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "dexe",
+      "symbol": "DEXE",
+      "name": "DeXe",
+      "catalog_price": 1.87,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "sp500-xstock",
+      "symbol": "SPYX",
+      "name": "SP500 xStock",
+      "catalog_price": 781.16,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "escoin-token",
+      "symbol": "ELG",
+      "name": "Escoin",
+      "catalog_price": 0.291482,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "proton",
+      "symbol": "XPR",
+      "name": "XPR Network",
+      "catalog_price": 0.00221819,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "edu-coin",
+      "symbol": "EDU",
+      "name": "Open Campus",
+      "catalog_price": 0.073915,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "royal-euro",
+      "symbol": "REUR",
+      "name": "Royal Euro",
+      "catalog_price": 4.13,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "merlin-chain",
+      "symbol": "MERL",
+      "name": "Merlin Chain",
+      "catalog_price": 0.02952054,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "altlayer",
+      "symbol": "ALT",
+      "name": "AltLayer",
+      "catalog_price": 0.00837608,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "vaneck-treasury-fund",
+      "symbol": "VBILL",
+      "name": "VanEck Treasury Fund",
+      "catalog_price": 1,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "bio-protocol",
+      "symbol": "BIO",
+      "name": "Bio Protocol",
+      "catalog_price": 0.02830146,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "space-id",
+      "symbol": "ID",
+      "name": "SPACE ID",
+      "catalog_price": 0.03910339,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "allora",
+      "symbol": "ALLO",
+      "name": "Allora",
+      "catalog_price": 0.237046,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "goplus-security",
+      "symbol": "GPS",
+      "name": "GoPlus Security",
+      "catalog_price": 0.0100792,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "huma-finance",
+      "symbol": "HUMA",
+      "name": "Huma Finance",
+      "catalog_price": 0.03362322,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "dappos",
+      "symbol": "DOS",
+      "name": "DAPPOS",
+      "catalog_price": 0.288494,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "arcium",
+      "symbol": "ARX",
+      "name": "Arcium",
+      "catalog_price": 0.272629,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "strategy-tokenized-bstocks",
+      "symbol": "MSTRB",
+      "name": "Strategy (bStocks Tokenized Stock)",
+      "catalog_price": 152.88,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "marscat-token",
+      "symbol": "MCAT",
+      "name": "Marscat Token",
+      "catalog_price": 0.591965,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "aelf",
+      "symbol": "ELF",
+      "name": "aelf",
+      "catalog_price": 0.067002,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "bas",
+      "symbol": "BAS",
+      "name": "BNB Attestation Service",
+      "catalog_price": 0.02192984,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "newton-project",
+      "symbol": "AB",
+      "name": "AB",
+      "catalog_price": 0.00054657,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "dusk-network",
+      "symbol": "DUSK",
+      "name": "DUSK",
+      "catalog_price": 0.088247,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "based-brett",
+      "symbol": "BRETT",
+      "name": "Brett",
+      "catalog_price": 0.00541283,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "usdu",
+      "symbol": "USDU",
+      "name": "USDu",
+      "catalog_price": 0.998937,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "brz",
+      "symbol": "BRZ",
+      "name": "Brazilian Digital",
+      "catalog_price": 0.196402,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "chainopera-ai",
+      "symbol": "COAI",
+      "name": "ChainOpera AI",
+      "catalog_price": 0.282957,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "standx-dusd",
+      "symbol": "DUSD",
+      "name": "StandX DUSD",
+      "catalog_price": 0.996955,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "venus",
+      "symbol": "XVS",
+      "name": "Venus",
+      "catalog_price": 3.11,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "token-pocket",
+      "symbol": "TPT",
+      "name": "TokenPocket Token",
+      "catalog_price": 0.00882616,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "memetoon",
+      "symbol": "MEME",
+      "name": "MEMETOON",
+      "catalog_price": 0.00051674,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "meme-horse",
+      "symbol": "MHORSE",
+      "name": "MEME HORSE",
+      "catalog_price": 0.050224,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "bedrock-btc",
+      "symbol": "BRBTC",
+      "name": "Bedrock BTC",
+      "catalog_price": 62482,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "aleo",
+      "symbol": "ALEO",
+      "name": "ALEO",
+      "catalog_price": 0.03345657,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "spacex-xstocks",
+      "symbol": "SPCXX",
+      "name": "SpaceX xStock",
+      "catalog_price": 163.93,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-shib",
+      "symbol": "SHIB",
+      "name": "Binance-Peg SHIB",
+      "catalog_price": 5.32e-06,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "nexus-4",
+      "symbol": "NEX",
+      "name": "Nexus",
+      "catalog_price": 8.10433e-07,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "nvidia-bstocks",
+      "symbol": "NVDAB",
+      "name": "NVIDIA (bStocks Tokenized Stock)",
+      "catalog_price": 226.72,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "mask-network",
+      "symbol": "MASK",
+      "name": "Mask Network",
+      "catalog_price": 0.476261,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "holoworld",
+      "symbol": "HOLO",
+      "name": "Holoworld",
+      "catalog_price": 0.059955,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "ankr",
+      "symbol": "ANKR",
+      "name": "Ankr Network",
+      "catalog_price": 0.0047008,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "spdr-s-p-500-etf-ondo-tokenized-etf",
+      "symbol": "SPYON",
+      "name": "SPDR S&P 500 ETF (Ondo Tokenized ETF)",
+      "catalog_price": 785.73,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "toshi",
+      "symbol": "TOSHI",
+      "name": "Toshi",
+      "catalog_price": 0.00011092,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "ravedao",
+      "symbol": "RAVE",
+      "name": "RaveDAO",
+      "catalog_price": 0.17205,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-litecoin",
+      "symbol": "LTC",
+      "name": "Binance-Peg Litecoin",
+      "catalog_price": 62.34,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "nvidia-xstock",
+      "symbol": "NVDAX",
+      "name": "NVIDIA xStock",
+      "catalog_price": 226.66,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "lombard-protocol",
+      "symbol": "BARD",
+      "name": "Lombard",
+      "catalog_price": 0.119708,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "wrapped-xpl",
+      "symbol": "WXPL",
+      "name": "Wrapped XPL",
+      "catalog_price": 0.083437,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "sharex-2",
+      "symbol": "SHARE",
+      "name": "ShareX",
+      "catalog_price": 2.4,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "micron-technology-bstock",
+      "symbol": "MUB",
+      "name": "Micron Technology (bStocks Tokenized Stock)",
+      "catalog_price": 992.39,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "ethgas-2",
+      "symbol": "GWEI",
+      "name": "ETHGas",
+      "catalog_price": 0.02131986,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "micron-technology-ondo-tokenized-stock",
+      "symbol": "MUON",
+      "name": "Micron Technology (Ondo Tokenized Stock)",
+      "catalog_price": 998.34,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "nasdaq-xstock",
+      "symbol": "QQQX",
+      "name": "Nasdaq xStock",
+      "catalog_price": 747.26,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "nesa",
+      "symbol": "NES",
+      "name": "Nesa",
+      "catalog_price": 0.14033,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "moolah",
+      "symbol": "MOOLAH",
+      "name": "Moolah",
+      "catalog_price": 0.04000755,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "synapse-2",
+      "symbol": "SYN",
+      "name": "Synapse",
+      "catalog_price": 0.181137,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "acurast",
+      "symbol": "ACU",
+      "name": "Acurast",
+      "catalog_price": 0.096467,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "alphabet-xstock",
+      "symbol": "GOOGLX",
+      "name": "Alphabet xStock",
+      "catalog_price": 352.53,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "lobster-2",
+      "symbol": "龙虾",
+      "name": "龙虾 (Lobster)",
+      "catalog_price": 0.03948462,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "lab",
+      "symbol": "LAB",
+      "name": "LAB",
+      "catalog_price": 0.050473,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "folks",
+      "symbol": "FOLKS",
+      "name": "FOLKS",
+      "catalog_price": 2.17,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "succinct",
+      "symbol": "PROVE",
+      "name": "Succinct",
+      "catalog_price": 0.196192,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "pumpbtc",
+      "symbol": "PUMPBTC",
+      "name": "pumpBTC",
+      "catalog_price": 57771,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "sandisk-bstocks-tokenized-stock",
+      "symbol": "SNDKB",
+      "name": "SanDisk (bStocks Tokenized Stock)",
+      "catalog_price": 1481.61,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "eurite",
+      "symbol": "EURI",
+      "name": "Eurite",
+      "catalog_price": 1.12,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "rekt-4",
+      "symbol": "REKT",
+      "name": "Rekt",
+      "catalog_price": 8.7647e-08,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "nkyc-token",
+      "symbol": "NKYC",
+      "name": "NKYC Token",
+      "catalog_price": 9.21,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "sahara-ai",
+      "symbol": "SAHARA",
+      "name": "Sahara AI",
+      "catalog_price": 0.00867544,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "unitas",
+      "symbol": "UP",
+      "name": "Unitas",
+      "catalog_price": 0.169955,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "sign-global",
+      "symbol": "SIGN",
+      "name": "Sign",
+      "catalog_price": 0.01284541,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "orbs",
+      "symbol": "ORBS",
+      "name": "Orbs",
+      "catalog_price": 0.00717644,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "giggle-fund",
+      "symbol": "GIGGLE",
+      "name": "Giggle Fund",
+      "catalog_price": 35.45,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "momentum-3",
+      "symbol": "MMT",
+      "name": "Momentum",
+      "catalog_price": 0.172572,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "neiro-3",
+      "symbol": "NEIRO",
+      "name": "Neiro",
+      "catalog_price": 8.36e-05,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "wiki-cat",
+      "symbol": "WKC",
+      "name": "Wiki Cat",
+      "catalog_price": 6.5638e-08,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "nvidia-ondo-tokenized-stock",
+      "symbol": "NVDAON",
+      "name": "NVIDIA (Ondo Tokenized Stock)",
+      "catalog_price": 226.94,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "alphabet-bstocks-tokenized-stock",
+      "symbol": "GOOGLB",
+      "name": "Alphabet (bStocks Tokenized Stock)",
+      "catalog_price": 351.67,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "aegis-yusd",
+      "symbol": "YUSD",
+      "name": "Aegis YUSD",
+      "catalog_price": 0.998859,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "invesco-qqq-etf-ondo-tokenized-etf",
+      "symbol": "QQQON",
+      "name": "Invesco QQQ ETF (Ondo Tokenized ETF)",
+      "catalog_price": 748.93,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "yfsx",
+      "symbol": "YFSX",
+      "name": "YFSX",
+      "catalog_price": 1700.62,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "lista",
+      "symbol": "LISTA",
+      "name": "Lista DAO",
+      "catalog_price": 0.078281,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "xpin-network",
+      "symbol": "XPIN",
+      "name": "XPIN Network",
+      "catalog_price": 0.00078452,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "vana",
+      "symbol": "VANA",
+      "name": "Vana",
+      "catalog_price": 1.082,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "velvet",
+      "symbol": "VELVET",
+      "name": "Velvet",
+      "catalog_price": 0.071559,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "subsquid",
+      "symbol": "SQD",
+      "name": "SQD",
+      "catalog_price": 0.02532028,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "euler",
+      "symbol": "EUL",
+      "name": "Euler",
+      "catalog_price": 1.37,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "tornado-cash",
+      "symbol": "TORN",
+      "name": "Tornado Cash",
+      "catalog_price": 6.86,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "skyai",
+      "symbol": "SKYAI",
+      "name": "SkyAI",
+      "catalog_price": 0.03284448,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "hims-hers-health-ondo-tokenized-stock",
+      "symbol": "HIMSON",
+      "name": "Hims & Hers Health (Ondo Tokenized Stock)",
+      "catalog_price": 30.87,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "cartesi",
+      "symbol": "CTSI",
+      "name": "Cartesi",
+      "catalog_price": 0.03403203,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "opengradient",
+      "symbol": "OPG",
+      "name": "OpenGradient",
+      "catalog_price": 0.140851,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "changenow",
+      "symbol": "NOW",
+      "name": "ChangeNOW",
+      "catalog_price": 0.385976,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "teller",
+      "symbol": "DEBIT",
+      "name": "Teller",
+      "catalog_price": 1.87,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "apro",
+      "symbol": "AT",
+      "name": "Apro",
+      "catalog_price": 0.139516,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "rhea-2",
+      "symbol": "RHEA",
+      "name": "RHEA",
+      "catalog_price": 0.07741,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "binance-peg-dai",
+      "symbol": "DAI",
+      "name": "Binance-Peg DAI",
+      "catalog_price": 0.999765,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    },
+    {
+      "id": "frax-share",
+      "symbol": "FRAX",
+      "name": "Frax (prev. FXS)",
+      "catalog_price": 0.331238,
+      "bsc_address_verified": false,
+      "chart_status": "not_checked_rate_limit"
+    }
+  ]
+}

@@ -6,15 +6,22 @@ External availability is a point-in-time observation, never a reliability guaran
 import concurrent.futures, datetime, json, pathlib, threading, time, urllib.request, urllib.error, urllib.parse, argparse
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-parser=argparse.ArgumentParser();parser.add_argument('catalog',type=pathlib.Path,help='JSON catalog snapshot with items');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('catalog',type=pathlib.Path,help='JSON catalog snapshot with items');parser.add_argument('--output',type=pathlib.Path,default=ROOT/'docs/catalog-audit-2026-10-12.json');parser.add_argument('--resume',type=pathlib.Path);args=parser.parse_args()
 catalog=json.loads(args.catalog.read_text())
 items=catalog.get('items',[])
 lock=threading.Lock(); next_start=0; results={}; done=0; stopped=threading.Event()
 started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+previous={}
+if args.resume:
+    previous={x['id']:x for x in json.loads(args.resume.read_text()).get('assets',[]) if x.get('chart_status')=='available'}
+    results.update({x['id']:previous[x['id']] for x in items if x['id'] in previous})
 def check(asset):
     global next_start
+    row={'id':asset.get('id'),'symbol':asset.get('symbol'),'name':asset.get('name'),'catalog_price':asset.get('price'),'bsc_address_verified':False,'chart_status':'not_checked'}
+    if stopped.is_set():
+        row['chart_status']='not_checked_rate_limit';return row
     with lock:
-        wait=max(0,next_start-time.monotonic());next_start=max(next_start,time.monotonic())+3
+        wait=max(0,next_start-time.monotonic());next_start=max(next_start,time.monotonic())+5
     if wait: time.sleep(wait)
     row={'id':asset.get('id'),'symbol':asset.get('symbol'),'name':asset.get('name'),'catalog_price':asset.get('price'),'bsc_address_verified':False,'chart_status':'not_checked'}
     if stopped.is_set():
@@ -35,11 +42,11 @@ def check(asset):
     row['duration_seconds']=round(time.monotonic()-begin,2)
     return row
 def save():
-    payload={'started_at':started,'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':catalog.get('scope'),'catalog_count':len(items),'checked':sum(x['chart_status']!='not_checked_rate_limit' for x in results.values()),'complete':len(results)==len(items) and not stopped.is_set(),'stop_reason':'provider_rate_limit' if stopped.is_set() else None,'notes':['Only the 250 assets returned by this catalog snapshot, not all BNB Chain contracts.','Charts tested at 30 days; other periods and every asset detail/pool/security endpoint are not exhaustively tested.','No contract address is inferred from ecosystem membership.'],'assets':[results.get(x['id'],{'id':x['id'],'symbol':x.get('symbol'),'name':x.get('name'),'chart_status':'pending'}) for x in items]}
-    (ROOT/'docs/catalog-audit-2026-10-12.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
+    payload={'started_at':started,'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':catalog.get('scope'),'catalog_count':len(items),'checked':sum(x['chart_status']!='not_checked_rate_limit' for x in results.values()),'complete':len(results)==len(items) and not stopped.is_set(),'reused_available':len(previous),'stop_reason':'provider_rate_limit' if stopped.is_set() else None,'notes':['Only the 250 assets returned by this catalog snapshot, not all BNB Chain contracts.','Charts tested at 30 days; other periods and every asset detail/pool/security endpoint are not exhaustively tested.','No contract address is inferred from ecosystem membership.'],'assets':[results.get(x['id'],{'id':x['id'],'symbol':x.get('symbol'),'name':x.get('name'),'chart_status':'pending'}) for x in items]}
+    args.output.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')
 save()
 with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-    jobs=[executor.submit(check,x) for x in items]
+    jobs=[executor.submit(check,x) for x in items if x['id'] not in results]
     for job in concurrent.futures.as_completed(jobs):
         row=job.result();results[row['id']]=row;done+=1;save()
-        if done%10==0 or done==len(items):print(json.dumps({'checked':done,'total':len(items),'available':sum(x['chart_status']=='available' for x in results.values())}),flush=True)
+        if done%10==0 or done==len(items):print(json.dumps({'requests_completed':sum(x['chart_status'] not in ['not_checked_rate_limit','pending'] for x in results.values())-len(previous),'inventoried':len(results),'total':len(items),'available':sum(x['chart_status']=='available' for x in results.values())}),flush=True)

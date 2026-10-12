@@ -8,6 +8,8 @@ La pagina principale carica il frontend storico dentro un iframe e applica i mod
 
 - [Mappa completa e confronto competitivo](docs/mappa-piattaforma-2026-10-12.md)
 - [Verifica del catalogo](docs/catalog-audit-2026-10-12.json): 250 ID inventariati, 116 richieste completate, 32 grafici disponibili, 84 errori del fornitore, 134 non verificati dopo il limite di richieste. Nessuna garanzia di funzionamento per ogni moneta.
+- [Secondo controllo del catalogo](docs/catalog-audit-evening-2026-10-12.json): 9 grafici disponibili aggiuntivi, 32 esiti precedenti riutilizzati; verifica fermata al nuovo limite del fornitore.
+- [Controllo endpoint e periodi BNB](docs/endpoint-audit-evening-2026-10-12.json)
 - [Inventario statico dei moduli](docs/runtime-inventory-2026-10-12.json)
 - La categoria CoinGecko “BNB Chain Ecosystem” non dimostra la presenza di un contratto BSC.
 - Le previsioni sono scenari sperimentali: attendibilità e vantaggio dopo i costi non sono dimostrati.

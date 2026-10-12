@@ -39,7 +39,7 @@ async function health(force=false){
     ['News','/api/news-v26?v=272'],
     ['Kiber AI','/api/kiber?v=272']
   ];
-  const started=performance.now(),rows=await Promise.all(tests.map(async([name,url])=>{const t=performance.now();try{const d=await j(url,{cache:'no-store'},7000);return{name,ok:true,ms:Math.round(performance.now()-t),detail:name==='Kiber AI'?(d.ai?`IA · ${d.provider||'provider'}`:'fallback deterministico'):(d.source?String(Array.isArray(d.source)?d.source.join(' + '):d.source):'online'),ai:name==='Kiber AI'?!!d.ai:null}}catch(e){return{name,ok:false,ms:Math.round(performance.now()-t),detail:'non disponibile'}}}));
+  const started=performance.now(),rows=await Promise.all(tests.map(async([name,url])=>{const t=performance.now();try{const d=await j(url,{cache:'no-store'},7000);return{name,ok:true,ms:Math.round(performance.now()-t),detail:name==='Kiber AI'?(d.ai?`IA · ${d.provider||'provider'}`:'motore locale; OpenAI non collegata'):(d.source?String(Array.isArray(d.source)?d.source.join(' + '):d.source):'online'),ai:name==='Kiber AI'?!!d.ai:null}}catch(e){return{name,ok:false,ms:Math.round(performance.now()-t),detail:'non disponibile'}}}));
   const dom=[
     ['Scanner token',typeof window.kiberOpenCoin==='function'&&typeof window.kiberOpenToken==='function'],
     ['Ricerca',!!($('tokenSearch')||$('v241MarketInput'))],
@@ -50,10 +50,10 @@ async function health(force=false){
   state.health={rows:[...rows,...dom],elapsed:Math.round(performance.now()-started)};state.healthAt=Date.now();syncHealthChip();return state.health;
 }
 function syncHealthChip(){
-  const h=state.health;if(!h)return;const failed=h.rows.filter(x=>!x.ok).length,ai=h.rows.find(x=>x.name==='Kiber AI'),dot=$('v272HealthDot'),txt=$('v272HealthText');if(dot)dot.className='v272-dot '+(failed?'bad':ai&&!ai.ai?'warn':'good');if(txt)txt.textContent=failed?`${failed} moduli da verificare`:ai&&!ai.ai?'Dati attivi · IA esterna in fallback':'Fonti principali operative';
+  const h=state.health;if(!h)return;const failed=h.rows.filter(x=>!x.ok).length,ai=h.rows.find(x=>x.name==='Kiber AI'),dot=$('v272HealthDot'),txt=$('v272HealthText');if(dot)dot.className='v272-dot '+(failed?'bad':ai&&!ai.ai?'warn':'good');if(txt)txt.textContent=failed?`${failed} moduli da verificare`:ai&&!ai.ai?'Motore locale · OpenAI non collegata':'Servizi raggiungibili · dati da verificare';
 }
 async function showHealth(force=false){
-  openOverlay('Stato sistema','<div class="v272-loading">Test delle fonti e dei comandi…</div>');const h=await health(force);const box=$('v272Body');if(!box)return;box.innerHTML=`<div class="v272-health-summary"><b>${h.rows.filter(x=>x.ok).length}/${h.rows.length} moduli collegati</b><span>Test completato in ${h.elapsed} ms</span></div><div class="v272-health-list">${h.rows.map(x=>`<div><i class="${x.ok?'ok':'no'}"></i><span><b>${esc(x.name)}</b><small>${esc(x.detail)}${x.ms!=null?' · '+x.ms+' ms':''}</small></span></div>`).join('')}</div><button class="v272-refresh-health" id="v272RefreshHealth">Ricontrolla tutto</button>`;$('v272RefreshHealth').onclick=()=>showHealth(true);
+  openOverlay('Stato sistema','<div class="v272-loading">Test delle fonti e dei comandi…</div>');const h=await health(force);const box=$('v272Body');if(!box)return;box.innerHTML=`<div class="v272-health-summary"><b>${h.rows.filter(x=>x.ok).length}/${h.rows.length} controlli di collegamento superati</b><p>Verifica accesso ai servizi e presenza dei comandi. Non certifica dati, grafici e previsioni di ogni moneta.</p><span>Test completato in ${h.elapsed} ms</span></div><div class="v272-health-list">${h.rows.map(x=>`<div><i class="${x.ok?'ok':'no'}"></i><span><b>${esc(x.name)}</b><small>${esc(x.detail)}${x.ms!=null?' · '+x.ms+' ms':''}</small></span></div>`).join('')}</div><button class="v272-refresh-health" id="v272RefreshHealth">Ricontrolla collegamenti</button>`;$('v272RefreshHealth').onclick=()=>showHealth(true);
 }
 function renderWatch(){
   const list=watchList();['v241Watch','watchTotal','watchTotal2','watchCountNav'].forEach(id=>{if($(id))$(id).textContent=String(list.length)});
