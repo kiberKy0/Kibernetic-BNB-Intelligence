@@ -20,7 +20,7 @@ function scorePool(x,profile){
   return {score:s,label:s>=75?'Da approfondire con priorità':s>=60?'Interessante ma da verificare':s>=45?'Speculativo':'Fragile / dati insufficienti',why:why.slice(0,5),risks:risks.slice(0,5),metrics:{liquidityUsd:liq,volume24h:vol,marketCap:mc,change24h:chg,buys24h:buys,sells24h:sells,ageHours:age,turnover:turn,liquidityToMcap:lm}};
 }
 module.exports=async function handler(req,res){
-  if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});res.setHeader('Cache-Control','s-maxage=120, stale-while-revalidate=420');
+  if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});res.setHeader('Cache-Control','s-maxage=300, stale-while-revalidate=600');const limit=Math.max(1,Math.min(40,Number(req.query?.limit||20)||20));
   try{
     const [p1,p2,profilesR]=await Promise.allSettled([
       get('https://api.geckoterminal.com/api/v2/networks/bsc/new_pools?page=1&include=base_token,quote_token'),
@@ -35,7 +35,7 @@ module.exports=async function handler(req,res){
       const profile=profMap.get(address)||null,sc=scorePool(pool,profile),mc=sc.metrics.marketCap;if(mc!==null&&mc>50000000)continue;if((sc.metrics.liquidityUsd||0)<20000)continue;
       candidates.push({address,name:token.name||pool.attributes?.name||'',symbol:token.symbol||'',image:token.image||profile?.icon||null,poolAddress:pool.attributes?.address||'',createdAt:pool.attributes?.pool_created_at||null,profile:profile?{description:profile.description||'',url:profile.url||'',links:(profile.links||[]).slice(0,5)}:null,...sc,source:'GeckoTerminal + DEX Screener'});
     }}
-    const seen=new Set(),uniq=candidates.filter(x=>{if(seen.has(x.address))return false;seen.add(x.address);return true}).sort((a,b)=>b.score-a.score).slice(0,20);
-    return res.status(200).json({version:'26.0',updatedAt:new Date().toISOString(),candidates:uniq,sources:['GeckoTerminal new pools','DEX Screener token profiles'],criteria:'Market cap/FDV <= $50M quando disponibile, liquidità minima $20k, attività, età pool, turnover, equilibrio buy/sell e presenza di profilo pubblico.',note:'La sezione individua progetti emergenti da approfondire. Non certifica team, contratto o sicurezza e non è una raccomandazione di acquisto.'});
+    const seen=new Set(),uniq=candidates.filter(x=>{if(seen.has(x.address))return false;seen.add(x.address);return true}).sort((a,b)=>b.score-a.score).slice(0,limit);
+    return res.status(200).json({version:'26.0',updatedAt:new Date().toISOString(),candidates:uniq,limit,coverage:'Campione delle nuove coppie; non tutti i token BNB Chain',sources:['GeckoTerminal new pools','DEX Screener token profiles'],criteria:'Market cap/FDV <= $50M quando disponibile, liquidità minima $20k, attività, età pool, turnover, equilibrio buy/sell e presenza di profilo pubblico.',note:'La sezione individua progetti emergenti da approfondire. Non certifica team, contratto o sicurezza e non è una raccomandazione di acquisto.'});
   }catch{return res.status(502).json({version:'26.0',candidates:[],error:'Discovery feed unavailable'})}
 };
