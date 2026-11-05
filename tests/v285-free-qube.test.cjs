@@ -14,7 +14,7 @@ test('Qube is clearly labeled rule-based and does not claim external LLM or wall
  assert.doesNotMatch(q,/OPENAI_API_KEY|process\.env|sk-proj/);
 });
 test('GoPlus checks are read only and unknown results are not declared safe',()=>{
- const api=require('../api/token-safety.js');
+ const api=require('../api/token-search.js');
  const missing=api.securitySummary({});
  assert.equal(missing.risk,'NON VERIFICABILE');
  const suspicious=api.securitySummary({is_honeypot:'1',sell_tax:'0.45'});
