@@ -1,0 +1,19 @@
+/* Qube, assistente gratuito a regole: indipendente da API a pagamento */
+.qube-fab{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));right:18px;z-index:9000;border:1px solid #82d5ff;border-radius:30px;background:#335ed6;color:#fff;box-shadow:0 8px 25px #07142770;padding:13px 20px;font:700 15px system-ui;cursor:pointer}
+.qube-panel{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9001;width:min(420px,calc(100vw - 24px));height:min(640px,calc(100dvh - 30px));background:#f7faff;color:#18365b;border:1px solid #b9cdea;border-radius:20px;box-shadow:0 20px 70px #0007;display:flex;flex-direction:column;overflow:hidden;font-family:system-ui,sans-serif}
+.qube-panel[hidden],.qube-fab[hidden]{display:none!important}
+.qube-top{display:flex;gap:10px;align-items:center;padding:13px 16px;background:linear-gradient(120deg,#e6f0ff,#f2ebff);border-bottom:1px solid #c8d8f0}
+.qube-mark{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#536ce2;color:#fff;font-weight:800;font-size:20px}
+.qube-top>div:nth-child(2){flex:1;display:flex;flex-direction:column;gap:3px}
+.qube-top strong{font-size:17px}.qube-top small{font-size:11px;color:#617ca2}
+#qubeClose{background:transparent;color:#496180;border:0;font-size:25px;cursor:pointer;padding:6px}
+.qube-messages{flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:10px}
+.qube-msg{white-space:pre-wrap;overflow-wrap:anywhere;max-width:94%;border-radius:14px;padding:12px;font-size:13px;line-height:1.55}
+.qube-msg.assistant{align-self:flex-start;background:#e6edfc;color:#203b60}
+.qube-msg.user{align-self:flex-end;background:#536ce2;color:#fff}
+.qube-quick{display:flex;gap:6px;flex-wrap:wrap;padding:7px 12px}
+.qube-quick button{border:1px solid #c3d4ed;background:#fff;color:#3c56af;border-radius:99px;padding:8px 10px;font-size:11px;cursor:pointer}
+.qube-compose{display:flex;gap:7px;padding:9px 12px}
+.qube-compose input{flex:1;min-width:0;border:1px solid #c3d4ed;background:#fff;color:#142d4e;border-radius:12px;padding:12px;font:13px system-ui}
+.qube-compose button{border:0;background:#536ce2;color:#fff;border-radius:12px;padding:0 13px;font-weight:700;cursor:pointer}
+.qube-note{padding:0 12px 12px;color:#617c9a;font-size:10px}
