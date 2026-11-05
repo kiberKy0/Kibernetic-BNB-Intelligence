@@ -1,0 +1,24 @@
+/* Free scanner with explicit source and quality messages */
+#freeScanner{scroll-margin-top:20px;margin:14px 0;padding:18px!important;border:1px solid #31546a!important;border-radius:20px;background:linear-gradient(145deg,#102438,#0b1c2c);color:#e8f5ff}
+.free-scanner-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.free-scanner-head>div>span{font-size:10px;letter-spacing:.12em;color:#62dbf5;font-weight:800}
+.free-scanner-head h2{margin:6px 0;font-size:23px;color:#f5fbff}
+.free-scanner-head p{margin:0;color:#a1b7c8;font-size:12px}
+.free-scanner-head button,.free-scanner-actions button{border:1px solid #367897;background:#0d3043;border-radius:12px;padding:11px 13px;color:#c7f1ff;font:600 12px system-ui;cursor:pointer}
+.free-scanner-head button:disabled,.free-scanner-actions button:disabled{opacity:.55}
+.free-scanner-nav{border:1px solid #3ebddd!important;background:#0d3448!important;color:#cff6ff!important}
+.free-scanner-meta{font-size:11px;color:#9dbbce;padding:15px 0}
+.free-scanner-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:10px}
+.free-scanner-row{padding:14px;border:1px solid #2b4e60;border-radius:16px;background:#102a3e;min-width:0}
+.free-scanner-title{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.free-scanner-title strong{font-size:16px;color:#fff}
+.free-scanner-title span{color:#a2b9c8;font-size:11px;overflow-wrap:anywhere}
+.free-scanner-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0;font-size:11px;color:#dae8f1}
+.free-scanner-actions{display:flex;flex-wrap:wrap;gap:8px}
+.free-scanner-actions .free-scanner-open{background:#31b1db;color:#092431;border-color:#31b1db}
+.free-scanner-risk,.free-scanner-result small{display:block;color:#d7b578;margin-top:10px;font-size:11px;line-height:1.5}
+.free-scanner-result{border-top:1px solid #31546a;padding-top:10px;margin-top:12px;color:#edf7ff}
+.free-scanner-result strong{font-size:12px}
+.free-scanner-result p{font-size:12px;line-height:1.45;color:#d5e5ed}
+.free-scanner-foot{color:#8ea8bd;font-size:11px;line-height:1.5;margin:15px 0 0}
+.free-scanner-empty{color:#9dbbd1;padding:10px}
