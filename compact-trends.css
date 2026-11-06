@@ -1,0 +1,58 @@
+/* Consistent fold controls on Android, with headings always visible. */
+.kiber-fold-host{position:relative!important}
+.kiber-fold-toggle{
+ position:absolute;top:9px;right:10px;z-index:6;width:40px;height:40px;
+ display:grid;place-items:center;border:1px solid #456a83;border-radius:12px;
+ background:#13344b;color:#b8ecff;font:bold 26px/1 system-ui;cursor:pointer;
+ -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.kiber-fold-toggle:focus-visible{outline:3px solid #6edcff;outline-offset:2px}
+.kiber-fold-host > :is(.v269-head,.v266-title,.free-scanner-head,.v277-sectors-head,header,h2)[data-kiber-fold-keep="1"]{padding-right:44px}
+.kiber-fold-host[data-kiber-fold-closed="1"]:not(.v269-chart)>:not([data-kiber-fold-keep="1"]):not(.kiber-fold-toggle){display:none!important}
+.kiber-fold-host.v269-chart[data-kiber-fold-closed="1"]>:not([data-kiber-fold-keep="1"]):not(.kiber-fold-toggle){
+ max-height:0!important;overflow:hidden!important;opacity:0!important;
+ margin-top:0!important;margin-bottom:0!important;padding-top:0!important;padding-bottom:0!important;
+ border:0!important;pointer-events:none!important
+}
+#kiberAccessGuide.kiber-fold-host h2{max-width:calc(100% - 38px)}
+#kiberAccessGuide.kiber-fold-host{padding-top:20px}
+.kiber-fold-host .kiber-fold-toggle{flex-shrink:0}
+#v28MainForecast.kiber-fold-host[data-kiber-fold-closed="1"]{min-height:62px}
+#freeScanner.kiber-fold-host[data-kiber-fold-closed="1"]{min-height:90px}
+#kiberAutoToken.kiber-fold-host[data-kiber-fold-closed="1"]{min-height:74px}
+.v266-forecast.kiber-fold-host .kiber-fold-toggle{top:9px;right:9px;width:35px;height:35px;font-size:23px}
+.v266-forecast.kiber-fold-host>div:first-child{padding-right:44px}
+.v266-forecast.kiber-fold-host>div:first-child b{font-variant-numeric:tabular-nums}
+.kiber-market-leader{margin:10px 0 16px;padding:13px 15px;border:1px solid #36566b;border-radius:13px;background:#0b2132;color:#d5e5f3;font-size:13px;line-height:1.5;font-weight:650}
+.kiber-market-leader.kiber-up{border-color:#235746;color:#6ce2b0}
+.kiber-market-leader.kiber-down{border-color:#69444d;color:#f6abb0}
+.kiber-trend-panel{background:#0a1c2b;border:1px solid #31536b;border-radius:18px;margin:13px 0;padding:17px 15px;color:#d7e9f7}
+.kiber-trend-title{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.kiber-trend-title strong{font-size:20px;color:#f5fbff}
+.kiber-trend-title small{font-size:12px;color:#9fbacd;line-height:1.35}
+.kiber-trend-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.kiber-trend-grid>div{min-width:0;background:#102739;border:1px solid #31506a;padding:12px 11px;border-radius:12px;display:flex;flex-direction:column;gap:7px}
+.kiber-trend-grid small{font-size:10px;line-height:1.35;color:#9ab6c9;letter-spacing:.035em;font-weight:700}
+.kiber-trend-grid strong{font-size:clamp(13px,2.2vw,18px);line-height:1.35;font-weight:800;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.kiber-trend-grid span{font-size:12px;color:#c3d8e8;overflow-wrap:anywhere}
+.kiber-up strong,.kiber-search-trend.kiber-up{color:#65dcb0!important}
+.kiber-down strong,.kiber-search-trend.kiber-down{color:#f38e9b!important}
+.kiber-flat strong,.kiber-search-trend.kiber-flat{color:#f0c37c!important}
+.kiber-unknown strong,.kiber-search-trend.kiber-unknown{color:#a4bfd1!important}
+#kiberTrendNote{margin:12px 0 0;font-size:12px;line-height:1.6;color:#92acbf}
+.kiber-search-trend{display:inline-block;margin-top:5px;font-size:11px!important;font-weight:700!important}
+@media(max-width:600px){
+ .kiber-trend-panel{padding:14px 11px}
+ .kiber-trend-grid{grid-template-columns:1fr;gap:7px}
+ .kiber-trend-grid>div{display:grid;grid-template-columns:108px 1fr;gap:5px 9px;align-items:center;padding:10px 12px}
+ .kiber-trend-grid small{grid-row:1 / 3;font-size:10px}
+ .kiber-trend-grid strong{font-size:17px}
+ .kiber-trend-grid span{grid-column:2;font-size:12px}
+ .kiber-fold-toggle{width:42px;height:42px}
+}
+
+/* Keep sector refresh and market chart headings clear of the top-right chevron. */
+#freeScanner.kiber-fold-host .free-scanner-head{padding-right:44px;flex-wrap:wrap}
+.v269-chart.kiber-fold-host>.v269-head{padding-right:50px}
+#v28MainForecast.kiber-fold-host>h3{max-width:calc(100% - 44px)}
+#kiberAutoToken.kiber-fold-host>header{padding-right:44px}
