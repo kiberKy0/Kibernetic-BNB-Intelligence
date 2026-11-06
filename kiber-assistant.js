@@ -44,7 +44,7 @@ function init(){
  $('kiberClose').onclick=()=>{panel.hidden=true;open.hidden=false;};
  $('kiberSend').onclick=submit;
  $('kiberInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submit();}};
- panel.querySelectorAll('[data-kiber]').forEach(b=>b.onclick=()=>{$('kiberInput').value=b.dataset.kib;submit();});
+ panel.querySelectorAll('[data-kiber]').forEach(b=>b.onclick=()=>{$('kiberInput').value=b.dataset.kiber;submit();});
 }
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init,{once:true}):init();
 })();
