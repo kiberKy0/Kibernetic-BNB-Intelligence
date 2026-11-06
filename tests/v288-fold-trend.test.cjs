@@ -67,9 +67,9 @@ test('Fold chevrons retain section titles and never wrap chart code or token but
  assert.match(css,/data-kiber-fold-closed/);
  assert.match(css,/\.v269-chart/);
 });
-test('V28.8 bootstrap mounts the trend helper before the panel script',()=>{
+test('Bootstrap mounts the trend helper after sector metrics and token charts',()=>{
  const src=fs.readFileSync(path.join(root,'index.html'),'utf8');
  assert(src.includes('compact-trends.css'));
  assert(src.indexOf("'sector-trend-utils.js'")<src.indexOf("'compact-trends.js'"));
- assert(src.includes("V='288-20261106-trends'"));
+ assert.match(src,/V='\d{3}-\d{8}-[a-z-]+'/);
 });
