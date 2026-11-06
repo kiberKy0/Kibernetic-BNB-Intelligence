@@ -7,7 +7,7 @@
  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .kiber-fold-toggle:focus-visible{outline:3px solid #6edcff;outline-offset:2px}
-.kiber-fold-host > [data-kiber-fold-keep="1"]{padding-right:44px}
+.kiber-fold-host > :is(.v269-head,.v266-title,.free-scanner-head,.v277-sectors-head,header,h2)[data-kiber-fold-keep="1"]{padding-right:44px}
 .kiber-fold-host[data-kiber-fold-closed="1"]:not(.v269-chart)>:not([data-kiber-fold-keep="1"]):not(.kiber-fold-toggle){display:none!important}
 .kiber-fold-host.v269-chart[data-kiber-fold-closed="1"]>:not([data-kiber-fold-keep="1"]):not(.kiber-fold-toggle){
  max-height:0!important;overflow:hidden!important;opacity:0!important;
@@ -50,3 +50,9 @@
  .kiber-trend-grid span{grid-column:2;font-size:12px}
  .kiber-fold-toggle{width:42px;height:42px}
 }
+
+/* Keep sector refresh and market chart headings clear of the top-right chevron. */
+#freeScanner.kiber-fold-host .free-scanner-head{padding-right:44px;flex-wrap:wrap}
+.v269-chart.kiber-fold-host>.v269-head{padding-right:50px}
+#v28MainForecast.kiber-fold-host>h3{max-width:calc(100% - 44px)}
+#kiberAutoToken.kiber-fold-host>header{padding-right:44px}
