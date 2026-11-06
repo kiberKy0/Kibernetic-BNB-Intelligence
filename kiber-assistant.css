@@ -26,3 +26,11 @@
 #v266Home #v266BnbWhy{font-size:14px;line-height:1.55;color:#c2d8e8;font-weight:500;letter-spacing:0;margin-top:12px}
 #v266Home #v266BnbPill{margin-top:9px;font-size:12px}
 #v277BnbBell{display:none!important}
+
+/* Mobile floating brand action: logo only, fully clickable and accessible */
+button.kiber-fab{width:60px!important;height:60px!important;padding:6px!important;display:grid!important;place-items:center!important;right:14px!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;background:#081b2d!important;border:1px solid #487ba4!important;border-radius:50%!important;box-shadow:0 7px 20px #0009!important;color:transparent!important;font-size:0!important;z-index:13000!important}
+button.kiber-fab[hidden]{display:none!important}
+button.kiber-fab img.kiber-fab-logo{display:block;width:46px;height:46px;object-fit:contain;pointer-events:none}
+button.kiber-fab:focus-visible{outline:3px solid #66dfff;outline-offset:3px}
+.kiber-panel{z-index:13001!important}
+@media(max-width:600px){button.kiber-fab{width:55px!important;height:55px!important;right:12px!important}button.kiber-fab img.kiber-fab-logo{width:42px;height:42px}}
