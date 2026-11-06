@@ -113,6 +113,7 @@ function marketLeader(){
  if(box.textContent!==label)box.textContent=label;
  box.className='kiber-market-leader '+(leader?'kiber-'+leader.state:'kiber-unknown');
  box.title=leader?'Indicatore TVL a 7 giorni su campione limitato, non variazione dei prezzi':'Servizio settori in attesa di dati recenti';
+ window.kiberMarketSectorSummary=()=>leader?'Nel campione TVL BNB Chain di '+leader.sample+' protocolli, il settore con variazione maggiore a 7 giorni è '+leader.name+' ('+leader.label+' '+T.percentage(leader.value)+'). Questo non misura il prezzo dei token e non è una raccomandazione di acquisto.':'Settori: dati recenti non disponibili. Non posso indicare un settore favorito.';
 }
 function enhanceSearch(){
  const catalog=window.kiberCatalogContext?.()||[],search=window.kiberSearchContext?.()||[];
@@ -136,7 +137,7 @@ function renderAll(){
 }
 function init(){
  document.addEventListener('click',e=>{if(e.target.closest?.('#freeScanNav')){const s=$('freeScanner');if(s)toggle(s,'scanner',true);}},true);
- document.addEventListener('kiber:token-loading',()=>{$('kiberTokenTrend')?.remove();renderHash='';},{passive:true});
+ document.addEventListener('kiber:token-loading',()=>{$('kiberTokenTrend')?.remove();summaryText='';window.kiberCurrentTrendSummary=()=>'';renderHash='';},{passive:true});
  document.addEventListener('kiber:live-updated',renderAll,{passive:true});
  renderAll();
  setTimeout(()=>{requestSectors();renderAll()},1500);
