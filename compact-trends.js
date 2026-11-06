@@ -38,7 +38,7 @@ function enhanceFold(cfg){
  if(!btn){
    btn=document.createElement('button');btn.type='button';btn.className='kiber-fold-toggle';
    btn.setAttribute('aria-label','Apri o chiudi sezione');
-   host.prepend(btn);
+   host.append(btn);
    btn.onclick=e=>{e.preventDefault();e.stopPropagation();toggle(host,cfg.key,host.dataset.kiberFoldClosed==='1')};
  }
  if(host.dataset.kiberFoldClosed!==(folds[cfg.key]===undefined?(cfg.open?'0':'1'):(folds[cfg.key]?'0':'1'))){
