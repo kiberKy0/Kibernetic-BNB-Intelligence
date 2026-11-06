@@ -1,0 +1,28 @@
+/* Kib, assistente gratuito a regole: indipendente da API a pagamento */
+.kib-fab{position:fixed;bottom:calc(18px + env(safe-area-inset-bottom));right:18px;z-index:9000;border:1px solid #82d5ff;border-radius:30px;background:#335ed6;color:#fff;box-shadow:0 8px 25px #07142770;padding:13px 20px;font:700 15px system-ui;cursor:pointer}
+.kib-panel{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9001;width:min(420px,calc(100vw - 24px));height:min(640px,calc(100dvh - 30px));background:#f7faff;color:#18365b;border:1px solid #b9cdea;border-radius:20px;box-shadow:0 20px 70px #0007;display:flex;flex-direction:column;overflow:hidden;font-family:system-ui,sans-serif}
+.kib-panel[hidden],.kib-fab[hidden]{display:none!important}
+.kib-top{display:flex;gap:10px;align-items:center;padding:13px 16px;background:linear-gradient(120deg,#e6f0ff,#f2ebff);border-bottom:1px solid #c8d8f0}
+.kib-mark{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#536ce2;color:#fff;font-weight:800;font-size:20px}
+.kib-top>div:nth-child(2){flex:1;display:flex;flex-direction:column;gap:3px}
+.kib-top strong{font-size:17px}.kib-top small{font-size:11px;color:#617ca2}
+#kibClose{background:transparent;color:#496180;border:0;font-size:25px;cursor:pointer;padding:6px}
+.kib-messages{flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:10px}
+.kib-msg{white-space:pre-wrap;overflow-wrap:anywhere;max-width:94%;border-radius:14px;padding:12px;font-size:13px;line-height:1.55}
+.kib-msg.assistant{align-self:flex-start;background:#e6edfc;color:#203b60}
+.kib-msg.user{align-self:flex-end;background:#536ce2;color:#fff}
+.kib-quick{display:flex;gap:6px;flex-wrap:wrap;padding:7px 12px}
+.kib-quick button{border:1px solid #c3d4ed;background:#fff;color:#3c56af;border-radius:99px;padding:8px 10px;font-size:11px;cursor:pointer}
+.kib-compose{display:flex;gap:7px;padding:9px 12px}
+.kib-compose input{flex:1;min-width:0;border:1px solid #c3d4ed;background:#fff;color:#142d4e;border-radius:12px;padding:12px;font:13px system-ui}
+.kib-compose button{border:0;background:#536ce2;color:#fff;border-radius:12px;padding:0 13px;font-weight:700;cursor:pointer}
+.kib-note{padding:0 12px 12px;color:#617c9a;font-size:10px}
+
+/* Scheda BNB, leggibilità mobile: senza campanella e con dati espliciti */
+#v266Home .v266-forecast:first-child{padding:20px 16px;border-color:rgba(95,166,205,.28)}
+#v266Home .v266-forecast:first-child>div:first-child{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+#v266Home .v266-forecast:first-child>div:first-child span{font-size:14px;letter-spacing:.035em;line-height:1.35;color:#acc8de;font-weight:750}
+#v266Home #v266BnbPrice{font-size:clamp(23px,5vw,30px);line-height:1.2;font-weight:800;color:#f2faff;font-variant-numeric:tabular-nums}
+#v266Home #v266BnbWhy{font-size:14px;line-height:1.55;color:#c2d8e8;font-weight:500;letter-spacing:0;margin-top:12px}
+#v266Home #v266BnbPill{margin-top:9px;font-size:12px}
+#v277BnbBell{display:none!important}
