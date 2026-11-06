@@ -1,17 +1,17 @@
 (()=>{
 'use strict';
-const V='27.1',$=id=>document.getElementById(id),q=(s,r=document)=>r.querySelector(s),qa=(s,r=document)=>[...r.querySelectorAll(s)];
+const V='28.9',$=id=>document.getElementById(id),q=(s,r=document)=>r.querySelector(s),qa=(s,r=document)=>[...r.querySelectorAll(s)];
 const n=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Number(v):null);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const money=v=>{v=n(v);if(v===null)return'—';const a=Math.abs(v);if(a>=1e12)return'$'+(v/1e12).toFixed(2)+'T';if(a>=1e9)return'$'+(v/1e9).toFixed(2)+'B';if(a>=1e6)return'$'+(v/1e6).toFixed(2)+'M';if(a>=1e3)return'$'+v.toLocaleString('it-IT',{maximumFractionDigits:2});return'$'+v.toLocaleString('it-IT',{maximumFractionDigits:a<1?8:2})};
 const pct=v=>{v=n(v);return v===null?'—':`${v>=0?'+':''}${v.toLocaleString('it-IT',{maximumFractionDigits:2})}%`};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const S={seq:0,chartSeq:0,coin:null,intel:null,news:null,chartData:null,days:30,chart:null,series:null,volume:null,mode:'id',requested:null,source:'—',aiBusy:false,selectedTime:null,autoBusy:false,updatedAt:null,chartError:null};
+const S={seq:0,chartSeq:0,coin:null,intel:null,news:null,chartData:null,chartIntel:null,chartKind:'none',chartPoints:[],days:30,chart:null,series:null,volume:null,mode:'id',requested:null,source:'—',aiBusy:false,selectedTime:null,autoBusy:false,updatedAt:null,chartError:null};
 
 function mark(){document.body.classList.add('v271');document.documentElement.dataset.kiberVersion=V;document.title='Kiber BNB Chain'}
 async function json(url,opt={}){const r=await fetch(url,{...opt,signal:opt.signal||AbortSignal.timeout(15000)});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d?.error||String(r.status));return d}
 function validAddress(x){return /^0x[a-fA-F0-9]{40}$/.test(String(x||''))}
-function periodForIntel(days){return days<=1?'24h':days<=7?'7d':'30d'}
+function periodForIntel(days){return days<=1?'24h':days<=7?'7d':days<=30?'30d':days<=90?'90d':days<=365?'365d':'1095d'}
 function watchKey(){const c=S.coin||{};return c.id?`id:${c.id}`:c.address?`address:${String(c.address).toLowerCase()}`:''}
 function watchList(){try{return JSON.parse(localStorage.getItem('kiber_v271_watch')||'[]')}catch{return[]}}
 function setWatchList(a){try{localStorage.setItem('kiber_v271_watch',JSON.stringify(a.slice(0,120)))}catch{}}
@@ -66,7 +66,7 @@ function evidenceMeta(){
 }
 function renderForecast(){const f=basicForecast(),m=evidenceMeta(),pill=$('v271Forecast');pill.className='v271-pill '+f.cls;pill.textContent=`${f.icon} ${f.label}`;const why=f.reasons.length?f.reasons.join(' · '):'I segnali disponibili non convergono abbastanza per forzare una direzione.';$('v271Why').innerHTML=`<b>${esc(f.label)}</b><span>${esc(why)}</span><small>Kiber score ${f.score>=0?'+':''}${f.score}/100 · Qualità dati ${m.quality}/100 · Convergenza ${m.convergence}. Indicatori interni, non probabilità.</small>`}
 function renderCoin(){
-  const c=S.coin||{};if($('v275TokenAnalyze'))$('v275TokenAnalyze').disabled=!S.coin;qa('[data-v271-days]').forEach(b=>{const d=Number(b.dataset.v271Days);b.hidden=c.id?d===1095&&c.id!=='binancecoin':d>30});$('v271TopName').textContent=c.symbol?`${c.symbol} · ${c.name||'Token'}`:(c.name||'Token');$('v271Name').textContent=c.name||'Token';$('v271Symbol').textContent=c.symbol||'TOKEN';
+  const c=S.coin||{};if($('v275TokenAnalyze'))$('v275TokenAnalyze').disabled=!S.coin;qa('[data-v271-days]').forEach(b=>b.hidden=false);$('v271TopName').textContent=c.symbol?`${c.symbol} · ${c.name||'Token'}`:(c.name||'Token');$('v271Name').textContent=c.name||'Token';$('v271Symbol').textContent=c.symbol||'TOKEN';
   const img=$('v271Logo');if(c.image){img.src=c.image;img.alt=c.symbol||c.name||'Token';img.hidden=false}else{img.removeAttribute('src');img.alt='';img.hidden=true}
   const network=c.address?'Contratto BNB Chain verificabile':'Dati di mercato · contratto BSC non disponibile dalla fonte';$('v271Meta').textContent=`${c.rank?'#'+c.rank+' · ':''}${network}${c.dataLimited?' · dettaglio non disponibile: dati del catalogo':''}`;
   $('v271Price').textContent=money(c.price);$('v27124').textContent=pct(c.change24);$('v2717').textContent=pct(c.change7d);$('v271Cap').textContent=money(c.marketCap);$('v271Vol24').textContent=money(c.volume24);$('v271Liq').textContent=money(S.intel?.token?.liquidityUsd);
@@ -85,41 +85,56 @@ function renderFactors(){
 
 function destroyChart(){S._selectionCleanup?.();S._selectionCleanup=null;try{S._ro?.disconnect()}catch{}S._ro=null;try{S.chart?.remove()}catch{}S.chart=S.series=S.volume=null}
 function loadLib(){return new Promise((ok,no)=>{if(window.LightweightCharts)return ok();let s=q('script[data-v271-chartlib]'),done=false;const finish=error=>{if(done)return;done=true;clearTimeout(timer);if(error){s?.remove();no(error)}else ok()},timer=setTimeout(()=>finish(new Error('Chart library timeout')),12000);if(s){s.addEventListener('load',()=>finish(),{once:true});s.addEventListener('error',()=>finish(new Error('Chart library unavailable')),{once:true});return}s=document.createElement('script');s.dataset.v271Chartlib='1';s.src='https://cdn.jsdelivr.net/npm/lightweight-charts@5.0.9/dist/lightweight-charts.standalone.production.js';s.async=true;s.onload=()=>finish();s.onerror=()=>finish(new Error('Chart library unavailable'));document.head.appendChild(s)})}
-function chartMetrics(points){
-  const prices=points.map(x=>n(x.p??x.close)).filter(v=>v!==null);if(!prices.length)return;const first=prices[0],last=prices.at(-1),hi=Math.max(...prices),lo=Math.min(...prices),chg=first?((last/first)-1)*100:null;$('v271High').textContent=money(hi);$('v271Low').textContent=money(lo);$('v271PeriodChange').textContent=pct(chg)
+function candleChoice(){const U=window.KiberCandles;if(!U)return{candles:[],source:'Modulo non disponibile',kind:'none'};return U.pick(S.chartIntel?.chart?.candles||S.chartIntel?.technical?.candles||[],S.chartData?.points||[],S.days,!S.coin?.id)}
+function updateCandleMetrics(c){
+ const a=c.candles;S.chartKind=c.kind;S.chartPoints=a.map(x=>({t:x.time*1000,p:x.close,v:x.volume}));
+ if(!a.length){for(const k of ['v271High','v271Low','v271PeriodChange'])$(k).textContent='—';$('v271Source').textContent=c.source;return}
+ $('v271High').textContent=money(Math.max(...a.map(x=>x.high)));$('v271Low').textContent=money(Math.min(...a.map(x=>x.low)));
+ $('v271PeriodChange').textContent=pct((a.at(-1).close/a[0].open-1)*100);
+ const date=t=>new Date(t*1000).toLocaleDateString('it-IT');
+ $('v271Source').textContent=c.source+' · '+date(a[0].time)+' → '+date(a.at(-1).time);
+ $('v271ChartTitle').textContent='Candele rosse/verdi · '+(c.kind==='dex'?'DEX':'prezzi osservati');
 }
 function renderFallbackChart(){
-  const el=$('v271Chart');if(!el)return;const candles=(S.intel?.technical?.candles||[]).map(x=>({t:Number(x?.[0])*1000,p:n(x?.[4])})).filter(x=>Number.isFinite(x.t)&&x.p!==null),market=(S.chartData?.points||[]).map(x=>({t:Number(x.t),p:n(x.p)})).filter(x=>Number.isFinite(x.t)&&x.p!==null),a=(candles.length>=4&&S.days<=30?candles:market);
-  if(a.length<2){el.innerHTML='<div class="v271-error">Storico non disponibile per questo periodo.</div>';return}
-  const vals=a.map(x=>x.p),lo=Math.min(...vals),hi=Math.max(...vals),rg=hi-lo||1,W=1000,H=360,L=70,R=20,T=20,B=42,X=i=>L+i/(a.length-1)*(W-L-R),Y=v=>T+(hi-v)/rg*(H-T-B),pts=a.map((x,i)=>`${X(i).toFixed(1)},${Y(x.p).toFixed(1)}`).join(' ');
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:100%;display:block"><line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="rgba(120,160,185,.18)"/><polyline points="${pts}" fill="none" stroke="#59d7ff" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>`;chartMetrics(a);$('v271Source').textContent=(candles.length>=4&&S.days<=30?'GeckoTerminal':'CoinGecko')+' · fallback';$('v271ChartTitle').textContent='Grafico resiliente · fallback locale';
+ const el=$('v271Chart');if(!el)return;const c=candleChoice(),a=c.candles;
+ if(a.length<3){el.innerHTML='<div class="v271-error">Storico insufficiente per questo periodo.</div>';updateCandleMetrics(c);return}
+ const W=1000,H=390,L=20,R=65,T=14,B=18,lo=Math.min(...a.map(x=>x.low)),hi=Math.max(...a.map(x=>x.high)),range=hi-lo||hi*.02||1;
+ const X=i=>L+(i+.5)*(W-L-R)/a.length,Y=x=>T+(hi-x)/range*(H-T-B),width=Math.max(1.5,Math.min(12,(W-L-R)/a.length*.65));
+ const shapes=a.map((x,i)=>{const cx=X(i),top=Math.min(Y(x.open),Y(x.close)),height=Math.max(2,Math.abs(Y(x.open)-Y(x.close))),color=x.close>=x.open?'#26a69a':'#ef5350';return '<line x1="'+cx+'" x2="'+cx+'" y1="'+Y(x.high)+'" y2="'+Y(x.low)+'" stroke="'+color+'" stroke-width="1.4"/><rect x="'+(cx-width/2)+'" y="'+top+'" width="'+width+'" height="'+height+'" fill="'+color+'"/>'}).join('');
+ el.innerHTML='<svg role="img" aria-label="Candele rosse e verdi" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" style="width:100%;height:100%">'+shapes+'</svg>';updateCandleMetrics(c)
 }
 function renderChart(range=null){
-  const el=$('v271Chart');if(!el)return;const LC=window.LightweightCharts;if(!LC){renderFallbackChart();return}destroyChart();el.innerHTML='';
-  S.chart=LC.createChart(el,{width:el.clientWidth,height:390,layout:{background:{type:'solid',color:'#04111d'},textColor:'#7895aa',fontFamily:'system-ui,-apple-system,sans-serif'},grid:{vertLines:{color:'rgba(110,150,175,.06)'},horzLines:{color:'rgba(110,150,175,.08)'}},rightPriceScale:{borderColor:'rgba(110,150,175,.15)'},timeScale:{borderColor:'rgba(110,150,175,.15)',timeVisible:S.days<=30,secondsVisible:false,tickMarkFormatter:(time,type,locale)=>window.KiberChart?.tick(time,type,locale)},crosshair:{mode:LC.CrosshairMode?.Normal??0},localization:{locale:'it-IT',timeFormatter:time=>new Date(Number(time)*1000).toLocaleString('it-IT'),priceFormatter:p=>money(p)}});
-  const candles=(S.intel?.technical?.candles||[]).map(x=>({time:Number(x?.[0]),open:n(x?.[1]),high:n(x?.[2]),low:n(x?.[3]),close:n(x?.[4]),volume:n(x?.[5])})).filter(x=>Number.isFinite(x.time)&&[x.open,x.high,x.low,x.close].every(v=>v!==null));
-  const useCandles=candles.length>=4&&S.days<=30;
-  if(useCandles){
-    S.series=S.chart.addSeries(LC.CandlestickSeries,{upColor:'#26a69a',downColor:'#ef5350',borderVisible:false,wickUpColor:'#26a69a',wickDownColor:'#ef5350',priceLineVisible:true,lastValueVisible:true});S.series.setData(candles.map(({time,open,high,low,close})=>({time,open,high,low,close})));
-    S.volume=S.chart.addSeries(LC.HistogramSeries,{priceFormat:{type:'volume'},priceScaleId:'',lastValueVisible:false,priceLineVisible:false});S.volume.priceScale().applyOptions({scaleMargins:{top:.82,bottom:0}});S.volume.setData(candles.map(x=>({time:x.time,value:x.volume||0,color:x.close>=x.open?'rgba(38,166,154,.30)':'rgba(239,83,80,.28)'})));chartMetrics(candles);$('v271Source').textContent='GeckoTerminal';$('v271ChartTitle').textContent='Candele DEX · prezzo reale del pool';
-  }else{
-    const pts=(S.chartData?.points||[]).map(x=>({time:Math.floor(Number(x.t)/1000),value:n(x.p),p:n(x.p),volume:n(x.volume)})).filter(x=>Number.isFinite(x.time)&&x.value!==null);if(pts.length<2){el.innerHTML='<div class="v271-error">Storico non disponibile per questo periodo.</div>';return}
-    S.series=S.chart.addSeries(LC.AreaSeries,{lineColor:'#59d7ff',topColor:'rgba(89,215,255,.28)',bottomColor:'rgba(89,215,255,.02)',lineWidth:2,priceLineVisible:true,lastValueVisible:true});S.series.setData(pts.map(x=>({time:x.time,value:x.value})));
-    if(S.chartData?.volumeKind==='bar'){S.volume=S.chart.addSeries(LC.HistogramSeries,{priceFormat:{type:'volume'},priceScaleId:'',lastValueVisible:false,priceLineVisible:false});S.volume.priceScale().applyOptions({scaleMargins:{top:.82,bottom:0}});S.volume.setData(pts.map(x=>({time:x.time,value:x.volume||0,color:'rgba(73,151,194,.22)'})))}chartMetrics(pts);$('v271Source').textContent=S.chartData?.source||'CoinGecko';$('v271ChartTitle').textContent='Prezzo di mercato · storico verificabile';
-  }
-  const selectedPoints=useCandles?candles.map(x=>({t:x.time*1000,p:x.close,v:x.volume})):(S.chartData?.points||[]).map(x=>({t:Number(x.t),p:Number(x.p),v:S.chartData?.volumeKind==='bar'?x.volume:null}));S._selectionCleanup=window.KiberChart?.bind(S.chart,el,selectedPoints,t=>{S.selectedTime=t;window.kiberSelectChartTime?.(t)},S.selectedTime);if(range)S.chart.timeScale().setVisibleLogicalRange(range);else S.chart.timeScale().fitContent();S._ro=new ResizeObserver(()=>S.chart?.applyOptions({width:el.clientWidth}));S._ro.observe(el);
+ const el=$('v271Chart');if(!el)return;const c=candleChoice(),a=c.candles,LC=window.LightweightCharts;
+ if(a.length<3){destroyChart();el.innerHTML='<div class="v271-error">Storico insufficiente per questo periodo. Nessuna candela inventata.</div>';updateCandleMetrics(c);return}
+ if(!LC?.CandlestickSeries){destroyChart();renderFallbackChart();return}
+ destroyChart();el.innerHTML='';
+ S.chart=LC.createChart(el,{width:el.clientWidth,height:390,layout:{background:{type:'solid',color:'#04111d'},textColor:'#7895aa',fontFamily:'system-ui,-apple-system,sans-serif'},grid:{vertLines:{color:'rgba(110,150,175,.06)'},horzLines:{color:'rgba(110,150,175,.08)'}},rightPriceScale:{borderColor:'rgba(110,150,175,.15)'},timeScale:{borderColor:'rgba(110,150,175,.15)',timeVisible:S.days<=30,secondsVisible:false,tickMarkFormatter:(time,type,locale)=>window.KiberChart?.tick(time,type,locale)},crosshair:{mode:LC.CrosshairMode?.Normal??0},localization:{locale:'it-IT',timeFormatter:time=>new Date(Number(time)*1000).toLocaleString('it-IT'),priceFormatter:p=>money(p)}});
+ S.series=S.chart.addSeries(LC.CandlestickSeries,{upColor:'#26a69a',downColor:'#ef5350',borderVisible:false,wickUpColor:'#26a69a',wickDownColor:'#ef5350',priceLineVisible:true,lastValueVisible:true});
+ S.series.setData(a.map(({time,open,high,low,close})=>({time,open,high,low,close})));
+ if(c.kind==='dex'&&a.some(x=>x.volume!==null)){S.volume=S.chart.addSeries(LC.HistogramSeries,{priceFormat:{type:'volume'},priceScaleId:'',lastValueVisible:false,priceLineVisible:false});S.volume.priceScale().applyOptions({scaleMargins:{top:.82,bottom:0}});S.volume.setData(a.map(x=>({time:x.time,value:x.volume??0,color:x.close>=x.open?'rgba(38,166,154,.30)':'rgba(239,83,80,.28)'})))}
+ updateCandleMetrics(c);S._selectionCleanup=window.KiberChart?.bind(S.chart,el,S.chartPoints,t=>{S.selectedTime=t;window.kiberSelectChartTime?.(t)},S.selectedTime);
+ if(range)try{S.chart.timeScale().setVisibleLogicalRange(range)}catch{S.chart.timeScale().fitContent()}else S.chart.timeScale().fitContent();
+ S._ro=new ResizeObserver(()=>S.chart?.applyOptions({width:el.clientWidth}));S._ro.observe(el);
 }
 async function loadChart(background=false){
-  const token=++S.chartSeq,el=$('v271Chart'),coin=S.coin,days=S.days;if(!el)return;const range=background?S.chart?.timeScale().getVisibleLogicalRange():null;if(!background){destroyChart();S.chartLoading=true;S.chartError=null;S.chartData=null;el.innerHTML='<div class="v271-loading">Aggiornamento grafico…</div>'}
-  try{
-    const [chartR,intelR]=await Promise.allSettled([coin?.id?json(`/api/coingecko?type=coin_chart&id=${encodeURIComponent(coin.id)}&days=${days}`,{cache:'no-store'}):Promise.resolve(null),coin?.address&&days<=30?json(`/api/token-intel-v26?address=${encodeURIComponent(coin.address)}&period=${periodForIntel(days)}`,{cache:'no-store'}):Promise.resolve(null)]);
-    if(token!==S.chartSeq)return;let chartData=chartR.status==='fulfilled'?chartR.value:null;if(coin?.id==='binancecoin'&&!(chartData?.points?.length>=2)){try{const fallback=await json('/api/coingecko?type=bnb_ohlc&days='+days,{cache:'no-store'});chartData=window.KiberHistory?.closedBNB(fallback)||null}catch{chartData=null}}if(token!==S.chartSeq)return;if(background&&!(chartData?.points?.length>=2)&&!(intelR.status==='fulfilled'&&intelR.value?.technical?.candles?.length>=4))throw Error('No fresh chart');S.chartData=chartData||S.chartData;
-    if(coin?.address&&days<=30)S.intel=intelR.status==='fulfilled'&&intelR.value?intelR.value:{...S.intel,technical:{candles:[]}};
-    S.chartLoading=false;S.chartError=!(S.chartData?.points?.length>=2)&&!(S.intel?.technical?.candles?.length>=4)?'Nessuno storico restituito dalle fonti per questo periodo.':null;renderCoin();await loadLib();if(token!==S.chartSeq)return;renderChart(range);
-  }catch(e){if(token!==S.chartSeq)return;S.chartLoading=false;if(!background){S.chartError='Storico temporaneamente non disponibile: cambia periodo o riprova con Aggiorna.';renderFallbackChart()}else throw e}
+ const token=++S.chartSeq,el=$('v271Chart'),coin=S.coin,days=S.days;if(!el||!coin)return;
+ const range=background?S.chart?.timeScale().getVisibleLogicalRange():null;
+ if(!background){destroyChart();S.chartLoading=true;S.chartError=null;S.chartData=null;S.chartIntel=null;S.chartPoints=[];S.chartKind='none';el.innerHTML='<div class="v271-loading">Aggiornamento candele…</div>'}
+ try{
+  const [marketR,dexR]=await Promise.allSettled([
+   coin.id?json('/api/coingecko?type=coin_chart&id='+encodeURIComponent(coin.id)+'&days='+days,{cache:'no-store'}):Promise.resolve(null),
+   coin.address?json('/api/token-intel-v26?address='+encodeURIComponent(coin.address)+'&period='+periodForIntel(days),{cache:'no-store'}):Promise.resolve(null)
+  ]);if(token!==S.chartSeq)return;
+  let market=marketR.status==='fulfilled'?marketR.value:null;
+  if(coin.id==='binancecoin'&&!(market?.points?.length>=3)){try{const q=await json('/api/coingecko?type=bnb_ohlc&days='+days,{cache:'no-store'});if(q?.candles?.length>=3)market={source:q.source,points:q.candles.map(x=>({t:x.t*1000,p:x.close}))}}catch{}}
+  if(token!==S.chartSeq)return;
+  const dex=dexR.status==='fulfilled'&&dexR.value?.technical?dexR.value:null;
+  if(background&&!market&&!dex)throw Error('Aggiornamento non disponibile');
+  S.chartData=market;S.chartIntel=dex;if(dex)S.intel=dex;S.chartLoading=false;renderCoin();
+  try{await loadLib()}catch{}if(token!==S.chartSeq)return;renderChart(range);
+ }catch(e){if(token!==S.chartSeq)return;S.chartLoading=false;if(!background){S.chartError='Storico non disponibile.';renderFallbackChart()}else throw e}
 }
-function changePeriod(days){if(![1,7,30,90,365,1095].includes(days))return;S.selectedTime=null;S.days=days;qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===days));if(!S.coin?.id&&days>30){S.days=30;qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===30));const el=$('v271Chart');if(el)el.innerHTML='<div class="v271-error">Storico 1A/3A non disponibile per questo contratto dalle fonti DEX correnti. Kiber usa 30G finché non colleghiamo uno storico più profondo.</div>';setTimeout(loadChart,900);return}loadChart()}
-
+function changePeriod(days){if(![1,7,30,90,365,1095].includes(days))return;S.selectedTime=null;S.days=days;qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===days));loadChart()}
 async function loadSecondary(seq){
   const c=S.coin||{},jobs=[];
   jobs.push(json(`/api/news-v26?symbol=${encodeURIComponent(c.symbol||'')}&name=${encodeURIComponent(c.name||'')}`,{cache:'no-store'}).then(x=>{if(seq===S.seq)S.news=x}).catch(()=>{}));
@@ -127,12 +142,12 @@ async function loadSecondary(seq){
   await Promise.allSettled(jobs);if(seq!==S.seq)return;renderCoin();renderForecast();renderFactors();
 }
 async function openById(id){
-  id=String(id||'').trim();if(!id)return;const seq=++S.seq;S.mode='id';S.requested={id};S.chartSeq++;S.chartError=null;S.chartLoading=true;S.selectedTime=null;S.coin=S.intel=S.news=S.chartData=null;S.days=30;loading(id);qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===30));
+  id=String(id||'').trim();if(!id)return;const seq=++S.seq;S.mode='id';S.requested={id};S.chartSeq++;S.chartError=null;S.chartLoading=true;S.selectedTime=null;S.coin=S.intel=S.news=S.chartData=S.chartIntel=null;S.chartPoints=[];S.chartKind='none';S.days=30;loading(id);qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===30));
   try{const d=await json(`/api/coingecko?type=coin_detail&id=${encodeURIComponent(id)}`,{cache:'no-store'}).catch(()=>null);if(seq!==S.seq)return;S.coin=window.KiberTokenLoading.resolveCoin(id,d,[...(window.kiberCatalogContext?.()||[]),...(window.kiberSearchContext?.()||[])]);if(!S.coin)throw Error('Token detail unavailable');renderCoin();await Promise.allSettled([loadSecondary(seq),loadChart()]);if(seq!==S.seq)return;renderCoin()}catch(e){if(seq!==S.seq)return;showFatal('Non riesco ad aprire questa moneta dai dati CoinGecko.','Il catalogo resta disponibile: puoi tornare indietro e provare un altro asset.')}
 }
 async function openByAddress(address){
-  address=String(address||'').trim();if(!validAddress(address))return;const seq=++S.seq;S.mode='address';S.requested={address};S.chartSeq++;S.chartError=null;S.chartLoading=true;S.selectedTime=null;S.coin=S.intel=S.news=S.chartData=null;S.days=7;loading('Token BNB Chain');qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===7));
-  try{const i=await json(`/api/token-intel-v26?address=${encodeURIComponent(address)}&period=7d`,{cache:'no-store'});if(seq!==S.seq)return;S.intel=i;const t=i.token||{};S.coin={id:null,address,name:t.name||'Token',symbol:t.symbol||'TOKEN',image:t.imageUrl||'',rank:null,price:n(t.priceUsd),marketCap:n(t.marketCap),volume24:n(t.volume24h),change24:n(t.change24h),change7d:null,change30d:null};renderCoin();await loadSecondary(seq);if(seq!==S.seq)return;await loadLib();S.chartLoading=false;S.chartError=S.intel?.technical?.candles?.length>=4?null:'Nessuno storico DEX disponibile.';renderChart();renderCoin()}catch(e){if(seq!==S.seq)return;showFatal('Analisi on-chain non disponibile per questo contratto.','Il token potrebbe non avere un pool BNB Chain rilevato dalle fonti correnti.')}
+  address=String(address||'').trim();if(!validAddress(address))return;const seq=++S.seq;S.mode='address';S.requested={address};S.chartSeq++;S.chartError=null;S.chartLoading=true;S.selectedTime=null;S.coin=S.intel=S.news=S.chartData=S.chartIntel=null;S.chartPoints=[];S.chartKind='none';S.days=7;loading('Token BNB Chain');qa('[data-v271-days]').forEach(b=>b.classList.toggle('active',+b.dataset.v271Days===7));
+  try{const i=await json(`/api/token-intel-v26?address=${encodeURIComponent(address)}&period=7d`,{cache:'no-store'});if(seq!==S.seq)return;S.intel=S.chartIntel=i;const t=i.token||{};S.coin={id:null,address,name:t.name||'Token',symbol:t.symbol||'TOKEN',image:t.imageUrl||'',rank:null,price:n(t.priceUsd),marketCap:n(t.marketCap),volume24:n(t.volume24h),change24:n(t.change24h),change7d:null,change30d:null};renderCoin();await loadSecondary(seq);if(seq!==S.seq)return;await loadLib();S.chartLoading=false;S.chartError=S.intel?.technical?.candles?.length>=4?null:'Nessuno storico DEX disponibile.';renderChart();renderCoin()}catch(e){if(seq!==S.seq)return;showFatal('Analisi on-chain non disponibile per questo contratto.','Il token potrebbe non avere un pool BNB Chain rilevato dalle fonti correnti.')}
 }
 function showFatal(title,text){if($('v275TokenAnalyze'))$('v275TokenAnalyze').disabled=true;S.chartLoading=false;S.chartError=text;$('v271Name').textContent=title;$('v271Meta').textContent=text;$('v271Forecast').textContent='🟡 DATI INSUFFICIENTI';$('v271Forecast').className='v271-pill neutral';$('v271Chart').innerHTML='<div class="v271-error">Nessun grafico disponibile.</div>';$('v271Factors').innerHTML='<div class="v271-error">Nessun dato sufficiente per una previsione affidabile.</div>'}
 async function reloadAll(){const c=S.requested||S.coin;if(!c)return;if(c.id)return openById(c.id);else if(c.address)return openByAddress(c.address)}
@@ -152,6 +167,6 @@ function intercept(e){
   const chain=e.target.closest?.('#marketList .token-row[data-address]');if(chain){e.preventDefault();e.stopImmediatePropagation();openByAddress(chain.dataset.address);return}
   const emerg=e.target.closest?.('[data-v26-token]');if(emerg&&!emerg.closest('#v271TokenView')){e.preventDefault();e.stopImmediatePropagation();openByAddress(emerg.dataset.v26Token)}
 }
-function boot(){mark();ensurePanel();document.addEventListener('click',intercept,true);window.openToken=address=>openByAddress(address);window.kiberOpenCoin=id=>openById(id);window.kiberOpenToken=address=>openByAddress(address);setInterval(refreshLive,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshLive()});window.kiberTokenContext=()=>({coin:S.coin,intel:S.intel,news:S.news,chartData:S.chartData,chartLoading:S.chartLoading,chartError:S.chartError,days:S.days,forecast:basicForecast()})}
+function boot(){mark();ensurePanel();document.addEventListener('click',intercept,true);window.openToken=address=>openByAddress(address);window.kiberOpenCoin=id=>openById(id);window.kiberOpenToken=address=>openByAddress(address);setInterval(refreshLive,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshLive()});window.kiberTokenContext=()=>({coin:S.coin,intel:S.intel,news:S.news,chartData:S.chartData,chartPoints:S.chartPoints,chartKind:S.chartKind,chartLoading:S.chartLoading,chartError:S.chartError,days:S.days,forecast:basicForecast()})}
 document.readyState==='loading'?document.addEventListener('DOMContentLoaded',boot,{once:true}):boot();
 })();

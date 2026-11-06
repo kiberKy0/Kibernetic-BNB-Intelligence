@@ -1,0 +1,4 @@
+const test=require('node:test'),assert=require('node:assert/strict'),U=require('../token-chart-utils.js');
+test('DEX candles validation and sorting',()=>{const d=U.dex([[200,10,12,8,11,2],[100,8,10,7,9,3],[300,9,8,10,9,1]]);assert.equal(d.length,2);assert.deepEqual(d.map(x=>x.time),[100,200])});
+test('All periods build real red-green candle data from sampled prices',()=>{for(const days of [1,7,30,90,365,1095]){const a=Array.from({length:110},(_,i)=>({t:(1700000000+i*86400000),p:100+i%8})),c=U.sampled(a,days);assert.ok(c.length>0);assert.ok(c.every(x=>x.high>=x.open&&x.low<=x.close&&x.volume===null))}});
+test('Prefer full DEX history over sampled CoinGecko and never create missing candles',()=>{const t=1700000000,day=86400,d=Array.from({length:90},(_,i)=>[t+i*day,10,12,9,11,2]),p=d.map(x=>({t:x[0]*1000,p:x[4]}));assert.equal(U.pick(d,p,90).kind,'dex');assert.equal(U.pick(d.slice(0,4),p,90).kind,'sampled');assert.equal(U.pick([],[],90).kind,'none')});
