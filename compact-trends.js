@@ -115,22 +115,66 @@ function marketLeader(){
  box.title=leader?'Indicatore TVL a 7 giorni su campione limitato, non variazione dei prezzi':'Servizio settori in attesa di dati recenti';
  window.kiberMarketSectorSummary=()=>leader?'Nel campione TVL BNB Chain di '+leader.sample+' protocolli, il settore con variazione maggiore a 7 giorni è '+leader.name+' ('+leader.label+' '+T.percentage(leader.value)+'). Questo non misura il prezzo dei token e non è una raccomandazione di acquisto.':'Settori: dati recenti non disponibili. Non posso indicare un settore favorito.';
 }
+
+function sectorOf(info){
+ const c=window.KiberWatch?.sector?.(info||{});
+ if(c?.name&&c.name!=='Non classificato'&&c.name!=='Altro')return c.name;
+ return ({binancecoin:'Layer 1 & Layer 2',chainlink:'Data & Oracle','pancakeswap-token':'DeFi'})[String(info?.id||'').toLowerCase()]||'Non classificato';
+}
+function usd(v,compact=false){
+ if(v===null||v===undefined||v==='')return '—';
+ const n=Number(v);if(!Number.isFinite(n))return '—';
+ if(compact){
+  const x=Math.abs(n),d=x>=1e12?1e12:x>=1e9?1e9:x>=1e6?1e6:x>=1e3?1e3:1;
+  const suffix=d===1e12?' T':d===1e9?' Mld':d===1e6?' Mln':d===1e3?' mila':'';
+  return '$'+(n/d).toLocaleString('it-IT',{maximumFractionDigits:2})+suffix;
+ }
+ return '$'+n.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:Math.abs(n)<1?6:2});
+}
+function compactBnb(){
+ const host=document.querySelector('.v269-chart.kiber-fold-host'),head=host?.querySelector(':scope > .v269-head');
+ if(!head)return;
+ let panel=host.querySelector(':scope > #kiberBnbCompact');
+ if(!panel){
+  panel=make('div','kiber-bnb-compact');panel.id='kiberBnbCompact';panel.dataset.kiberFoldKeep='1';
+  panel.innerHTML='<div class="kiber-bnb-compact-grid"><div data-bnb-stat="price"><small>PREZZO BNB (USD)</small><strong>—</strong></div><div data-bnb-stat="cap"><small>MARKET CAP</small><strong>—</strong></div><div data-bnb-stat="volume"><small>VOLUME 24H</small><strong>—</strong></div><div data-bnb-stat="change"><small>VARIAZIONE 24H</small><strong>—</strong></div></div><div class="kiber-bnb-compact-note">Settore: <b>Layer 1 &amp; Layer 2</b> · Market cap e volume non sono il TVL della blockchain.</div>';
+  head.after(panel);
+ }
+ const coin=(window.kiberCatalogContext?.()||[]).find(x=>x?.id==='binancecoin'||String(x?.symbol||'').toUpperCase()==='BNB');
+ const validPrice=coin?.price!==null&&coin?.price!==undefined&&Number.isFinite(Number(coin.price));
+ const chartLast=document.getElementById('v269Last')?.textContent?.trim();
+ const price=validPrice?usd(coin.price):(chartLast&&chartLast!=='—'?chartLast:'—');
+ const change=coin?.change24==null?null:Number(coin.change24);
+ const vals={
+  price:[validPrice?'PREZZO BNB (USD)':'ULTIMA CANDELA (USDT)',price],
+  cap:['MARKET CAP',usd(coin?.marketCap,true)],
+  volume:['VOLUME 24H',usd(coin?.volume24,true)],
+  change:['VARIAZIONE 24H',Number.isFinite(change)?T.percentage(change):'—']
+ };
+ for(const [key,[label,value]] of Object.entries(vals)){
+  const tile=panel.querySelector('[data-bnb-stat="'+key+'"]'),s=tile?.querySelector('small'),b=tile?.querySelector('strong');if(!s||!b)continue;
+  if(s.textContent!==label)s.textContent=label;if(b.textContent!==value)b.textContent=value;
+  if(key==='change'){b.classList.toggle('kiber-positive',Number.isFinite(change)&&change>0);b.classList.toggle('kiber-negative',Number.isFinite(change)&&change<0);}
+ }
+}
 function enhanceSearch(){
  const catalog=window.kiberCatalogContext?.()||[],search=window.kiberSearchContext?.()||[];
  const byId=new Map([...catalog,...search].filter(x=>x?.id).map(x=>[String(x.id),x]));
  for(const row of document.querySelectorAll('#v272SearchResults [data-v272-id],#v21CatalogList [data-v21-id]')){
-   const id=row.dataset.v272Id||row.dataset.v21Id;
-   const info=byId.get(id);if(!info)continue;
-   const trend=T.periodChange(info.change24);
-   const sig=trend.state==='unknown'?'24h: dato assente':'24h: '+trend.label+' '+T.percentage(trend.value);
-   let tag=row.querySelector('.kiber-search-trend');
-   if(!tag){tag=make('small','kiber-search-trend');const target=row.querySelector('.v21-name>div:last-child,.v272-result>div')||row;target.append(tag);}
-   if(tag.textContent!==sig)tag.textContent=sig;
-   tone(tag,trend);
+  const info=byId.get(row.dataset.v272Id||row.dataset.v21Id);if(!info)continue;
+  const sector=sectorOf(info),label='Settore: '+sector;
+  let tag=row.querySelector('.kiber-search-sector,.kiber-search-trend');
+  if(!tag){
+   tag=make('small','kiber-search-sector');
+   (row.querySelector('.v21-name>div:last-child,.v272-result>div')||row).append(tag);
+  }
+  tag.className='kiber-search-sector';if(tag.textContent!==label)tag.textContent=label;
+  tag.title=sector==='Non classificato'?'Categoria non disponibile nei dati attuali':'Settore di appartenenza del token';
  }
 }
 function renderAll(){
  for(const cfg of FOLDS)enhanceFold(cfg);
+ compactBnb();
  appendTrendCard();
  marketLeader();
  enhanceSearch();
