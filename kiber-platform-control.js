@@ -15,7 +15,7 @@ function match(raw){
  if(/^(?:aggiorna|ricarica|rinfresca|sincronizza)\b.*\b(?:dati|prezzi|quotazioni|mercato|grafico)\b/.test(q))return{kind:'refresh-data'};
  const token=q.match(/^(?:cerca|trova|apri|analizza)\s+(?:il\s+)?(?:token|moneta|coin)\s+(.{2,80})$/);
  if(token)return{kind:'search-token',value:token[1]};
- const navigation=/^(?:apri|mostra|vai(?:\s+a|\s+su|\s+alla|\s+al)?|portami\s+(?:a|su|alla|al)|fammi vedere|visualizza|naviga\s+(?:a|su|alla|al)|spostati\s+(?:a|su|alla|al))\s+(.+)$/;
+ const navigation=/^(?:apri|mostra|vai(?:\s+a|\s+su|\s+alla|\s+al)?|portami\s+(?:a|su|alla|al)|fammi vedere|mostrami|visualizza|naviga\s+(?:a|su|alla|al)|spostati\s+(?:a|su|alla|al))\s+(.+)$/;
  const m=q.match(navigation);
  if(!m)return null;
  const part=m[1].replace(/^(?:il|lo|la|le|i|gli|l|sul|sulla|nella|nello|nel|nella)\s+/,'').trim();
@@ -64,8 +64,8 @@ function execute(cmd){
  }
  if(cmd.kind==='refresh-scanner'){
    const b=$('freeScanRefresh');if(!b)return{handled:true,message:'Lo scanner non è disponibile in questa schermata.',closeChat:false};
-   show('scanner');if(!b.disabled)b.click();
-   return{handled:true,closeChat:true,message:b.disabled?'Lo scanner è già in aggiornamento.':'Ho richiesto un aggiornamento dello scanner. Controlla l’orario dei dati per verificare la freschezza.'};
+   const wasBusy=b.disabled;show('scanner');if(!b.disabled)b.click();
+   return{handled:true,closeChat:true,message:wasBusy?'Lo scanner è già in aggiornamento.':'Ho richiesto un aggiornamento dello scanner. Controlla l’orario dei dati per verificare la freschezza.'};
  }
  if(cmd.kind==='refresh-data'){
    const refresh=$('freeScanRefresh');let done=0;
