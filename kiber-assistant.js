@@ -11,7 +11,7 @@ function context(){
  return {marketSectorSummary:window.kiberMarketSectorSummary?.()||'',trendSummary:window.kiberCurrentTrendSummary?.()||'',watch:watch.slice(0,30),catalogCount:catalog.length,scannerCount:Number(($('freeScanStatus')?.textContent||'').match(/^\d+/)?.[0]||0),selectedToken:$('v271Name')?.textContent||$('labName')?.textContent||null,price:$('v271Price')?.textContent||$('mPrice')?.textContent||null,change24:$('v27124')?.textContent||$('mChange')?.textContent||null,source:'Interfaccia Kibernetic; dati possono essere incompleti o non aggiornati'};
 }
 function help(){
- return 'Sono Kiber, assistente integrato in Kibernetic. Posso spiegare dati e funzioni, aprire lo scanner, mostrare i monitorati e analizzare il contesto disponibile. Non sono collegato a un modello linguistico esterno: questa è una versione gratuita basata su comandi e regole verificabili. Nessuna operazione finanziaria viene eseguita.';
+ return 'Sono Kiber, assistente integrato in Kibernetic. Posso spiegare dati e funzioni, aprire lo scanner, mostrare i monitorati e analizzare il contesto disponibile. Quando Gemini è configurato posso rispondere anche con un modello linguistico; altrimenti uso comandi e regole verificabili. Nessuna operazione finanziaria viene eseguita.';
 }
 function localAnswer(q,ctx){
  const t=q.toLowerCase();
