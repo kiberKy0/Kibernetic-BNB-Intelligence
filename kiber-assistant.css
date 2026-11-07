@@ -38,3 +38,6 @@ button.kiber-fab:focus-visible{outline:3px solid #66dfff;outline-offset:3px}
 /* Voice commands in the floating assistant */
 #kiberVoice{padding:0 12px;min-width:38px;font-size:16px}
 #kiberVoice[aria-pressed="true"]{background:#954823;box-shadow:0 0 0 2px #f9b77a}
+
+#kiberTalk{padding:0 10px;min-width:38px;font-size:16px;background:#305b81}
+#kiberTalk[aria-pressed="true"]{background:#0a7088;box-shadow:0 0 0 2px #42d8e7}
