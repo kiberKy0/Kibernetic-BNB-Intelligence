@@ -2,9 +2,11 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').slice(0,500);
-const state={history:[],busy:false,recognition:null};
+const state={history:[],busy:false,recognition:null,voiceReplies:false};
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
-function say(role,text){const b=$('kiberMessages');if(!b)return;const item=el('div','kiber-msg '+role,text);b.append(item);b.scrollTop=b.scrollHeight;state.history.push({role,text:String(text).slice(0,3000)});if(state.history.length>30)state.history.shift();}
+function say(role,text){const b=$('kiberMessages');if(!b)return;const item=el('div','kiber-msg '+role,text);b.append(item);b.scrollTop=b.scrollHeight;state.history.push({role,text:String(text).slice(0,3000)});if(state.history.length>30)state.history.shift();if(role==='assistant')speak(text);}
+function speak(text){if(!state.voiceReplies||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(String(text||'').slice(0,750));utterance.lang='it-IT';utterance.rate=1;speechSynthesis.speak(utterance)}catch{}}
+function toggleVoiceReplies(){if(!('speechSynthesis' in window)){say('assistant','La lettura vocale non è supportata da questo browser.');return}state.voiceReplies=!state.voiceReplies;const b=$('kiberTalk');if(b){b.textContent=state.voiceReplies?'🔊':'🔈';b.setAttribute('aria-pressed',String(state.voiceReplies));b.setAttribute('aria-label',state.voiceReplies?'Disattiva risposte vocali':'Attiva risposte vocali')}if(state.voiceReplies)speak('Risposte vocali attive.');else speechSynthesis.cancel();}
 function context(){
  let watch=[];try{watch=JSON.parse(localStorage.getItem('kiber_v271_watch')||'[]');if(!Array.isArray(watch))watch=[];}catch{}
  const catalog=typeof window.kiberCatalogContext==='function'?window.kiberCatalogContext():[];
@@ -72,12 +74,12 @@ async function submit(){
 function init(){
  if($('kiberPanel'))return;
  const panel=el('aside','kiber-panel');panel.id='kiberPanel';panel.hidden=true;panel.setAttribute('aria-label','Assistente Kiber');
- panel.innerHTML='<div class="kiber-top"><div class="kiber-mark">K</div><div><strong>Kiber</strong><small>Assistente gratuito · dati locali</small></div><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="500" aria-label="Messaggio a Kiber" placeholder="Scrivi o parla a Kiber…"><button type="button" id="kiberVoice" aria-label="Comando vocale" aria-pressed="false">🎙️</button><button type="button" id="kiberSend">Invia</button></div><small class="kiber-note">Modalità locale a regole. Non è ChatGPT né una IA generativa. Nessuna operazione su wallet.</small>';
+ panel.innerHTML='<div class="kiber-top"><div class="kiber-mark">K</div><div><strong>Kiber</strong><small>Assistente gratuito · dati locali</small></div><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="500" aria-label="Messaggio a Kiber" placeholder="Scrivi o parla a Kiber…"><button type="button" id="kiberTalk" aria-label="Attiva risposte vocali" aria-pressed="false">🔈</button><button type="button" id="kiberVoice" aria-label="Comando vocale" aria-pressed="false">🎙️</button><button type="button" id="kiberSend">Invia</button></div><small class="kiber-note">Modalità locale a regole. Non è ChatGPT né una IA generativa. Nessuna operazione su wallet.</small>';
  const open=el('button','kiber-fab');open.id='kiberFab';open.type='button';open.setAttribute('aria-label','Apri assistente Kiber');open.title='Apri assistente Kiber';const logo=el('img','kiber-fab-logo');logo.src='assets/kiber-logo.svg';logo.alt='';logo.setAttribute('aria-hidden','true');logo.width=44;logo.height=44;open.appendChild(logo);
  document.body.append(panel,open);
  open.onclick=()=>{panel.hidden=false;open.hidden=true;$('kiberInput')?.focus();void geminiReady();if(!state.history.length)say('assistant',help());};
  $('kiberClose').onclick=()=>{panel.hidden=true;open.hidden=false;};
- $('kiberSend').onclick=submit;$('kiberVoice').onclick=voice;
+ $('kiberSend').onclick=submit;$('kiberVoice').onclick=voice;$('kiberTalk').onclick=toggleVoiceReplies;
  $('kiberInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submit();}};
  panel.querySelectorAll('[data-kiber]').forEach(b=>b.onclick=()=>{$('kiberInput').value=b.dataset.kiber;submit();});
 }
