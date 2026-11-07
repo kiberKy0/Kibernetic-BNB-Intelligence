@@ -40,3 +40,8 @@ body.v268.v268-chat-open{overflow:hidden}
 .v268-chart-bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 18px 16px;color:#68869d;font-size:9px}.v268-chart-bottom strong{color:#a8eaff}.v268-chart-bottom button{border:0;background:transparent;color:#59d5ff;font:inherit;font-weight:900;cursor:pointer}
 
 @media(max-width:700px){.v268-chat-shell{width:100%}.v268-chat-head{padding-left:10px;padding-right:10px}.v268-chat-mode{display:none}.v268-msg{max-width:84%;font-size:13px}.v268-chart-top{padding:16px 13px 9px}.v268-chart-top h2{font-size:22px}.v268-periods{padding:0 13px 10px}.v268-chart-metrics{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 13px 10px}.v268-chart-metrics>div:last-child{grid-column:span 2}.v268-chart-stage{margin:0 7px 9px}#v268Chart{height:350px}.v268-chart-bottom{padding:0 13px 14px}.v268-legend{padding:0 13px 10px}}
+/* Kiber voice control: opt-in speech responses and microphone status */
+.v268-chat-compose{grid-template-columns:minmax(0,1fr) 38px 44px 48px}
+#v268Talk{font-size:18px;min-width:0;padding:0}
+#v268Talk[aria-pressed="true"]{border-color:#53d9fd;background:#0a4560;color:#f1fdff;box-shadow:inset 0 0 0 1px #2dd2ff}
+#v268Mic[aria-pressed="true"]{border-color:#f7a451;background:#613518;box-shadow:0 0 0 3px rgba(245,148,41,.2)}
