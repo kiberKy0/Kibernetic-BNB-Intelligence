@@ -60,12 +60,12 @@ function execute(cmd){
  if(cmd.kind==='section'){
    const ok=show(cmd.section);
    const labels={scanner:'Scanner FREE',watch:'Token monitorati',news:'Notizie',sectors:'Settori',macro:'Macro e SEC',chart:'Grafico',lab:'Analisi',market:'Mercato',kiber:'Kiber'};
-   return{handled:true,closeChat:cmd.section!=='kiber'&&ok,message:ok?'Ho aperto '+labels[cmd.section]+'.':'Questa sezione non è disponibile nella schermata corrente.'};
+   return{handled:true,closeChat:false,message:ok?'Ho aperto '+labels[cmd.section]+'.':'Questa sezione non è disponibile nella schermata corrente.'};
  }
  if(cmd.kind==='refresh-scanner'){
    const b=$('freeScanRefresh');if(!b)return{handled:true,message:'Lo scanner non è disponibile in questa schermata.',closeChat:false};
    const wasBusy=b.disabled;show('scanner');if(!b.disabled)b.click();
-   return{handled:true,closeChat:true,message:wasBusy?'Lo scanner è già in aggiornamento.':'Ho richiesto un aggiornamento dello scanner. Controlla l’orario dei dati per verificare la freschezza.'};
+   return{handled:true,closeChat:false,message:wasBusy?'Lo scanner è già in aggiornamento.':'Ho richiesto un aggiornamento dello scanner. Controlla l’orario dei dati per verificare la freschezza.'};
  }
  if(cmd.kind==='refresh-data'){
    const refresh=$('freeScanRefresh');let done=0;
@@ -76,7 +76,7 @@ function execute(cmd){
  if(cmd.kind==='search-token'){
    const field=$('tokenSearch'),btn=$('searchBtn');if(!field||!btn)return{handled:true,closeChat:false,message:'La ricerca dei token non è disponibile in questa schermata.'};
    field.value=cmd.value;btn.click();
-   return{handled:true,closeChat:true,message:'Ho avviato la ricerca di '+cmd.value+'. Verifica i risultati e l’indirizzo del contratto prima di interpretarli.'};
+   return{handled:true,closeChat:false,message:'Ho avviato la ricerca di '+cmd.value+'. Verifica i risultati e l’indirizzo del contratto prima di interpretarli.'};
  }
  return{handled:false};
 }
