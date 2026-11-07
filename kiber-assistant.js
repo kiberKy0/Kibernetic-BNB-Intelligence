@@ -10,7 +10,7 @@ function speak(text){if(state.voiceReplies&&isChatOpen())window.KiberVoice?.spea
 function toggleVoiceReplies(){
  if(!window.KiberVoice?.hasSpeech){say('assistant','Il tuo browser non dispone di voci sintetizzate.');return}
  state.voiceReplies=!state.voiceReplies;const b=$('kiberTalk'),opts=$('kiberVoiceOptions');
- if(b){b.textContent=state.voiceReplies?'🔊':'🔈';b.setAttribute('aria-pressed',String(state.voiceReplies));b.setAttribute('aria-label',state.voiceReplies?'Disattiva risposte vocali':'Attiva risposte vocali')}
+ if(b){b.textContent=state.voiceReplies?'Voce ON':'Voce';b.setAttribute('aria-pressed',String(state.voiceReplies));b.setAttribute('aria-label',state.voiceReplies?'Disattiva risposte vocali':'Attiva risposte vocali')}
  if(opts)opts.hidden=!state.voiceReplies;
  if(state.voiceReplies){window.KiberVoice.populate($('kiberVoiceSelect'));speak('Ciao! Sono Kiber. Puoi scegliere una voce italiana qui sotto.')}
  else window.KiberVoice.stopSpeech();
@@ -21,16 +21,16 @@ function closeSession(){
  state.voiceReplies=false;state.busy=false;state.history=[];
  $('kiberMessages')?.replaceChildren();
  if($('kiberInput'))$('kiberInput').value='';
- const talk=$('kiberTalk');if(talk){talk.textContent='🔈';talk.setAttribute('aria-pressed','false');talk.setAttribute('aria-label','Attiva risposte vocali')}
+ const talk=$('kiberTalk');if(talk){talk.textContent='Voce';talk.setAttribute('aria-pressed','false');talk.setAttribute('aria-label','Attiva risposte vocali')}
  if($('kiberVoiceOptions'))$('kiberVoiceOptions').hidden=true;
- if($('kiberMicStatus')){$('kiberMicStatus').hidden=true;$('kiberMicStatus').textContent=''}
+ if($('kiberMicStatus')){$('kiberMicStatus').hidden=true;$('kiberMicStatus').textContent=''}if($('kiberMicHelp'))$('kiberMicHelp').hidden=true;
  $('kiberVoice')?.setAttribute('aria-pressed','false');
 }
 function voice(){
  if(!window.KiberVoice){say('assistant','La registrazione vocale non è disponibile. Ricarica la pagina.');return}
  if(!state.mic)state.mic=window.KiberVoice.makeMic({
   onText:t=>{if(!isChatOpen())return;const input=$('kiberInput');if(input){input.value=t;void submit()}},
-  onStatus:(m,pressed)=>{const node=$('kiberMicStatus');if(node){node.hidden=!m;node.textContent=m}$('kiberVoice')?.setAttribute('aria-pressed',String(!!pressed))}
+  onStatus:(m,pressed)=>{const node=$('kiberMicStatus');if(node){node.hidden=!m;node.textContent=m}if($('kiberMicHelp'))$('kiberMicHelp').hidden=!/microfono|browser|chrome|permess|accesso|dispositivo|autorizzazione/i.test(m)||pressed;$('kiberVoice')?.setAttribute('aria-pressed',String(!!pressed))}
  });
  state.mic.toggle();
 }
@@ -106,13 +106,13 @@ async function submit(){
 function init(){
  if($('kiberPanel'))return;
  const panel=el('aside','kiber-panel');panel.id='kiberPanel';panel.hidden=true;panel.setAttribute('aria-label','Assistente Kiber');
- panel.innerHTML='<div class="kiber-top"><div class="kiber-mark kiber-avatar-mark"><img src="assets/kiber-logo.svg?v=295" width="36" height="36" alt="Logo Kiber"></div><div><strong>Kiber</strong><small>Assistente gratuito · dati locali</small></div><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="500" aria-label="Messaggio a Kiber" placeholder="Scrivi o parla a Kiber…"><button type="button" id="kiberTalk" aria-label="Attiva risposte vocali" aria-pressed="false">🔈</button><button type="button" id="kiberVoice" class="kiber-mic-button" aria-label="Comando vocale" aria-pressed="false" title="Parla con Kiber"><svg class="kiber-mic-icon" viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 10.5v1.5a6.5 6.5 0 0 0 13 0v-1.5M12 18.5v3M8.5 21.5h7"></path></svg></button><button type="button" id="kiberSend">Invia</button></div><div class="kiber-voice-options" id="kiberVoiceOptions" hidden><label for="kiberVoiceSelect">Voce di Kiber</label><select id="kiberVoiceSelect" aria-label="Scegli la voce di Kiber"></select><button type="button" id="kiberVoicePreview">Ascolta</button></div><small class="kiber-mic-status" id="kiberMicStatus" role="status" aria-live="polite" hidden></small><small class="kiber-note">Modalità locale a regole. Non è ChatGPT né una IA generativa. Nessuna operazione su wallet.</small>';
+ panel.innerHTML='<div class="kiber-top"><div class="kiber-mark kiber-avatar-mark"><img src="assets/kiber-logo.svg?v=295" width="36" height="36" alt="Logo Kiber"></div><div><strong>Kiber</strong><small>Assistente gratuito · dati locali</small></div><button type="button" id="kiberTalk" class="kiber-voice-settings-btn" aria-label="Attiva risposte vocali" aria-pressed="false" title="Impostazioni voce">Voce</button><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="500" aria-label="Messaggio a Kiber" placeholder="Scrivi o parla a Kiber…"><button type="button" id="kiberVoice" class="kiber-mic-button" aria-label="Comando vocale" aria-pressed="false" title="Parla con Kiber"><svg class="kiber-mic-icon" viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 10.5v1.5a6.5 6.5 0 0 0 13 0v-1.5M12 18.5v3M8.5 21.5h7"></path></svg><span class="kiber-mic-text">Parla</span></button><button type="button" id="kiberSend">Invia</button></div><div class="kiber-voice-options" id="kiberVoiceOptions" hidden><label for="kiberVoiceSelect">Voce di Kiber</label><select id="kiberVoiceSelect" aria-label="Scegli la voce di Kiber"></select><button type="button" id="kiberVoicePreview">Ascolta</button></div><small class="kiber-mic-status" id="kiberMicStatus" role="status" aria-live="polite" hidden></small><div class="kiber-mic-help" id="kiberMicHelp" hidden>Se il browser blocca il microfono, apri Kibernetic direttamente in Chrome oppure usa la dettatura della tastiera del telefono.<button type="button" id="kiberUseKeyboard">Usa tastiera</button></div><small class="kiber-note">Modalità locale a regole. Non è ChatGPT né una IA generativa. Nessuna operazione su wallet.</small>';
  const open=el('button','kiber-fab');open.id='kiberFab';open.type='button';open.setAttribute('aria-label','Apri assistente Kiber');open.title='Apri assistente Kiber';const logo=el('img','kiber-fab-logo');logo.src='assets/kiber-logo.svg';logo.alt='';logo.setAttribute('aria-hidden','true');logo.width=44;logo.height=44;open.appendChild(logo);
  document.body.append(panel,open);
  open.onclick=()=>{panel.hidden=false;open.hidden=true;$('kiberInput')?.focus();void geminiReady();if(!state.history.length)say('assistant',help());};
  $('kiberClose').onclick=()=>{closeSession();panel.hidden=true;open.hidden=false;};
  $('kiberSend').onclick=submit;$('kiberVoice').onclick=voice;$('kiberTalk').onclick=toggleVoiceReplies;
- $('kiberVoicePreview').onclick=()=>window.KiberVoice?.speak('Ciao, questa è la voce di Kiber. Come posso aiutarti?');
+ $('kiberVoicePreview').onclick=()=>window.KiberVoice?.speak('Ciao, questa è la voce di Kiber. Come posso aiutarti?');$('kiberUseKeyboard').onclick=()=>{const input=$('kiberInput');if(input){input.focus();if($('kiberMicStatus')){$('kiberMicStatus').hidden=false;$('kiberMicStatus').textContent='Usa il microfono della tastiera Android per dettare il comando.'}}};
  window.addEventListener('pagehide',closeSession);document.addEventListener('visibilitychange',()=>{if(document.hidden){state.mic?.cancel();window.KiberVoice?.stopSpeech()}});
  $('kiberInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submit();}};
  panel.querySelectorAll('[data-kiber]').forEach(b=>b.onclick=()=>{$('kiberInput').value=b.dataset.kiber;submit();});
