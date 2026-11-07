@@ -17,7 +17,7 @@ function populate(select){
  const auto=document.createElement('option');auto.value='auto';auto.textContent='Voce italiana automatica';select.append(auto);
  for(const v of it){const opt=document.createElement('option');opt.value=v.voiceURI;opt.textContent=v.name+(v.localService?' · dispositivo':' · online');select.append(opt)}
  const chosen=(it.some(v=>v.voiceURI===old)?old:it.some(v=>v.voiceURI===stored)?stored:'auto');select.value=chosen;
- if(!it.length){const o=document.createElement('option');o.value='not-ready';o.disabled=true;o.textContent='Caricamento voci italiane…';select.append(o)}
+ if(!it.length){const o=document.createElement('option');o.value='not-ready';o.disabled=true;o.textContent='Nessuna voce italiana rilevata: controlla le voci del telefono';select.append(o)}
  select.onchange=()=>{try{localStorage.setItem('kiber_voice_id',select.value)}catch{}};
 }
 if(synth?.addEventListener)synth.addEventListener('voiceschanged',()=>voicesSelects.forEach(s=>{if(s.isConnected)populate(s);else voicesSelects.delete(s)}));
@@ -91,7 +91,7 @@ function makeMic({onText,onStatus}){
    media.onstop=()=>{tracks();clearTimeout(timer);if(id!==nonce)return;const blob=new Blob(chunks,{type:media?.mimeType||mime||'audio/webm'});media=null;chunks=[];void transcribe(blob,id)};
    media.start(350);mode='recording';status('Ti ascolto… Tocca di nuovo per inviare (max 12 s)',true);
    timer=setTimeout(()=>{if(id===nonce&&media?.state==='recording')stop()},12000);
-  }catch(e){tracks();if(id!==nonce)return;mode='idle';const denied=e?.name==='NotAllowedError'||e?.name==='PermissionDeniedError';status(denied?'Accesso al microfono negato. Abilitalo per questo sito.':'Microfono non disponibile. Controlla il browser e riprova.',false)}
+  }catch(e){tracks();if(id!==nonce)return;mode='idle';const kind=String(e?.name||'');const message=/NotAllowed|PermissionDenied|Security/.test(kind)?'Microfono bloccato: apri il sito in Chrome e autorizza il microfono nelle impostazioni del sito.':/NotFound|DevicesNotFound/.test(kind)?'Questo browser non rileva il microfono. Apri il sito in Chrome su Android e verifica i permessi.':/NotReadable|TrackStart/.test(kind)?'Microfono occupato o non accessibile. Chiudi le altre app che lo utilizzano.':'Il microfono non è disponibile in questa pagina. Prova Chrome su Android.';status(message,false)}
  }
  function stop(){
   if(mode==='recording'&&media?.state==='recording'){status('Elaborazione registrazione…',false);media.stop()}
