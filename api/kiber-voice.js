@@ -20,7 +20,7 @@ module.exports=async(req,res)=>{
     const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{
       method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},
       signal:AbortSignal.timeout(22000),
-      body:JSON.stringify({contents:[{parts:[{text:'Trascrivi fedelmente in italiano le parole pronunciate in questo audio. Rispondi esclusivamente con la trascrizione, senza spiegazioni e senza inventare parole non udibili.'},{inlineData:{mimeType:mime,data:base64}}]}],generationConfig:{maxOutputTokens:230,temperature:0}})
+      body:JSON.stringify({contents:[{parts:[{text:'Trascrivi fedelmente in italiano le parole pronunciate in questo audio. Rispondi esclusivamente con la trascrizione, senza spiegazioni e senza inventare parole non udibili.'},{inlineData:{mimeType:mime.split(';')[0],data:base64}}]}],generationConfig:{maxOutputTokens:230,temperature:0}})
     });
     const data=await r.json().catch(()=>({}));
     if(!r.ok){const m=r.status===429?'Limite temporaneo Gemini raggiunto':r.status===403?'Servizio vocale non autorizzato':r.status===400?'Formato non accettato da Gemini':'Trascrizione vocale non disponibile';return res.status(r.status===429?429:502).json({error:m})}
