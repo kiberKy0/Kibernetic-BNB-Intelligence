@@ -35,16 +35,39 @@
     cleanupLegacy();const body=q('#section-market .section-body');if(!body)return;
     const h=q('#section-market .section-head h2'),p=q('#section-market .section-head p');if(h)h.textContent='Catalogo Mercato';if(p)p.textContent='Catalogo dell’ecosistema BNB, non elenco di tutti i contratti BSC. Il contratto viene verificato nella scheda.';
     let tools=$('v21Tools');if(!tools){tools=document.createElement('div');tools.id='v21Tools';tools.innerHTML=`<div class="v21-tabs"><button type="button" data-v21="catalog" class="active">Classifica BNB</button><button type="button" data-v21="chain">Mercato on-chain</button></div><div class="v21-sortline"><select id="v21Sort"><option value="rank">Posizione globale</option><option value="marketCap">Capitalizzazione</option><option value="volume24">Volume 24h</option><option value="change24">Variazione 24h</option></select><a href="https://www.coingecko.com/en/categories/binance-smart-chain" target="_blank" rel="noopener">Apri CoinGecko ↗</a></div><div class="v21-source"><span><b>Fonte:</b> CoinGecko · BNB Chain Ecosystem</span><span id="v21Meta">Caricamento…</span></div>`;body.insertBefore(tools,body.firstChild);qa('[data-v21]',tools).forEach(b=>b.onclick=()=>setMode(b.dataset.v21));$('v21Sort').onchange=e=>{V21.sort=e.target.value;renderCatalog()}}
+    if($('v21Tools')&&!$('v21SectorSourceNote')){const note=document.createElement('p');note.id='v21SectorSourceNote';note.className='v21-sector-source-note';note.textContent='Settori: categorie CoinGecko o progetti identificati. “Da verificare” indica che la fonte non ha fornito una categoria attendibile.';$('v21Tools').after(note)}
     let list=$('v21CatalogList');if(!list){list=document.createElement('div');list.id='v21CatalogList';list.dataset.owner='v21v2';list.className='token-list v21-catalog-list';const old=$('marketList');old.parentNode.insertBefore(list,old)}
   }
 
   function sorted(items=V21.items){const a=[...items];if(V21.sort==='marketCap')a.sort((x,y)=>(y.marketCap||0)-(x.marketCap||0));else if(V21.sort==='volume24')a.sort((x,y)=>(y.volume24||0)-(x.volume24||0));else if(V21.sort==='change24')a.sort((x,y)=>(y.change24||0)-(x.change24||0));else a.sort((x,y)=>(x.rank??999999)-(y.rank??999999));return a}
 
-  function rowHtml(x){const c=x.change24==null?null:Number(x.change24),rank=x.rank?`#${x.rank}`:'—',logo=x.image?`<img src="${safe(x.image)}" alt="Logo ${safe(x.symbol)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`:`<span>${safe(String(x.symbol||'?').slice(0,3))}</span>`;return `<article class="v21-row" data-v21-id="${safe(x.id)}"><div class="v21-rank"><small>Rank</small><b>${rank}</b></div><div class="v21-name"><div class="v21-logo">${logo}</div><div><b>${safe(x.name)}</b><small>${safe(x.symbol)} · ecosistema BNB</small></div></div><div class="v21-stat v21-price"><small>Prezzo</small><b>${money(x.price)}</b></div><div class="v21-stat v21-cap"><small>Market cap</small><b>${compact(x.marketCap)}</b></div><div class="v21-stat v21-change"><small>24h</small><b class="${c>=0?'up':'down'}">${pct(c)}</b></div><div class="v21-stat v21-volume"><small>Volume 24h</small><b>${compact(x.volume24)}</b></div><button type="button" class="v21-analyze">Apri token</button></article>`}
+  function rowHtml(x){const sector=window.KiberSector?.classify(x)||{name:'Da verificare',detail:'Metadati non disponibili',source:'Da verificare'};const c=x.change24==null?null:Number(x.change24),rank=x.rank?`#${x.rank}`:'—',logo=x.image?`<img src="${safe(x.image)}" alt="Logo ${safe(x.symbol)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`:`<span>${safe(String(x.symbol||'?').slice(0,3))}</span>`;return `<article class="v21-row" data-v21-id="${safe(x.id)}"><div class="v21-rank"><small>Rank</small><b>${rank}</b></div><div class="v21-name"><div class="v21-logo">${logo}</div><div><b>${safe(x.name)}</b><small>${safe(x.symbol)} · ecosistema BNB</small></div></div><div class="v21-stat v21-price"><small>Prezzo</small><b>${money(x.price)}</b></div><div class="v21-stat v21-cap"><small>Market cap</small><b>${compact(x.marketCap)}</b></div><div class="v21-stat v21-change"><small>24h</small><b class="${c>=0?'up':'down'}">${pct(c)}</b></div><div class="v21-stat v21-volume"><small>Volume 24h</small><b>${compact(x.volume24)}</b></div><div class="v21-sector" title="${safe(sector.source)}"><small>Settore</small><b>${safe(sector.name)}</b><em>${safe(sector.detail||sector.source)}</em></div><button type="button" class="v21-analyze">Apri token</button></article>`}
 
   function bindRows(){qa('#v21CatalogList [data-v21-id]').forEach(r=>{const x=V21.items.find(z=>z.id===r.dataset.v21Id);if(!x)return;const go=e=>{e?.stopPropagation();analyzeItem(x)};r.onclick=go;r.querySelector('.v21-analyze')?.addEventListener('click',go)})}
 
-  function renderCatalog(items=V21.items){const list=$('v21CatalogList');if(!list)return;const a=sorted(items),shown=a.slice(0,V21.visible);list.innerHTML=shown.length?shown.map(rowHtml).join(''):'<div class="v21-empty">Nessun dato di classifica disponibile.</div>';if(a.length>shown.length){const b=document.createElement('button');b.className='secondary v21-more';b.type='button';b.textContent=`Mostra altri ${Math.min(60,a.length-shown.length)} token`;b.onclick=()=>{V21.visible+=60;renderCatalog(items)};list.appendChild(b)}else if(items===V21.items&&V21.hasMore&&V21.page<5){const b=document.createElement('button');b.className='secondary v21-more';b.type='button';b.disabled=V21.loadingMore;b.textContent=V21.loadingMore?'Caricamento…':'Cerca altri token nel catalogo (pagina '+(V21.page+1)+')';b.onclick=loadMoreCatalog;list.appendChild(b)}bindRows();if($('marketCount'))$('marketCount').textContent=`${a.length} classificati`;if($('v21Meta'))$('v21Meta').textContent=`${shown.length}/${a.length} token · ${V21.source}`}
+  function renderCatalog(items=V21.items){const list=$('v21CatalogList');if(!list)return;const a=sorted(items),shown=a.slice(0,V21.visible);list.innerHTML=shown.length?shown.map(rowHtml).join(''):'<div class="v21-empty">Nessun dato di classifica disponibile.</div>';if(a.length>shown.length){const b=document.createElement('button');b.className='secondary v21-more';b.type='button';b.textContent=`Mostra altri ${Math.min(60,a.length-shown.length)} token`;b.onclick=()=>{V21.visible+=60;renderCatalog(items)};list.appendChild(b)}else if(items===V21.items&&V21.hasMore&&V21.page<5){const b=document.createElement('button');b.className='secondary v21-more';b.type='button';b.disabled=V21.loadingMore;b.textContent=V21.loadingMore?'Caricamento…':'Cerca altri token nel catalogo (pagina '+(V21.page+1)+')';b.onclick=loadMoreCatalog;list.appendChild(b)}bindRows();if(!sectorTimer)sectorTimer=setInterval(verifyVisibleSectors,17500);setTimeout(verifyVisibleSectors,1000);if($('marketCount'))$('marketCount').textContent=`${a.length} token`;if($('v21Meta'))$('v21Meta').textContent=`${shown.length}/${a.length} token · ${V21.source}`}
+
+  let sectorTimer=null;
+  function updateSectorRow(id){
+    const row=qa('#v21CatalogList .v21-row').find(x=>x.dataset.v21Id===id);if(!row)return;
+    const coin=V21.items.find(x=>x.id===id);if(!coin)return;
+    const c=window.KiberSector?.classify(coin);if(!c)return;
+    const sector=row.querySelector('.v21-sector');if(!sector)return;
+    sector.title=c.source;
+    const name=sector.querySelector('b'),detail=sector.querySelector('em');
+    if(name)name.textContent=c.name;if(detail)detail.textContent=c.detail||c.source;
+  }
+  function verifyVisibleSectors(){
+    if(document.hidden||!window.KiberSector)return;
+    for(const row of qa('#v21CatalogList .v21-row')){
+      const rect=row.getBoundingClientRect();
+      if(rect.bottom<0||rect.top>window.innerHeight+200)continue;
+      const item=V21.items.find(x=>x.id===row.dataset.v21Id);
+      if(!item||window.KiberSector.classify(item).verified)continue;
+      void window.KiberSector.enrich(item).then(()=>updateSectorRow(item.id));
+      break;
+    }
+  }
 
   function saveCache(items){try{localStorage.setItem(CACHE_KEY,JSON.stringify({at:Date.now(),items:items.slice(0,1250)}))}catch{}}
   function loadCache(){try{const d=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');return Array.isArray(d?.items)?d:null}catch{return null}}
