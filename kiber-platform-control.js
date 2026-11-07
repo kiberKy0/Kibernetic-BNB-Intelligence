@@ -34,7 +34,7 @@ function show(section){
  if(section==='scanner'){
    const btn=$('freeScanNav'),node=$('freeScanner');
    if(!node)return false;
-   if(btn)btn.click();else node.scrollIntoView({behavior:'smooth',block:'start'});
+   if(btn)btn.click();node.classList.add('open');node.scrollIntoView({behavior:'smooth',block:'start'});
    return true;
  }
  const selected=section==='chart'?'lab':section;
