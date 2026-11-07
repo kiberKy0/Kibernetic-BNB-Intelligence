@@ -96,3 +96,13 @@ button.kiber-fab:focus-visible{outline:3px solid #66dfff;outline-offset:3px}
   #v268Mic.kiber-mic-button,#kiberVoice.kiber-mic-button,
   #v268Mic.kiber-mic-button::before,#kiberVoice.kiber-mic-button::before{animation:none!important;transition:none!important}
 }
+
+
+/* Visible outer neon halo: light but recognizable on the light/dark panels */
+#v268Mic.kiber-mic-button:not([aria-pressed="true"]),
+#kiberVoice.kiber-mic-button:not([aria-pressed="true"]){
+  box-shadow:inset 0 1px 0 rgba(238,253,255,.45),
+             0 4px 13px rgba(0,17,38,.34),
+             0 0 0 2px rgba(83,216,255,.22),
+             0 0 16px 3px rgba(64,207,254,.43);
+}
