@@ -108,7 +108,10 @@ async function geminiCall(key,{instructions,input}){
     signal:AbortSignal.timeout(22000),
     body:JSON.stringify({
       systemInstruction:{parts:[{text:instructions}]},
-      contents:[{role:'user',parts:[{text:String(input||'').slice(0,22000)}]}],
+      contents:[{role:'user',parts:[{text:(()=>{
+        const full=String(input||''),mark='\n\nDOMANDA:\n',at=full.lastIndexOf(mark);
+        return at<0?full.slice(0,22000):full.slice(0,17000)+full.slice(at).slice(0,4000);
+      })()}]}],
       generationConfig:{maxOutputTokens:1400}
     })
   });
