@@ -12,3 +12,14 @@
  .v21-sector small{font-size:12px;min-width:48px}
  .v21-sector b{font-size:13px}
 }
+
+
+/* Sector browser: visible, tappable filters even on narrow phones */
+.v21-sector-filters{display:grid;gap:10px;margin:14px 0;padding:12px;border-radius:15px;border:1px solid rgba(66,197,245,.24);background:rgba(6,35,58,.72);min-width:0}
+.v21-sector-filters>label{display:block;color:#b9eaff;font-size:12px;font-weight:800}
+#v21SectorFilter{width:100%;height:45px;padding:0 12px;border-radius:11px;border:1px solid rgba(81,183,220,.45);background:#09283e;color:#e8faff;font-size:13px;font-weight:750}
+.v21-sector-chips{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding:4px 0 9px;-webkit-overflow-scrolling:touch}
+.v21-sector-chips button{border:1px solid rgba(88,184,225,.36);border-radius:999px;background:#0b2b43;color:#c7e6f4;padding:10px 13px;white-space:nowrap;min-height:40px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0;touch-action:manipulation}
+.v21-sector-chips button.active,.v21-sector-chips button[aria-pressed="true"]{border-color:#58d9ff;background:#155f84;color:#fff;box-shadow:0 0 0 1px rgba(43,198,244,.28)}
+.v21-sector-coverage{color:#99b8d1;font-size:11px;line-height:1.4}
+@media(max-width:800px){.v21-sector-filters{padding:10px 9px;margin:10px 0}.v21-sector-chips button{min-height:43px;font-size:13px;padding:10px 12px}}
