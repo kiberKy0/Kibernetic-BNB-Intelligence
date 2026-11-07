@@ -199,7 +199,39 @@ function sanitizeContext(body,e){
   const token=body.token?{symbol:String(body.token.symbol||'').slice(0,30),name:String(body.token.name||'').slice(0,120),address:String(body.token.address||'').slice(0,80),price:num(body.token.price??body.token.priceUsd),change24:num(body.token.change24??body.token.priceChange?.h24),change7d:num(body.token.change7d),change30d:num(body.token.change30d),marketCap:num(body.token.marketCap??body.token.fdv),volume24:num(body.token.volume24??body.token.volume?.h24),liquidityUsd:num(body.token.liquidityUsd??body.token.liquidity?.usd),rank:num(body.token.rank),categories:Array.isArray(body.token.categories)?body.token.categories.slice(0,10):[]}:null;
   return{version:VERSION,analysisMode:String(body.analysisMode||'summary').slice(0,40),analysisSubject:body.analysisSubject||null,oracleEvaluation:e,bnb:body.bnb||null,chain:body.chain||null,intelligence:body.intelligence||null,token,tokenIntel:body.tokenIntel||null,marketNews:body.marketNews?.items?{counts:body.marketNews.counts||null,marketNewsBalance:body.marketNews.marketNewsBalance||null,items:body.marketNews.items.slice(0,18)}:body.marketNews||null,tokenNews:body.tokenNews?.items?{counts:body.tokenNews.counts||null,items:body.tokenNews.items.slice(0,12)}:null,analysis:body.analysis||null,conversation:(body.conversation||[]).slice(-10).map(m=>({role:m.role==='assistant'?'assistant':'user',content:String(m.content||'').slice(0,1600)}))};
 }
+const voiceTranscriptionModel='gemini-3.5-flash-lite';
+const voiceTranscriptionAttempts=new Map();
+async function voiceTranscribe(req,res){
+  res.setHeader('Cache-Control','no-store');
+  if(req.method!=='POST')return res.status(405).json({error:'Metodo non consentito'});
+  const key=String(process.env.KIBER_ORACOLO_BNB||process.env.GEMINI_API_KEY||'').replace(/[\u200b-\u200d\u2060\ufeff\s]/g,'');
+  if(!key)return res.status(503).json({error:'Trascrizione IA non configurata'});
+  const now=Date.now(),ip=String(req.headers['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0].slice(0,90);
+  for(const [k,v] of voiceTranscriptionAttempts)if(now-v.at>120000)voiceTranscriptionAttempts.delete(k);
+  const current=voiceTranscriptionAttempts.get(ip)||{at:now,count:0};if(now-current.at>60000){current.at=now;current.count=0}
+  if(current.count>=8)return res.status(429).json({error:'Troppe richieste vocali. Riprova tra un minuto.'});
+  current.count++;voiceTranscriptionAttempts.set(ip,current);
+  try{
+    const body=typeof req.body==='string'?JSON.parse(req.body):req.body||{};
+    const base64=String(body.audio||''),mime=String(body.mime||'').toLowerCase();
+    if(!/^audio\/(?:webm|ogg|mp4|mpeg|wav|aac)(?:;[\w\s=+.-]+)?$/.test(mime)||base64.length<100||base64.length>1500000||!/^[a-zA-Z0-9+/]+=*$/.test(base64))
+      return res.status(400).json({error:'Formato o dimensione audio non valida (massimo 15 secondi)'});
+    const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+voiceTranscriptionModel+':generateContent',{
+      method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},
+      signal:AbortSignal.timeout(22000),
+      body:JSON.stringify({contents:[{parts:[{text:'Trascrivi fedelmente in italiano le parole pronunciate in questo audio. Rispondi esclusivamente con la trascrizione, senza spiegazioni e senza inventare parole non udibili.'},{inlineData:{mimeType:mime.split(';')[0],data:base64}}]}],generationConfig:{maxOutputTokens:230,temperature:0}})
+    });
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok){const m=r.status===429?'Limite temporaneo Gemini raggiunto':r.status===403?'Servizio vocale non autorizzato':r.status===400?'Formato non accettato da Gemini':'Trascrizione vocale non disponibile';return res.status(r.status===429?429:502).json({error:m})}
+    const raw=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join(' ').trim();
+    const text=raw.replace(/^["“]|["”]$/g,'').replace(/^(?:trascrizione|testo)\s*:\s*/i,'').slice(0,430);
+    if(!text||/^(?:audio non|nessun parlato|silenzio|non riesco a trascrivere)/i.test(text))return res.status(422).json({error:'Non ho sentito parole riconoscibili. Riprova più vicino al microfono.'});
+    return res.status(200).json({text,provider:'gemini',model:voiceTranscriptionModel});
+  }catch{return res.status(502).json({error:'La trascrizione non è riuscita. Controlla la connessione e riprova.'})}
+}
+
 module.exports=async function handler(req,res){
+  if(req.method==='POST'&&(req.query?.voice==='1'||/[?&]voice=1(?:&|$)/.test(String(req.url||''))))return voiceTranscribe(req,res);
   if(req.method==='GET'){
     const provider=(process.env.KIBER_ORACOLO_BNB||process.env.GEMINI_API_KEY)?'gemini':process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
     return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:provider==='gemini'?'gemini-3.5-flash-lite':process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,geminiStatus:provider==='gemini'?'configured_unverified':'not_configured',searchProvider:(process.env.TINYFISH_API_KEY||process.env.TINYFISH_APY_KEY)?'tinyfish':'not-configured',capabilities:['conversation','bnb','chain','token360','scenario','risk','contrarian','newsimpact','chartoracle','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','web-search-when-openai','data-quality','model-fallback','fallback']});
