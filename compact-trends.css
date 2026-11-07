@@ -77,3 +77,16 @@
 .kiber-bnb-compact-grid strong.kiber-negative{color:#f38e9b}
 .kiber-bnb-compact-note{margin-top:9px;color:#8eaabe;font-size:11px;line-height:1.45}
 .kiber-bnb-compact-note b{color:#8edaff}
+
+
+/* Final mobile legibility for catalog sector and Kiber official mark */
+#profileBtn #avatar{width:37px;min-width:37px;height:37px;display:inline-grid;place-items:center;font-size:0!important;color:transparent!important;text-indent:-9999px;overflow:hidden;background:linear-gradient(145deg,#084780,#0d6ea8) url('assets/kiber-logo.svg') center/86% 86% no-repeat!important;border:1px solid rgba(92,207,255,.35);border-radius:50%}
+.v21-catalog-list .v21-sector{overflow-wrap:normal;word-break:normal;min-width:0;max-width:100%}
+.v21-catalog-list .v21-sector b,.v21-catalog-list .v21-sector em{overflow-wrap:normal;word-break:normal;white-space:normal}
+@media(max-width:800px){
+ .v21-catalog-list .v21-row{grid-template-columns:43px minmax(0,1fr) 82px!important;grid-template-areas:'rank name action' 'rank cap action' 'rank price action' 'rank change action' 'sector sector sector'!important}
+ .v21-catalog-list .v21-sector{grid-area:sector!important;grid-column:1/-1!important;grid-row:auto!important;width:100%;box-sizing:border-box;padding:10px 11px!important;margin-top:5px;display:flex!important;align-items:baseline!important;gap:7px!important;flex-wrap:wrap!important}
+ .v21-catalog-list .v21-sector small{flex:0 0 auto;white-space:nowrap;font-size:11px!important}
+ .v21-catalog-list .v21-sector b{font-size:13px!important;color:#c3efff;line-height:1.35}
+ .v21-catalog-list .v21-sector em{font-size:11px!important;color:#9cb9d0;line-height:1.4}
+}
