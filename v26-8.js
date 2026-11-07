@@ -9,6 +9,19 @@ const S={messages:[],context:null,contextAt:0,busy:false,days:30,points:[],sourc
 function setVersion(){document.body.classList.add('v268');document.documentElement.dataset.kiberVersion=V;document.title='Kiber BNB Chain'}
 function time(){return new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}
 
+let geminiStatus={at:0,ready:false};
+async function geminiReady(){
+  if(Date.now()-geminiStatus.at<90000)return geminiStatus.ready;
+  try{
+    const r=await fetch('/api/kiber?provider=1',{cache:'no-store',signal:AbortSignal.timeout(6500)});
+    if(!r.ok)throw Error('Stato IA non disponibile');
+    const d=await r.json();
+    geminiStatus={at:Date.now(),ready:d.provider==='gemini'&&d.ai===true};
+  }catch{geminiStatus={at:Date.now(),ready:false}}
+  return geminiStatus.ready;
+}
+
+
 function ensureChat(){
   if($('v268Chat'))return;
   q('#v267KiberSheet')?.classList.remove('open');
@@ -27,7 +40,7 @@ async function send(seed){
  if(/^Analizza la BNB Chain adesso$/i.test(m))S.scope={subject:'chain'};
  const scope=S.scope,tc=scope.subject==='token'?scope.tokenContext:null,key=scope.subject+':'+(tc?.coin?.id||tc?.coin?.address||'');
  if(input)input.value='';S.busy=true;$('v268Send').disabled=true;bubble('user',m);S.messages.push({role:'user',content:m,scope:key});const typing=bubble('kiber','',true);$('v268Status').textContent='sta analizzando…';
- try{if(window.kiberLocalOracleAnswer){const answer=await window.kiberLocalOracleAnswer(m,scope);typing?.remove();bubble('kiber',answer);S.messages.push({role:'assistant',content:answer,scope:key});$('v268Mode').textContent='ORACOLO DATI';return}if(tc?.coin){try{const url=tc.coin.address?'/api/token-intel-v26?address='+encodeURIComponent(tc.coin.address):'/api/coingecko?type=coin_detail&id='+encodeURIComponent(tc.coin.id);const rr=await fetch(url,{signal:AbortSignal.timeout(15000)});if(rr.ok){const fresh=await rr.json();if(fresh.coin)tc.coin={...tc.coin,...fresh.coin};if(fresh.token){tc.intel=fresh;tc.coin={...tc.coin,price:fresh.token.priceUsd,volume24:fresh.token.volume24h,liquidityUsd:fresh.token.liquidityUsd,change24:fresh.token.change24h}}}}catch{}}S.contextAt=0;const c=await context(),mode=/settor/i.test(m)?'sectors':/monitorat|gruppo/i.test(m)?'watchlist':/cambi|rispetto.*prima/i.test(m)?'changes':/liquid|fluss|volume/i.test(m)?'liquidity':/risch/i.test(m)?'risk':/news|notizi/i.test(m)?'newsimpact':'chartoracle';
+ try{if(window.kiberLocalOracleAnswer && !(await geminiReady())){const answer=await window.kiberLocalOracleAnswer(m,scope);typing?.remove();bubble('kiber',answer);S.messages.push({role:'assistant',content:answer,scope:key});$('v268Mode').textContent='ORACOLO DATI';return}if(tc?.coin){try{const url=tc.coin.address?'/api/token-intel-v26?address='+encodeURIComponent(tc.coin.address):'/api/coingecko?type=coin_detail&id='+encodeURIComponent(tc.coin.id);const rr=await fetch(url,{signal:AbortSignal.timeout(15000)});if(rr.ok){const fresh=await rr.json();if(fresh.coin)tc.coin={...tc.coin,...fresh.coin};if(fresh.token){tc.intel=fresh;tc.coin={...tc.coin,price:fresh.token.priceUsd,volume24:fresh.token.volume24h,liquidityUsd:fresh.token.liquidityUsd,change24:fresh.token.change24h}}}}catch{}}S.contextAt=0;const c=await context(),mode=/settor/i.test(m)?'sectors':/monitorat|gruppo/i.test(m)?'watchlist':/cambi|rispetto.*prima/i.test(m)?'changes':/liquid|fluss|volume/i.test(m)?'liquidity':/risch/i.test(m)?'risk':/news|notizi/i.test(m)?'newsimpact':'chartoracle';
  const snapshot={at:Date.now(),price:n(scope.subject==='token'?(tc?.coin?.price??tc?.coin?.priceUsd):c?.chain?.bnb?.price),volume24:n(scope.subject==='token'?(tc?.coin?.volume24??tc?.intel?.token?.volume24h):c?.chain?.bnb?.volume24),liquidity:n(tc?.intel?.token?.liquidityUsd??tc?.coin?.liquidityUsd),tvl:n(c?.chain?.chain?.tvl),dexVolume24:n(c?.chain?.chain?.dexVolume24)};
  const body={analysisMode:mode,analysisSubject:scope.subject,message:m,bnb:c?.chain?.bnb,chain:c?.chain?.chain,intelligence:c?.intel,token:tc?.coin||null,tokenIntel:tc?.intel||null,tokenNews:tc?.news||null,marketNews:c?.news,analysis:{forensics:scope.forensics||null,chart:scope.chart||{days:tc?.days||30,source:tc?.chartData?.source},previous:S.previous[key]||null,current:snapshot,watchlist:window.kiberWatchContext?.(),sectors:window.kiberSectorContext?.()},conversation:S.messages.filter(x=>x.scope===key).slice(-8)};
  const r=await fetch('/api/kiber',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(45000),body:JSON.stringify(body)});const d=await r.json();if(!r.ok||!d.answer)throw Error('Analisi non disponibile');typing?.remove();bubble('kiber',d.answer);S.messages.push({role:'assistant',content:d.answer,scope:key});S.previous[key]=snapshot;$('v268Mode').textContent=d.provider==='deterministic'?'DATI LIVE':'DATI + IA';
