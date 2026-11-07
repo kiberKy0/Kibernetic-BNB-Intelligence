@@ -116,7 +116,7 @@ async function geminiCall(key,{instructions,input}){
     })
   });
   const d=await r.json().catch(()=>({}));
-  if(!r.ok)throw new Error(r.status===429?'Quota gratuita Gemini esaurita':r.status===403?'Gemini non autorizzato':r.status===404?'Modello Gemini non disponibile':'Gemini temporaneamente non disponibile');
+  if(!r.ok){const status=String(d?.error?.status||'').replace(/[^A-Z_]/g,'').slice(0,40);const reason=r.status===429?'Quota Gemini esaurita':r.status===403?'Gemini non autorizzato':r.status===404?'Modello Gemini non disponibile':r.status===400?'Richiesta o chiave Gemini non valida':r.status>=500?'Errore del server Gemini':'Gemini non disponibile';throw new Error(`${reason} [HTTP ${r.status}${status?' / '+status:''}]`)}
   const answer=(d.candidates||[]).flatMap(c=>c.content?.parts||[]).map(p=>p.text||'').filter(Boolean).join('\n').trim();
   if(!answer)throw new Error('Gemini non ha restituito testo');
   return{answer:answer.slice(0,11000),provider:'gemini',model};
