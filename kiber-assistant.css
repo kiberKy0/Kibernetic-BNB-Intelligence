@@ -118,3 +118,20 @@ button.kiber-fab:focus-visible{outline:3px solid #66dfff;outline-offset:3px}
 .kiber-voice-options button{padding:9px 12px;background:#157da9;color:#fff;border:0;border-radius:10px;font-weight:700;cursor:pointer}
 .kiber-mic-status{padding:7px 12px;color:#12587d;background:#ebf5fb;border-top:1px solid #d0e4ed;font:600 12px system-ui,sans-serif}
 @media(max-width:450px){.kiber-compose{gap:5px;padding:8px 10px}.kiber-compose input{padding:10px 8px;font-size:12px}#kiberTalk{padding:0 7px;min-width:33px}#kiberSend{padding:0 10px}}
+
+
+/* Kiber Voice UX V2: one calm microphone action, options in header */
+.kiber-top .kiber-voice-settings-btn{flex:0 0 auto;border:1px solid rgba(54,130,177,.35);border-radius:10px;background:#e2f2fa;color:#1a5f89;padding:7px 10px;min-height:36px;font:700 11px system-ui;cursor:pointer}
+.kiber-top .kiber-voice-settings-btn[aria-pressed="true"]{border-color:#0b92c8;background:#0b638e;color:#fff}
+.kiber-compose #kiberVoice.kiber-mic-button{flex:0 0 78px;width:78px;min-width:78px;max-width:78px;height:45px;border-radius:13px;border:1px solid rgba(47,146,187,.55);background:linear-gradient(160deg,#123e5b,#0a6587);color:#e7faff;box-shadow:inset 0 1px rgba(255,255,255,.12),0 3px 9px rgba(0,28,55,.2);display:flex;gap:6px;align-items:center;justify-content:center;font-size:12px;font-weight:750}
+.kiber-compose #kiberVoice.kiber-mic-button::before{display:none}
+.kiber-compose #kiberVoice .kiber-mic-icon{height:19px;width:19px;filter:none}
+.kiber-compose #kiberVoice.kiber-mic-button[aria-pressed="true"]{background:linear-gradient(155deg,#80501b,#bd662d);border-color:#f9b774;animation:none;box-shadow:0 0 0 2px rgba(244,158,75,.2)}
+.kiber-compose #kiberVoice.kiber-mic-button[aria-pressed="true"]::before{display:none}
+.kiber-compose #kiberVoice.kiber-mic-button:not([aria-pressed="true"]){box-shadow:inset 0 1px rgba(255,255,255,.12),0 3px 9px rgba(0,28,55,.2)}
+.kiber-compose #kiberSend{flex:0 0 auto;min-width:54px}
+.kiber-compose input{min-width:0!important;flex:1 1 auto}
+.kiber-mic-help{padding:8px 12px 10px;border-top:1px solid #cfe4f2;background:#eff8fc;color:#2f5d7a;font:12px/1.5 system-ui}
+.kiber-mic-help[hidden]{display:none!important}
+.kiber-mic-help button{margin-left:7px;border:1px solid #5ba0c1;border-radius:9px;color:#146690;background:#fff;padding:7px 10px;font-weight:700;cursor:pointer}
+@media(max-width:390px){.kiber-compose #kiberVoice.kiber-mic-button{flex-basis:66px;min-width:66px;width:66px;gap:4px}.kiber-compose #kiberSend{min-width:48px;padding:0 8px}.kiber-compose input{font-size:12px}}
