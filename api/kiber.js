@@ -99,6 +99,26 @@ function forensicsFallback(body){
     '\n\nNews/eventi vicini: '+linked.length+'. La vicinanza temporale è correlazione, non prova automatica di causalità.'+tail;
 }
 
+// Gemini e opzionale: mai esporre GEMINI_API_KEY nel browser o nel repository.
+async function geminiCall(key,{instructions,input}){
+  const model='gemini-3.5-flash-lite';
+  const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-goog-api-key':key},
+    signal:AbortSignal.timeout(22000),
+    body:JSON.stringify({
+      systemInstruction:{parts:[{text:instructions}]},
+      contents:[{role:'user',parts:[{text:String(input||'').slice(0,22000)}]}],
+      generationConfig:{maxOutputTokens:1400}
+    })
+  });
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(r.status===429?'Quota gratuita Gemini esaurita':r.status===403?'Gemini non autorizzato':r.status===404?'Modello Gemini non disponibile':'Gemini temporaneamente non disponibile');
+  const answer=(d.candidates||[]).flatMap(c=>c.content?.parts||[]).map(p=>p.text||'').filter(Boolean).join('\n').trim();
+  if(!answer)throw new Error('Gemini non ha restituito testo');
+  return{answer:answer.slice(0,11000),provider:'gemini',model};
+}
+
 async function gatewayCall(credential,{instructions,input}){
   const preferred=String(process.env.AI_GATEWAY_MODEL||'').trim();
   const models=[preferred,...(!preferred?['openai/gpt-6-astra','openai/gpt-6-sol','openai/gpt-6-luna']:[])].filter(Boolean);
@@ -124,6 +144,10 @@ async function openaiCall(key,{instructions,input,useWebSearch=false}){
   throw last||new Error('OpenAI unavailable');
 }
 async function callProvider(payload){
+  const geminiKey=String(process.env.GEMINI_API_KEY||'').trim();
+  // Con Gemini configurato, in caso di quota/esito negativo usa il fallback locale.
+  // Non passare automaticamente a provider a pagamento.
+  if(geminiKey)return geminiCall(geminiKey,payload);
   const attempts=[];const openaiKey=String(process.env.OPENAI_API_KEY||''),gatewayKey=String(process.env.AI_GATEWAY_API_KEY||''),oidc=String(process.env.VERCEL_OIDC_TOKEN||'');
   if(openaiKey)attempts.push(()=>openaiCall(openaiKey,payload));if(gatewayKey)attempts.push(()=>gatewayCall(gatewayKey,payload));if(!gatewayKey&&oidc)attempts.push(()=>gatewayCall(oidc,payload));
   let last=null;for(const run of attempts){try{return await run()}catch(e){last=e}}throw last||new Error('No AI credential available');
@@ -136,8 +160,8 @@ function sanitizeContext(body,e){
 }
 module.exports=async function handler(req,res){
   if(req.method==='GET'){
-    const provider=process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
-    return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,capabilities:['conversation','bnb','chain','token360','scenario','risk','contrarian','newsimpact','chartoracle','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','web-search-when-openai','data-quality','model-fallback','fallback']});
+    const provider=process.env.GEMINI_API_KEY?'gemini':process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
+    return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:provider==='gemini'?'gemini-3.5-flash-lite':process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,capabilities:['conversation','bnb','chain','token360','scenario','risk','contrarian','newsimpact','chartoracle','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','web-search-when-openai','data-quality','model-fallback','fallback']});
   }
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
   try{
