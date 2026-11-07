@@ -55,7 +55,7 @@ function makeMic({onText,onStatus}){
     reader.readAsDataURL(blob)
    });
    if(id!==nonce)return;
-   const res=await fetch('/api/kiber-voice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:base64,mime:blob.type||'audio/webm'}),signal:ctrl.signal});
+   const res=await fetch('/api/kiber?voice=1',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({audio:base64,mime:blob.type||'audio/webm'}),signal:ctrl.signal});
    const data=await res.json().catch(()=>({}));
    if(id!==nonce)return;
    if(!res.ok||!data.text)throw Error(data.error||'Trascrizione non riuscita');
