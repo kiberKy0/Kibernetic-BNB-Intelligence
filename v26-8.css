@@ -45,3 +45,58 @@ body.v268.v268-chat-open{overflow:hidden}
 #v268Talk{font-size:18px;min-width:0;padding:0}
 #v268Talk[aria-pressed="true"]{border-color:#53d9fd;background:#0a4560;color:#f1fdff;box-shadow:inset 0 0 0 1px #2dd2ff}
 #v268Mic[aria-pressed="true"]{border-color:#f7a451;background:#613518;box-shadow:0 0 0 3px rgba(245,148,41,.2)}
+
+
+/* Kiber mic 2.0 - one coherent design in both chat interfaces */
+#v268Mic.kiber-mic-button,
+#kiberVoice.kiber-mic-button{
+  position:relative;isolation:isolate;display:inline-grid;place-items:center;align-self:center;
+  flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;padding:0;
+  border:1px solid rgba(124,232,255,.62);border-radius:16px;
+  background:linear-gradient(145deg,#173c68 0%,#0a628b 48%,#063249 100%);
+  color:#f3fcff;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(228,252,255,.31),inset 0 -2px 8px rgba(0,12,34,.36),
+             0 4px 15px rgba(0,0,0,.33),0 0 12px rgba(44,196,245,.23);
+  transition:transform .2s ease,background .2s ease,box-shadow .2s ease,border-color .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+#v268Mic.kiber-mic-button::before,
+#kiberVoice.kiber-mic-button::before{
+  content:"";position:absolute;inset:-4px;border:1px solid rgba(73,208,251,.2);
+  border-radius:20px;pointer-events:none;
+}
+#v268Mic .kiber-mic-icon,
+#kiberVoice .kiber-mic-icon{
+  display:block;width:23px;height:23px;filter:drop-shadow(0 0 4px rgba(127,236,255,.55));
+}
+#v268Mic.kiber-mic-button:hover,
+#kiberVoice.kiber-mic-button:hover{
+  transform:translateY(-1px);border-color:#9ef1ff;
+  box-shadow:inset 0 1px 0 rgba(228,252,255,.3),0 7px 18px rgba(0,0,0,.4),0 0 19px rgba(67,211,255,.5);
+}
+#v268Mic.kiber-mic-button:focus-visible,
+#kiberVoice.kiber-mic-button:focus-visible{
+  outline:2px solid #94f3ff;outline-offset:4px;
+}
+#v268Mic.kiber-mic-button:active,
+#kiberVoice.kiber-mic-button:active{transform:scale(.95)}
+#v268Mic.kiber-mic-button[aria-pressed="true"],
+#kiberVoice.kiber-mic-button[aria-pressed="true"]{
+  color:#fff9ed;border-color:#ffb37e;
+  background:linear-gradient(145deg,#602a36 0%,#bb572c 55%,#70351d 100%);
+  box-shadow:inset 0 1px 0 rgba(255,248,218,.3),0 5px 18px rgba(0,0,0,.36),0 0 22px rgba(255,133,64,.44);
+  animation:kiberMicGlow 1.55s ease-in-out infinite;
+}
+#v268Mic.kiber-mic-button[aria-pressed="true"]::before,
+#kiberVoice.kiber-mic-button[aria-pressed="true"]::before{
+  border-color:rgba(255,169,111,.8);animation:kiberMicRing 1.55s ease-out infinite;
+}
+@keyframes kiberMicGlow{
+  0%,100%{box-shadow:inset 0 1px 0 rgba(255,248,218,.3),0 5px 18px rgba(0,0,0,.36),0 0 15px rgba(255,133,64,.35)}
+  50%{box-shadow:inset 0 1px 0 rgba(255,248,218,.3),0 5px 18px rgba(0,0,0,.36),0 0 24px rgba(255,154,75,.76)}
+}
+@keyframes kiberMicRing{0%{transform:scale(.93);opacity:.85}75%{transform:scale(1.23);opacity:0}100%{transform:scale(1.23);opacity:0}}
+@media(prefers-reduced-motion:reduce){
+  #v268Mic.kiber-mic-button,#kiberVoice.kiber-mic-button,
+  #v268Mic.kiber-mic-button::before,#kiberVoice.kiber-mic-button::before{animation:none!important;transition:none!important}
+}
