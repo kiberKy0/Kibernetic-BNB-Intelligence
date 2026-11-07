@@ -29,11 +29,41 @@ function localAnswer(q,ctx){
  if(/aggiorna|refresh/.test(t)){const b=$('freeScanRefresh');if(b){b.click();return 'Aggiornamento scanner richiesto. La fonte può restituire dati in cache; controlla l’orario indicato nella sezione.'}return 'Aggiorna la pagina per richiedere nuovi dati.';}
  return 'Non ho una risposta verificabile a questa domanda con le regole gratuite attuali. Puoi chiedermi: “scanner”, “monitorati”, “rischio”, “catalogo”, “analizza token”, “automazione”. Non invento dati o risposte.';
 }
-function submit(){
+let geminiState={at:0,ready:false};
+async function geminiReady(){
+ if(Date.now()-geminiState.at<90000)return geminiState.ready;
+ try{
+  const r=await fetch('/api/kiber?provider=1',{cache:'no-store',signal:AbortSignal.timeout(6500)});
+  if(!r.ok)throw Error('Servizio IA non disponibile');
+  const d=await r.json();
+  geminiState={at:Date.now(),ready:d.ai===true&&d.provider==='gemini'};
+ }catch{geminiState={at:Date.now(),ready:false}}
+ const note=$('kiberPanel')?.querySelector('.kiber-note');
+ if(note)note.textContent=geminiState.ready?'IA Gemini attiva · risposte basate sui dati disponibili. Nessuna operazione sul wallet.':'Modalità locale gratuita a regole · nessuna operazione sul wallet.';
+ return geminiState.ready;
+}
+async function submit(){
  if(state.busy)return;
  const input=$('kiberInput'),q=esc(input?.value||'').trim();if(!q)return;
  input.value='';say('user',q);state.busy=true;
- try{say('assistant',localAnswer(q,context()));}finally{state.busy=false;}
+ try{
+  const commands=/^(apri scanner|scanner|mostra monitorati|monitorati|controlla rischio|aggiorna scanner)$/i;
+  if(!commands.test(q)&&await geminiReady()){
+   const ctx=context();
+   const ui={marketSectorSummary:ctx.marketSectorSummary,trendSummary:ctx.trendSummary,selectedToken:ctx.selectedToken,price:ctx.price,change24:ctx.change24,source:ctx.source};
+   const recent=state.history.slice(-8).map(x=>({role:x.role,content:x.text}));
+   const r=await fetch('/api/kiber',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    signal:AbortSignal.timeout(30000),
+    body:JSON.stringify({message:q,analysisMode:'summary',analysisSubject:'bnb',analysis:{currentInterface:ui},conversation:recent})
+   });
+   if(!r.ok)throw Error('Gemini non disponibile');
+   const d=await r.json();
+   if(!d.answer)throw Error('Risposta vuota');
+   say('assistant',d.answer);
+  }else say('assistant',localAnswer(q,context()));
+ }catch{say('assistant',localAnswer(q,context()))}
+ finally{state.busy=false;}
 }
 function init(){
  if($('kiberPanel'))return;
@@ -41,7 +71,7 @@ function init(){
  panel.innerHTML='<div class="kiber-top"><div class="kiber-mark">K</div><div><strong>Kiber</strong><small>Assistente gratuito · dati locali</small></div><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="500" aria-label="Messaggio a Kiber" placeholder="Chiedi a Kiber…"><button type="button" id="kiberSend">Invia</button></div><small class="kiber-note">Modalità locale a regole. Non è ChatGPT né una IA generativa. Nessuna operazione su wallet.</small>';
  const open=el('button','kiber-fab');open.id='kiberFab';open.type='button';open.setAttribute('aria-label','Apri assistente Kiber');open.title='Apri assistente Kiber';const logo=el('img','kiber-fab-logo');logo.src='assets/kiber-logo.svg';logo.alt='';logo.setAttribute('aria-hidden','true');logo.width=44;logo.height=44;open.appendChild(logo);
  document.body.append(panel,open);
- open.onclick=()=>{panel.hidden=false;open.hidden=true;$('kiberInput')?.focus();if(!state.history.length)say('assistant',help());};
+ open.onclick=()=>{panel.hidden=false;open.hidden=true;$('kiberInput')?.focus();void geminiReady();if(!state.history.length)say('assistant',help());};
  $('kiberClose').onclick=()=>{panel.hidden=true;open.hidden=false;};
  $('kiberSend').onclick=submit;
  $('kiberInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submit();}};
