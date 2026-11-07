@@ -167,7 +167,7 @@ function wantsWebSearch(question){
   return /(?:cerc(?:a|ami|are)|ricerc|sul web|su internet|online|ultim[aei]|aggiornat[aeio]|notizi|novit[aà]|oggi|questa settimana|in tempo reale|fonti|verifica sul web)/i.test(q);
 }
 async function tinyFishSearch(question){
-  const key=String(process.env.TINYFISH_API_KEY||'').replace(/[\u200b-\u200d\u2060\ufeff\s]/g,'');
+  const key=String(process.env.TINYFISH_API_KEY||process.env.TINYFISH_APY_KEY||'').replace(/[\u200b-\u200d\u2060\ufeff\s]/g,'');
   if(!key)return{status:'not_configured',sources:[]};
   try{
     const url='https://api.search.tinyfish.ai?'+new URLSearchParams({query:String(question||'').slice(0,430),location:'IT',language:'it'}).toString();
@@ -191,7 +191,7 @@ function sanitizeContext(body,e){
 module.exports=async function handler(req,res){
   if(req.method==='GET'){
     const provider=(process.env.KIBER_ORACOLO_BNB||process.env.GEMINI_API_KEY)?'gemini':process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
-    return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:provider==='gemini'?'gemini-3.5-flash-lite':process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,geminiStatus:provider==='gemini'?'configured_unverified':'not_configured',searchProvider:process.env.TINYFISH_API_KEY?'tinyfish':'not-configured',capabilities:['conversation','bnb','chain','token360','scenario','risk','contrarian','newsimpact','chartoracle','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','web-search-when-openai','data-quality','model-fallback','fallback']});
+    return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:provider==='gemini'?'gemini-3.5-flash-lite':process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,geminiStatus:provider==='gemini'?'configured_unverified':'not_configured',searchProvider:(process.env.TINYFISH_API_KEY||process.env.TINYFISH_APY_KEY)?'tinyfish':'not-configured',capabilities:['conversation','bnb','chain','token360','scenario','risk','contrarian','newsimpact','chartoracle','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','web-search-when-openai','data-quality','model-fallback','fallback']});
   }
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
   try{
