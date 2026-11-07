@@ -119,3 +119,18 @@ body.v268.v268-chat-open{overflow:hidden}
 .v268-voice-options select{flex:1;min-width:105px;max-width:100%;height:35px;padding:0 9px;border-radius:10px;background:#0b2a3d;color:#f0fdff;border:1px solid #366b89;font:12px system-ui,sans-serif}
 .v268-voice-options button{border:1px solid #3587ad;background:#104866;border-radius:9px;color:#fff;padding:9px 12px;font-weight:700;cursor:pointer}
 .v268-mic-status{padding:8px 13px;background:#0a2537;color:#9de5ff;border-top:1px solid rgba(91,205,246,.18);font:600 12px system-ui,sans-serif}
+
+
+/* V2 voice UX: clear small controls instead of two competing audio buttons */
+.v268-chat-head .v268-voice-settings-btn{border:1px solid rgba(63,171,219,.35);background:#0b2f45;border-radius:11px;color:#aeeaff;padding:8px 10px;white-space:nowrap;min-height:36px;font:750 11px system-ui;cursor:pointer}
+.v268-chat-head .v268-voice-settings-btn[aria-pressed="true"]{background:#155b78;border-color:#44d2f4;color:#fff}
+.v268-chat-compose{grid-template-columns:minmax(0,1fr) 78px 48px!important;gap:8px}
+.v268-chat-compose #v268Mic.kiber-mic-button{display:flex;align-items:center;justify-content:center;gap:6px;flex:0 0 78px;width:78px;height:44px;min-width:78px;max-width:78px;padding:0;border-radius:13px;border:1px solid #1d92c0;background:linear-gradient(150deg,#123951,#0a6487);color:#e9faff;box-shadow:inset 0 1px rgba(255,255,255,.12),0 2px 9px #001a32;animation:none;font:750 12px system-ui}
+.v268-chat-compose #v268Mic.kiber-mic-button::before{display:none}
+.v268-chat-compose #v268Mic .kiber-mic-icon{width:19px;height:19px;filter:none}
+.v268-chat-compose #v268Mic.kiber-mic-button[aria-pressed="true"]{border-color:#edaa66;background:#925222;box-shadow:0 0 0 2px rgba(255,160,71,.17);animation:none}
+.v268-chat-compose #v268Mic.kiber-mic-button:not([aria-pressed="true"]){box-shadow:0 2px 9px #001a32}
+.v268-mic-help{background:#071e30;color:#a7d9f2;padding:9px 12px;line-height:1.5;font:12px system-ui;border-top:1px solid rgba(89,190,224,.15)}
+.v268-mic-help[hidden]{display:none!important}
+.v268-mic-help button{margin-left:7px;background:#135174;color:#e6faff;border:1px solid #498caf;border-radius:8px;padding:7px 10px;font-weight:700}
+@media(max-width:440px){.v268-chat-head .v268-voice-settings-btn{padding:8px}.v268-chat-compose{grid-template-columns:minmax(0,1fr) 68px 43px!important;gap:6px}.v268-chat-compose #v268Mic.kiber-mic-button{width:68px;min-width:68px;max-width:68px;gap:4px}.v268-chat-compose input{padding:10px!important}}
