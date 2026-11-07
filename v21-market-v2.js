@@ -48,6 +48,7 @@
   function renderCatalog(items=V21.items){const list=$('v21CatalogList');if(!list)return;const a=sorted(items),shown=a.slice(0,V21.visible);list.innerHTML=shown.length?shown.map(rowHtml).join(''):'<div class="v21-empty">Nessun dato di classifica disponibile.</div>';if(a.length>shown.length){const b=document.createElement('button');b.className='secondary v21-more';b.type='button';b.textContent=`Mostra altri ${Math.min(60,a.length-shown.length)} token`;b.onclick=()=>{V21.visible+=60;renderCatalog(items)};list.appendChild(b)}else if(items===V21.items&&V21.hasMore&&V21.page<5){const b=document.createElement('button');b.className='secondary v21-more';b.type='button';b.disabled=V21.loadingMore;b.textContent=V21.loadingMore?'Caricamento…':'Cerca altri token nel catalogo (pagina '+(V21.page+1)+')';b.onclick=loadMoreCatalog;list.appendChild(b)}bindRows();if(!sectorTimer)sectorTimer=setInterval(verifyVisibleSectors,17500);setTimeout(verifyVisibleSectors,1000);if($('marketCount'))$('marketCount').textContent=`${a.length} token`;if($('v21Meta'))$('v21Meta').textContent=`${shown.length}/${a.length} token · ${V21.source}`}
 
   let sectorTimer=null;
+  const checkedSectors=new Set();
   function updateSectorRow(id){
     const row=qa('#v21CatalogList .v21-row').find(x=>x.dataset.v21Id===id);if(!row)return;
     const coin=V21.items.find(x=>x.id===id);if(!coin)return;
@@ -63,7 +64,8 @@
       const rect=row.getBoundingClientRect();
       if(rect.bottom<0||rect.top>window.innerHeight+200)continue;
       const item=V21.items.find(x=>x.id===row.dataset.v21Id);
-      if(!item||window.KiberSector.classify(item).verified)continue;
+      if(!item||checkedSectors.has(item.id)||window.KiberSector.classify(item).verified)continue;
+      checkedSectors.add(item.id);
       void window.KiberSector.enrich(item).then(()=>updateSectorRow(item.id));
       break;
     }
