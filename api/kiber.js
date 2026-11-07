@@ -147,7 +147,7 @@ async function openaiCall(key,{instructions,input,useWebSearch=false}){
   throw last||new Error('OpenAI unavailable');
 }
 async function callProvider(payload){
-  const geminiKey=String(process.env.GEMINI_API_KEY||'').replace(/[\u200b-\u200d\u2060\ufeff\s]/g,'');
+  const geminiKey=String(process.env.KIBER_ORACOLO_BNB||process.env.GEMINI_API_KEY||'').replace(/[\u200b-\u200d\u2060\ufeff\s]/g,'');
   // Con Gemini configurato, in caso di quota/esito negativo usa il fallback locale.
   // Non passare automaticamente a provider a pagamento.
   if(geminiKey)return geminiCall(geminiKey,payload);
@@ -186,7 +186,7 @@ function sanitizeContext(body,e){
 }
 module.exports=async function handler(req,res){
   if(req.method==='GET'){
-    const provider=process.env.GEMINI_API_KEY?'gemini':process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
+    const provider=(process.env.KIBER_ORACOLO_BNB||process.env.GEMINI_API_KEY)?'gemini':process.env.OPENAI_API_KEY?'openai':(process.env.AI_GATEWAY_API_KEY||process.env.VERCEL_OIDC_TOKEN)?'vercel-ai-gateway':'deterministic';
     return res.status(200).json({ok:true,provider,ai:provider!=='deterministic',model:provider==='gemini'?'gemini-3.5-flash-lite':process.env.OPENAI_MODEL||process.env.AI_GATEWAY_MODEL||(provider==='vercel-ai-gateway'?'openai/gpt-6-astra':'gpt-6-astra'),version:VERSION,geminiStatus:provider==='gemini'?'configured_unverified':'not_configured',searchProvider:process.env.TINYFISH_API_KEY?'tinyfish':'not-configured',capabilities:['conversation','bnb','chain','token360','scenario','risk','contrarian','newsimpact','chartoracle','eventforensics','cycles','futureimpact','chart-point-analysis','cycle-frequency','web-search-when-openai','data-quality','model-fallback','fallback']});
   }
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
