@@ -39,7 +39,7 @@ async function geminiReady(){
   geminiState={at:Date.now(),ready:d.ai===true&&d.provider==='gemini'};
  }catch{geminiState={at:Date.now(),ready:false}}
  const note=$('kiberPanel')?.querySelector('.kiber-note');
- if(note)note.textContent=geminiState.ready?'IA Gemini attiva · risposte basate sui dati disponibili. Nessuna operazione sul wallet.':'Modalità locale gratuita a regole · nessuna operazione sul wallet.';
+ if(note)note.textContent=geminiState.ready?'Gemini configurata · la connessione viene verificata alla prima risposta.':'Modalità locale a regole · Gemini non configurata.';
  return geminiState.ready;
 }
 async function submit(){
@@ -51,7 +51,7 @@ async function submit(){
   if(!commands.test(q)&&await geminiReady()){
    const ctx=context();
    const ui={marketSectorSummary:ctx.marketSectorSummary,trendSummary:ctx.trendSummary,selectedToken:ctx.selectedToken,price:ctx.price,change24:ctx.change24,source:ctx.source};
-   const recent=state.history.slice(-8).map(x=>({role:x.role,content:x.text}));
+   const recent=state.history.slice(-9,-1).map(x=>({role:x.role,content:x.text}));
    const r=await fetch('/api/kiber',{
     method:'POST',headers:{'Content-Type':'application/json'},
     signal:AbortSignal.timeout(30000),
@@ -60,9 +60,10 @@ async function submit(){
    if(!r.ok)throw Error('Gemini non disponibile');
    const d=await r.json();
    if(!d.answer)throw Error('Risposta vuota');
-   say('assistant',d.answer);
+   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini attiva · risposta verificata.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA attiva · risposta verificata.';
+   say('assistant',d.provider==='deterministic'&&d.warning?'Gemini non ha risposto ('+d.warning+').\n\n'+d.answer:d.answer);
   }else say('assistant',localAnswer(q,context()));
- }catch{say('assistant',localAnswer(q,context()))}
+ }catch{say('assistant','La connessione al servizio IA non è riuscita. Riprova più tardi o usa i comandi locali Scanner, Monitorati e Rischi.')}
  finally{state.busy=false;}
 }
 function init(){
