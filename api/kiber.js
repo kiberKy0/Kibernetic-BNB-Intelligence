@@ -147,7 +147,7 @@ async function openaiCall(key,{instructions,input,useWebSearch=false}){
   throw last||new Error('OpenAI unavailable');
 }
 async function callProvider(payload){
-  const geminiKey=String(process.env.GEMINI_API_KEY||'').trim();
+  const geminiKey=String(process.env.GEMINI_API_KEY||'').replace(/[\u200b-\u200d\u2060\ufeff\s]/g,'');
   // Con Gemini configurato, in caso di quota/esito negativo usa il fallback locale.
   // Non passare automaticamente a provider a pagamento.
   if(geminiKey)return geminiCall(geminiKey,payload);
