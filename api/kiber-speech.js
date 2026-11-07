@@ -4,6 +4,7 @@ const attempts=new Map();
 function wav(pcm){const header=Buffer.alloc(44);header.write('RIFF',0);header.writeUInt32LE(36+pcm.length,4);header.write('WAVE',8);header.write('fmt ',12);header.writeUInt32LE(16,16);header.writeUInt16LE(1,20);header.writeUInt16LE(1,22);header.writeUInt32LE(24000,24);header.writeUInt32LE(48000,28);header.writeUInt16LE(2,32);header.writeUInt16LE(16,34);header.write('data',36);header.writeUInt32LE(pcm.length,40);return Buffer.concat([header,pcm])}
 module.exports=async(req,res)=>{
  res.setHeader('Cache-Control','no-store');if(req.method!=='POST')return res.status(405).json({error:'Metodo non consentito'});
+ if(process.env.KIBER_PREMIUM_VOICE_ENABLED!=='true')return res.status(403).json({error:'Voce premium non attivata: nessun consumo API consentito'});
  const key=String(process.env.KIBER_ORACOLO_BNB||process.env.GEMINI_API_KEY||'').replace(/[\u200b-\u200d\u2060\ufeff\s]/g,'');
  if(!key)return res.status(503).json({error:'Voce naturale Gemini non disponibile'});
  const now=Date.now(),ip=String(req.headers['x-forwarded-for']||req.socket?.remoteAddress||'unknown').split(',')[0].slice(0,90);
