@@ -7,11 +7,13 @@
   const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
   function forceVersion(){
-    document.documentElement.dataset.kiberVersion=V;
-    if(document.title!==`Kiber BNB Intelligence V${V}`)document.title=`Kiber BNB Intelligence V${V}`;
+    // Il numero mostrato appartiene alla build principale, non a questo modulo legacy.
+    const displayVersion=document.documentElement.dataset.kiberVersion || V;
+    if(!document.documentElement.dataset.kiberVersion)document.documentElement.dataset.kiberVersion=displayVersion;
+    if(document.title!==`Kiber BNB Intelligence V${displayVersion}`)document.title=`Kiber BNB Intelligence V${displayVersion}`;
     const st=q('.brand-live')||id('v24Status')||id('v23Status')||id('v22Status')||id('v21Status')||id('v20Status');
-    if(st){st.id='v241Status';const t=`V${V} · KIBER BNB INTELLIGENCE`;if(st.textContent!==t)st.textContent=t}
-    const eye=q('.hero .eyebrow'),et=`KIBER BNB INTELLIGENCE · V${V}`;if(eye&&eye.textContent!==et)eye.textContent=et;
+    if(st){st.id='v241Status';const t=`V${displayVersion} · KIBER BNB INTELLIGENCE`;if(st.textContent!==t)st.textContent=t}
+    const eye=q('.hero .eyebrow'),et=`KIBER BNB INTELLIGENCE · V${displayVersion}`;if(eye&&eye.textContent!==et)eye.textContent=et;
   }
 
   function buildHome(){
@@ -79,6 +81,6 @@
   function refreshCounts(){const w=id('watchTotal')?.textContent||id('watchTotal2')?.textContent||'0',a=id('alertCount')?.textContent||'0';id('v241Watch')&&(id('v241Watch').textContent=w);id('v241Alerts')&&(id('v241Alerts').textContent=a)}
   function askWhy(){show('kiber');setTimeout(()=>{const input=id('chatInput');if(!input)return;input.value='Analizza il quadro attuale della BNB Chain: cosa si sta muovendo, quali dati lo sostengono, cosa potrebbe spiegarlo, cosa contraddice la lettura e cosa devo controllare dopo.';id('chatSend')?.click()},180)}
 
-  function boot(){document.body.classList.add('v241-simple');qa('.pro').forEach(x=>x.remove());forceVersion();buildHome();buildWorkbar();show('home');loadSummary();refreshCounts();setInterval(refreshCounts,4000);setInterval(forceVersion,5000);setInterval(loadSummary,120000)}
+  function boot(){document.body.classList.add('v241-simple');qa('.pro').forEach(x=>x.remove());forceVersion();buildHome();buildWorkbar();show('home');loadSummary();refreshCounts();setInterval(refreshCounts,4000);setInterval(loadSummary,120000)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
