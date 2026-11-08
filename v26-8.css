@@ -134,3 +134,11 @@ body.v268.v268-chat-open{overflow:hidden}
 .v268-mic-help[hidden]{display:none!important}
 .v268-mic-help button{margin-left:7px;background:#135174;color:#e6faff;border:1px solid #498caf;border-radius:8px;padding:7px 10px;font-weight:700}
 @media(max-width:440px){.v268-chat-head .v268-voice-settings-btn{padding:8px}.v268-chat-compose{grid-template-columns:minmax(0,1fr) 68px 43px!important;gap:6px}.v268-chat-compose #v268Mic.kiber-mic-button{width:68px;min-width:68px;max-width:68px;gap:4px}.v268-chat-compose input{padding:10px!important}}
+
+
+/* Text-only Kiber Oracolo: remove the broken microphone/robotic speech controls */
+.v268-chat-compose{display:grid!important;grid-template-columns:minmax(0,1fr) 64px!important;align-items:center;gap:10px!important}
+.v268-chat-compose #v268Input{width:100%;min-width:0;max-width:100%;box-sizing:border-box;font-size:15px}
+.v268-chat-compose #v268Send{min-height:48px;width:64px;max-width:none;border-radius:14px;font-size:26px}
+#v268Mic,#v268Talk,#v268VoiceOptions,#v268MicStatus,#v268MicHelp,#v266Mic{display:none!important}
+@media(max-width:440px){.v268-chat-compose{grid-template-columns:minmax(0,1fr) 61px!important;gap:7px!important}.v268-chat-compose #v268Send{width:61px}}
