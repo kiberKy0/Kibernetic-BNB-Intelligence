@@ -161,6 +161,7 @@ function enhanceSearch(){
  const catalog=window.kiberCatalogContext?.()||[],search=window.kiberSearchContext?.()||[];
  const byId=new Map([...catalog,...search].filter(x=>x?.id).map(x=>[String(x.id),x]));
  for(const row of document.querySelectorAll('#v272SearchResults [data-v272-id],#v21CatalogList [data-v21-id]')){
+  if(row.closest('#v21CatalogList')){row.querySelectorAll('.kiber-search-sector,.kiber-search-trend').forEach(el=>el.remove());continue}
   const info=byId.get(row.dataset.v272Id||row.dataset.v21Id);if(!info)continue;
   const sector=sectorOf(info),label='Settore: '+sector;
   let tag=row.querySelector('.kiber-search-sector,.kiber-search-trend');
