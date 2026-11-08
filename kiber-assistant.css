@@ -135,3 +135,11 @@ button.kiber-fab:focus-visible{outline:3px solid #66dfff;outline-offset:3px}
 .kiber-mic-help[hidden]{display:none!important}
 .kiber-mic-help button{margin-left:7px;border:1px solid #5ba0c1;border-radius:9px;color:#146690;background:#fff;padding:7px 10px;font-weight:700;cursor:pointer}
 @media(max-width:390px){.kiber-compose #kiberVoice.kiber-mic-button{flex-basis:66px;min-width:66px;width:66px;gap:4px}.kiber-compose #kiberSend{min-width:48px;padding:0 8px}.kiber-compose input{font-size:12px}}
+
+
+/* Text-only Kiber: voice intentionally removed on user request. */
+.kiber-compose{display:flex!important;grid-template-columns:none!important;align-items:center;gap:9px!important;flex-wrap:nowrap!important;padding:11px 12px!important}
+.kiber-compose input{display:block!important;flex:1 1 auto!important;min-width:0!important;max-width:none!important;height:47px;font-size:14px!important}
+.kiber-compose #kiberSend{flex:0 0 auto;min-width:78px;min-height:47px;border-radius:12px;font-size:14px}
+.kiber-panel .kiber-note{padding:8px 12px;font-size:11px;line-height:1.4}
+#kiberTalk,#kiberVoice,#kiberMicStatus,#kiberMicHelp,#kiberVoiceOptions{display:none!important}
