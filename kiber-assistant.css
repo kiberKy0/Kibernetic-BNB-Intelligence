@@ -143,3 +143,9 @@ button.kiber-fab:focus-visible{outline:3px solid #66dfff;outline-offset:3px}
 .kiber-compose #kiberSend{flex:0 0 auto;min-width:78px;min-height:47px;border-radius:12px;font-size:14px}
 .kiber-panel .kiber-note{padding:8px 12px;font-size:11px;line-height:1.4}
 #kiberTalk,#kiberVoice,#kiberMicStatus,#kiberMicHelp,#kiberVoiceOptions{display:none!important}
+
+
+/* Optional local chat memory, default OFF, unobtrusive in header */
+.kiber-top .kiber-memory-toggle{min-height:34px;padding:7px 9px;flex-shrink:0;border:1px solid #6c93ac;border-radius:10px;background:#243d57;color:#c8e9f7;font:700 11px system-ui;cursor:pointer}
+.kiber-top .kiber-memory-toggle[aria-pressed="true"]{color:#fff;border-color:#2ec8a2;background:#116b61}
+@media(max-width:390px){.kiber-top .kiber-memory-toggle{padding:6px;font-size:10px}.kiber-top>div:nth-child(2)>small{font-size:10px}}
