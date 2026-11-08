@@ -3,9 +3,11 @@
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').slice(0,500);
 const state={history:[],busy:false,request:null,epoch:0};
+function updateMemoryLabel(){const b=$('kiberMemory');if(!b)return;const on=window.KiberDialogMemory?.allowed()||false;b.textContent=on?'Memoria ON':'Memoria OFF';b.setAttribute('aria-pressed',String(on));b.title=on?'Ricorda gli ultimi messaggi solo su questo browser. Tocca per disattivare e cancellare la memoria.':'Opzionale: conserva gli ultimi messaggi solo su questo browser. Non addestra Gemini.'}
+function toggleMemory(){const memory=window.KiberDialogMemory;if(!memory)return;const on=memory.setEnabled(!memory.allowed());updateMemoryLabel();say('assistant',on?'Memoria locale attivata: conserverò gli ultimi messaggi soltanto in questo browser. Non è addestramento automatico.':'Memoria disattivata: la cronologia locale salvata è stata cancellata.')}
 function isChatOpen(){const panel=$('kiberPanel');return !!(panel&&!panel.hidden)}
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;}
-function say(role,text){const b=$('kiberMessages');if(!b||!isChatOpen())return;const item=el('div','kiber-msg '+role,text);b.append(item);b.scrollTop=b.scrollHeight;state.history.push({role,text:String(text).slice(0,3000)});if(state.history.length>30)state.history.shift();}
+function say(role,text){const b=$('kiberMessages');if(!b||!isChatOpen())return;const item=el('div','kiber-msg '+role,text);b.append(item);b.scrollTop=b.scrollHeight;state.history.push({role,text:String(text).slice(0,3000)});if(state.history.length>30)state.history.shift();if(state.history.some(x=>x.role==='user'))window.KiberDialogMemory?.add(role,text);}
 function closeSession(){state.epoch++;try{state.request?.abort()}catch{}state.request=null;state.busy=false;state.history=[];$('kiberMessages')?.replaceChildren();if($('kiberInput'))$('kiberInput').value='';}
 function context(){
  let watch=[];try{watch=JSON.parse(localStorage.getItem('kiber_v271_watch')||'[]');if(!Array.isArray(watch))watch=[];}catch{}
@@ -57,12 +59,15 @@ async function submit(){
    if(epoch!==state.epoch||!isChatOpen())return;
    const ctx=context();
    const ui={marketSectorSummary:ctx.marketSectorSummary,trendSummary:ctx.trendSummary,selectedToken:ctx.selectedToken,price:ctx.price,change24:ctx.change24,source:ctx.source};
-   const recent=state.history.slice(-9,-1).map(x=>({role:x.role,content:x.text}));
+   const previousUser=state.history.slice(0,-1).reverse().find(x=>x.role==='user')?.text||'';
+   const opportunitiesRequest=!!window.KiberMarketOpportunities?.isRequest(q,previousUser);
+   const recent=(window.KiberDialogMemory?.allowed()?window.KiberDialogMemory.recent().slice(0,-1):state.history.slice(-9,-1).map(x=>({role:x.role,content:x.text}))).slice(-10);
+   const opportunities=opportunitiesRequest?window.KiberMarketOpportunities.build(typeof window.kiberCatalogContext==='function'?window.kiberCatalogContext():[]):null;
    const ctrl=new AbortController();state.request=ctrl;const timeout=setTimeout(()=>ctrl.abort(),30000);
    const r=await fetch('/api/kiber',{
     method:'POST',headers:{'Content-Type':'application/json'},
     signal:ctrl.signal,
-    body:JSON.stringify({message:q,analysisMode:'summary',analysisSubject:'bnb',analysis:{currentInterface:ui},conversation:recent})
+    body:JSON.stringify({message:q,analysisMode:opportunitiesRequest?'opportunities':'summary',analysisSubject:opportunitiesRequest?'market':'bnb',analysis:{currentInterface:ui,opportunities},conversation:recent})
    });
    clearTimeout(timeout);
    if(epoch!==state.epoch||!isChatOpen())return;
@@ -79,12 +84,12 @@ async function submit(){
 function init(){
  if($('kiberPanel'))return;
  const panel=el('aside','kiber-panel');panel.id='kiberPanel';panel.hidden=true;panel.setAttribute('aria-label','Assistente Kiber');
- panel.innerHTML='<div class="kiber-top"><div class="kiber-mark kiber-avatar-mark"><img src="assets/kiber-logo.svg?v=302" width="36" height="36" alt="Logo Kiber"></div><div><strong>Kiber</strong><small>Analisi BNB · Gemini</small></div><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="800" aria-label="Messaggio a Kiber" placeholder="Scrivi a Kiber…" autocomplete="off"><button type="button" id="kiberSend">Invia</button></div><small class="kiber-note">Gemini: disponibilità verificata alla risposta. Analisi informative, non ordini di acquisto.</small>';
+ panel.innerHTML='<div class="kiber-top"><div class="kiber-mark kiber-avatar-mark"><img src="assets/kiber-logo.svg?v=302" width="36" height="36" alt="Logo Kiber"></div><div><strong>Kiber</strong><small>Analisi BNB · Gemini</small></div><button type="button" id="kiberMemory" class="kiber-memory-toggle" aria-label="Memoria facoltativa dei dialoghi" aria-pressed="false">Memoria OFF</button><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="800" aria-label="Messaggio a Kiber" placeholder="Scrivi a Kiber…" autocomplete="off"><button type="button" id="kiberSend">Invia</button></div><small class="kiber-note">Gemini: disponibilità verificata alla risposta. Analisi informative, non ordini di acquisto.</small>';
  const open=el('button','kiber-fab');open.id='kiberFab';open.type='button';open.setAttribute('aria-label','Apri assistente Kiber');open.title='Apri assistente Kiber';const logo=el('img','kiber-fab-logo');logo.src='assets/kiber-logo.svg';logo.alt='';logo.setAttribute('aria-hidden','true');logo.width=44;logo.height=44;open.appendChild(logo);
  document.body.append(panel,open);
  open.onclick=()=>{panel.hidden=false;open.hidden=true;$('kiberInput')?.focus();void geminiReady();if(!state.history.length)say('assistant',help());};
  $('kiberClose').onclick=()=>{closeSession();panel.hidden=true;open.hidden=false;};
- $('kiberSend').onclick=submit;
+ $('kiberSend').onclick=submit;$('kiberMemory').onclick=toggleMemory;updateMemoryLabel();
  window.addEventListener('pagehide',closeSession);
  $('kiberInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();submit();}};
  panel.querySelectorAll('[data-kiber]').forEach(b=>b.onclick=()=>{$('kiberInput').value=b.dataset.kiber;submit();});
