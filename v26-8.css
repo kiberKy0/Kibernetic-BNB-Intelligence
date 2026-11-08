@@ -142,3 +142,9 @@ body.v268.v268-chat-open{overflow:hidden}
 .v268-chat-compose #v268Send{min-height:48px;width:64px;max-width:none;border-radius:14px;font-size:26px}
 #v268Mic,#v268Talk,#v268VoiceOptions,#v268MicStatus,#v268MicHelp,#v266Mic{display:none!important}
 @media(max-width:440px){.v268-chat-compose{grid-template-columns:minmax(0,1fr) 61px!important;gap:7px!important}.v268-chat-compose #v268Send{width:61px}}
+
+
+/* Explicitly opt-in browser-only dialogue memory; no added audio controls */
+.v268-chat-head .v268-memory-toggle{flex:0 0 auto;border:1px solid #265c80;border-radius:10px;background:#0d3045;color:#b9e1f5;font:750 11px system-ui;min-height:35px;padding:6px 9px;cursor:pointer}
+.v268-chat-head .v268-memory-toggle[aria-pressed="true"]{background:#0c6256;color:#e8fff8;border-color:#34c4a0}
+@media(max-width:460px){.v268-chat-head .v268-chat-mode{display:none!important}.v268-chat-head .v268-memory-toggle{padding:6px;font-size:10px;max-width:93px;white-space:nowrap}}
