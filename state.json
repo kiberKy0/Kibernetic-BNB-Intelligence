@@ -1,0 +1,33 @@
+{
+  "symbol": "BNBUSDT",
+  "interval": "4h",
+  "horizonHours": 24,
+  "weights": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "forecasts": [
+    {
+      "oracle": {
+        "scenario": null,
+        "band": 1.1928428832408366
+      },
+      "t": 1794182400000,
+      "issuedAt": 1794186249092,
+      "due": 1794268800000,
+      "entry": 685.21,
+      "probabilityUp": 0.5,
+      "baseline": 0.5625,
+      "actual": null,
+      "validation": {
+        "n": 50,
+        "challenger": 0.2562255405071216,
+        "incumbent": 0.25,
+        "baselineLoss": 0.24890625,
+        "promoted": false
+      }
+    }
+  ]
+}
