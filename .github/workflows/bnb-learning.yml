@@ -1,0 +1,46 @@
+name: BNB learning simulation
+on:
+  schedule:
+    - cron: '17 0,4,8,12,16,20 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/learn-bnb.cjs', '.github/workflows/bnb-learning.yml']
+permissions:
+  contents: write
+concurrency:
+  group: bnb-learning-state
+  cancel-in-progress: false
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Load simulation ledger
+        run: |
+          set -eu
+          if git ls-remote --exit-code --heads origin refs/heads/bnb-learning-state; then
+            git fetch --depth=1 origin refs/heads/bnb-learning-state
+            git worktree add --detach ledger FETCH_HEAD
+            test -s ledger/state.json
+          else
+            test "$?" -eq 2
+            git worktree add --detach ledger HEAD
+            git -C ledger switch --orphan bnb-learning-state
+          fi
+      - name: Check candles, evaluate outcomes and fit candidate
+        run: |
+          for attempt in 1 2 3; do
+            node scripts/learn-bnb.cjs ledger/state.json && exit 0
+            sleep 5
+          done
+          exit 1
+      - name: Record simulation
+        working-directory: ledger
+        run: |
+          git add state.json
+          if ! git diff --cached --quiet; then
+            git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -m "Record BNB simulation"
+            git push origin HEAD:refs/heads/bnb-learning-state
+          fi
