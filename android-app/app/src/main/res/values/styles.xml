@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<style name="Theme.Kibernetic" parent="android:style/Theme.Material.NoActionBar">
+<item name="android:colorAccent">#22D0FF</item>
+<item name="android:statusBarColor">#050B14</item>
+<item name="android:navigationBarColor">#050B14</item>
+<item name="android:windowLightStatusBar">false</item>
+<item name="android:windowBackground">#050B14</item>
+</style>
+</resources>
