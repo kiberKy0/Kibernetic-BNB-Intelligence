@@ -354,6 +354,26 @@
         "baselineLoss": 0.24972257653061217,
         "promoted": false
       }
+    },
+    {
+      "oracle": {
+        "scenario": null,
+        "band": 1.6277833316176957
+      },
+      "t": 1794686400000,
+      "issuedAt": 1794700538601,
+      "due": 1794772800000,
+      "entry": 590.29,
+      "probabilityUp": 0.5,
+      "baseline": 0.5535714285714286,
+      "actual": null,
+      "validation": {
+        "n": 50,
+        "challenger": 0.2573567181693039,
+        "incumbent": 0.25,
+        "baselineLoss": 0.257155612244898,
+        "promoted": false
+      }
     }
   ]
 }
