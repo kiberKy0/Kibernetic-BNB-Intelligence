@@ -4,16 +4,26 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const html=fs.readFileSync(require.resolve('../v20-production.html'),'utf8');
 const boot=fs.readFileSync(require.resolve('../index.html'),'utf8');
-test('XAU/USD appears as a native menu item even before deferred JS runs',()=>{
-  assert.match(html,/<nav[^>]*id="hubNav"[\s\S]*?<a\s+id="xauUsdNav"[^>]*>\s*<b>Oro XAU\/USD<\/b><span>Decoder separato<\/span><\/a><\/nav>/);
+const base=fs.readFileSync(require.resolve('../v17.js'),'utf8');
+
+test('Gold is an actual section in the Oracle hub, not an outbound page link',()=>{
+  assert.match(html,/<nav[^>]*id="hubNav"[\s\S]*?<button id="xauUsdNav"[^>]*data-section="gold"[^>]*>[\s\S]*?<b>Oro XAU\/USD<\/b><span>Decoder interno<\/span><\/button><\/nav>/);
+  assert.doesNotMatch(html,/<a id="xauUsdNav"/);
+  assert.doesNotMatch(html,/<button id="xauUsdNav"[^>]*target="_top"/);
 });
-test('gold menu item navigates top-level browser to separate XAU decoder page',()=>{
-  const anchor=html.match(/<a id="xauUsdNav"[^>]+>/)?.[0]||'';
-  assert.match(anchor,/href="\/xau-usd"/);
-  assert.match(anchor,/target="_top"/);
+
+test('Gold section embeds its independent XAU/USD decoder iframe inside the live BNB page',()=>{
+  assert.match(html,/<section class="panel" id="section-gold"[\s\S]*?<h2>Oro XAU\/USD · Decoder<\/h2>/);
+  assert.match(html,/<iframe id="xauEmbeddedFrame"[^>]*src="\/xau-usd"/);
+  assert.match(html,/<\/iframe>/);
+  assert.match(html,/<section class="panel open" id="section-market"/);
 });
-test('BNB remains mounted and gold menu uses link to avoid legacy button click interception',()=>{
+
+test('The existing hub section selector opens the gold panel without leaving BNB',()=>{
+  assert.match(base,/function openSection\(key\)/);
+  assert.match(base,/p\.id==='section-'\+key/);
+  assert.match(base,/#hubNav button/);
+  assert.match(base,/openSection\(b\.dataset\.section\)/);
   assert.match(boot,/v20-production\.html/);
-  assert.doesNotMatch(html,/<button[^>]+id="xauUsdNav"/);
-  assert.match(boot,/xau-nav\.js/);
+  assert.doesNotMatch(boot,/xau-nav\.js/);
 });
