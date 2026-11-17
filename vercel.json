@@ -3,6 +3,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/api/xau",
+      "destination": "/api/coingecko?type=xau"
+    },
+    {
       "source": "/api/token-safety",
       "destination": "/api/token-search?mode=safety"
     },
