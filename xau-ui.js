@@ -1,0 +1,91 @@
+(() => {
+  'use strict';
+  const decoder = window.XauDecoder;
+  const $ = id => document.getElementById(id);
+  const price = n => Number.isFinite(n) ? Number(n).toLocaleString('it-IT', { maximumFractionDigits: 2, minimumFractionDigits: 2 }) : '—';
+  let importActive = false;
+  const setText = (id, value) => { $(id).textContent = String(value); };
+  function render(result, source) {
+    $('signal').className = 'signal ' + (result.signal === 'BUY' ? 'buy' : result.signal === 'SELL' ? 'sell' : 'wait');
+    setText('signal', result.label);
+    setText('source', source + ' · ' + result.samples + ' candele · ' + result.interval);
+    setText('timestamp', 'Ultima candela chiusa UTC: ' + (result.time || '—'));
+    const m = result.metrics;
+    setText('price', price(m.price));
+    setText('ema', m.ema20 == null ? '—' : price(m.ema20) + ' / ' + price(m.ema50));
+    setText('rsi', m.rsi14 == null ? '—' : price(m.rsi14));
+    setText('atr', m.atr14 == null ? '—' : price(m.atr14) + ' (' + price(m.atrPct) + '%)');
+    setText('support', price(m.support20));
+    setText('resistance', price(m.resistance20));
+    const list = $('reasons');
+    list.replaceChildren();
+    (result.reasons.length ? result.reasons : ['In attesa dei dati']).forEach(reason => {
+      const item = document.createElement('li');
+      item.textContent = reason;
+      list.append(item);
+    });
+  }
+  function waiting(reason, source = 'Nessun feed affidabile') {
+    render({ signal: 'WAIT', label: 'ATTESA', samples: 0, interval: $('interval').value,
+      metrics: {}, time: null, reasons: [reason] }, source);
+  }
+  async function loadFeed() {
+    importActive = false;
+    $('refresh').disabled = true;
+    waiting('Verifica della disponibilità del feed…', 'Decoder XAU/USD');
+    try {
+      const response = await fetch('/api/xau?interval=' + encodeURIComponent($('interval').value),
+        { cache: 'no-store' });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error || 'Errore provider');
+      if (!Array.isArray(body.candles) || body.symbol !== 'XAU/USD') throw new Error('Dati provider non validi');
+      render(decoder.analyze(body.candles, $('interval').value), body.source + ' · dati provider');
+      setText('csvMessage', 'Il grafico TradingView e il feed del Decoder sono sorgenti indipendenti.');
+    } catch (error) {
+      waiting(error.message, 'Feed automatico non operativo');
+      setText('csvMessage', 'Per lo storico puoi usare un CSV con candele OHLC valide. Nessun segnale senza dati.');
+    } finally { $('refresh').disabled = false; }
+  }
+  function parseCsv(text) {
+    // Importazione locale, non scraping da TradingView.
+    const lines = text.trim().split(/\r?\n/).filter(Boolean);
+    if (lines.length > 2200) throw new Error('CSV troppo grande (massimo 2.000 candele)');
+    if (lines.length < 2) throw new Error('CSV senza righe');
+    const separator = lines[0].includes(';') ? ';' : ',';
+    const cols = lines.shift().replace(/^\uFEFF/, '').toLowerCase().split(separator).map(s => s.trim());
+    const index = key => cols.indexOf(key);
+    const timeIndex = cols.findIndex(s => ['time', 'datetime', 'date', 'timestamp'].includes(s));
+    if (timeIndex < 0 || ['open', 'high', 'low', 'close'].some(s => index(s) < 0))
+      throw new Error('Intestazioni richieste: time,open,high,low,close');
+    const records = lines.map(line => {
+      const cells = line.split(separator).map(s => s.trim().replace(/^"|"$/g, ''));
+      let t = cells[timeIndex];
+      if (/^\d{4}-\d\d-\d\d \d\d:\d\d/.test(t)) t = t.replace(' ', 'T') + 'Z';
+      else if (/^\d{4}-\d\d-\d\dT\d\d:\d\d(:\d\d)?$/.test(t)) t += 'Z';
+      const number = key => Number(cells[index(key)]);
+      return { time: t, open: number('open'), high: number('high'), low: number('low'), close: number('close') };
+    });
+    return decoder.cleanCandles(records);
+  }
+  $('refresh').addEventListener('click', loadFeed);
+  $('interval').addEventListener('change', () => {
+    if (importActive) setText('csvMessage', 'Periodo modificato: reimporta un CSV corrispondente oppure usa il feed.');
+    loadFeed();
+  });
+  $('csvFile').addEventListener('change', async event => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    if (file.size > 400000) { waiting('File troppo grande'); return; }
+    try {
+      const candles = parseCsv(await file.text());
+      if (candles.length < 60) throw new Error('Meno di 60 candele valide: ' + candles.length);
+      importActive = true;
+      render(decoder.analyze(candles, $('interval').value), 'CSV locale (non collegato al mercato live)');
+      setText('csvMessage', 'Storico letto localmente: ' + candles.length + ' candele. Non salvato e non inviato al server.');
+    } catch (error) {
+      waiting(error.message, 'CSV non valido');
+      setText('csvMessage', 'Controlla il formato CSV e la data UTC.');
+    }
+  });
+  loadFeed();
+})();

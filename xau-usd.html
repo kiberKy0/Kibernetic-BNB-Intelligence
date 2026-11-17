@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08121c">
+<title>Decoder XAU/USD · Kibernetic Intelligence</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:dark;color:#f2f6fa;background:#08121c}
+*{box-sizing:border-box}body{margin:0;background:#08121c;color:#f2f6fa}
+a{color:#f4ca72}button,select,input{font:inherit}button,select{cursor:pointer}
+.container{max-width:1400px;margin:auto;padding:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 0 20px}
+header small,.muted{color:#9cb0bf}.identity{display:flex;align-items:center;gap:12px}.identity img{width:46px;height:46px}
+h1{font-size:clamp(23px,4vw,36px);margin:0}h2{font-size:19px;margin:0 0 12px}p{line-height:1.5;margin:8px 0}
+.pill,.back{border:1px solid #365067;border-radius:12px;background:#132333;color:#f2f6fa;padding:10px 14px;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.back:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #f4ca72;outline-offset:2px}
+.sub{color:#9cb0bf;margin-top:5px}.gold{color:#ffce70}
+.banner{border:1px solid #68512a;border-radius:15px;padding:14px 16px;background:#1c1e1f;line-height:1.45;font-size:14px}
+.layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:14px;margin-top:16px}
+.panel{border:1px solid #2d4050;border-radius:17px;background:#101f2c;padding:16px;min-width:0}
+.tv-widget{width:100%;height:485px}.tv-technical{height:480px;width:100%}
+.tradingview-widget-container,.tradingview-widget-container__widget{width:100%;height:100%}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.tag{font-size:12px;color:#cbd9e3;border:1px solid #344b60;border-radius:999px;padding:6px 10px}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0}
+select,button.control{border-radius:9px;border:1px solid #496377;background:#162a3b;color:#fff;padding:10px}
+button.control{background:#21405a}.secondary{background:#142635!important}
+button:disabled{opacity:.55;cursor:wait}
+strong,output{font-variant-numeric:tabular-nums}
+.signal{font-size:clamp(23px,4vw,33px);font-weight:800;letter-spacing:.025em;padding:16px;border-radius:12px;background:#233143;color:#d6e4ee}
+.signal.buy{color:#96f2b9;background:#113b2d}.signal.sell{color:#ffb0b0;background:#45202a}.signal.wait{color:#f2cc83;background:#3b3322}
+.meta{color:#aac1d1;margin-top:8px;font-size:13px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.metric{border:1px solid #314355;border-radius:10px;padding:10px;background:#0a1824}
+.metric span{display:block;font-size:12px;color:#91a8b9}.metric b{display:block;margin-top:6px;font-size:16px}
+.reasons{padding-left:21px;line-height:1.55;color:#d1dfe8}
+.info{margin-top:15px;padding-top:12px;border-top:1px solid #33495e;font-size:13px;color:#9fb6c6}
+.upload{display:block;border:1px dashed #557082;border-radius:10px;padding:12px;margin-top:10px}
+.upload input{width:100%;max-width:100%;margin-top:8px}
+.grid-bottom{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
+@media(max-width:1000px){.layout{grid-template-columns:1fr}.tv-widget{height:460px}.tv-technical{height:430px}}
+@media(max-width:650px){.container{padding:10px}header{padding:10px 0}.panel{padding:12px}.metrics{grid-template-columns:repeat(2,1fr)}.tv-widget{height:410px}.grid-bottom{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+ <div class="identity"><img src="/assets/kiber-logo.svg" alt="Logo Kiber"><div><h1>Decoder <span class="gold">XAU/USD</span></h1><div class="sub">Kibernetic Intelligence · Reparto oro separato dall'Oracolo BNB</div></div></div>
+ <a class="back" href="/">← Torna all'Oracolo BNB</a>
+</header>
+<div class="banner"><strong>Analisi informativa, non ordini automatici.</strong> I setup ACQUISTO/VENDITA si attivano solo su dati OHLC verificabili e aggiornati. Mancanza di dati, indicatori discordanti o volatilità eccessiva significano <strong>ATTESA</strong>. Un setup tecnico non dimostra un vantaggio statistico né garantisce profitti.</div>
+<div class="layout">
+<section class="panel" aria-label="Grafico oro">
+<h2>Grafico XAU/USD · TradingView</h2>
+<p class="small">Fonte grafica esterna: TradingView, simbolo OANDA:XAUUSD. I dati visualizzati qui non vengono estratti dal widget.</p>
+<div class="tv-widget">
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{"autosize":true,"symbol":"OANDA:XAUUSD","interval":"15","timezone":"Etc/UTC","theme":"dark","style":"1","locale":"it","allow_symbol_change":false,"calendar":false,"support_host":"https://www.tradingview.com"}
+</script></div>
+</div>
+<div class="tags"><span class="tag">Oro spot / USD</span><span class="tag">Multi-timeframe</span><span class="tag">Solo consultazione grafica</span></div>
+<a href="https://it.tradingview.com/chart/?symbol=OANDA%3AXAUUSD" target="_blank" rel="noopener noreferrer">Apri il grafico completo su TradingView ↗</a>
+</section>
+<section class="panel" aria-label="Analisi tecnica TradingView">
+<h2>Sintesi tecnica esterna</h2>
+<p class="small">Indicatore TradingView a 15 minuti, separato dal nostro motore. Non equivale a un ordine del Decoder.</p>
+<div class="tv-technical">
+<div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div>
+<script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+{"interval":"15m","width":"100%","isTransparent":true,"height":"100%","symbol":"OANDA:XAUUSD","showIntervalTabs":true,"displayMode":"single","locale":"it","colorTheme":"dark"}
+</script></div>
+</div>
+</section>
+</div>
+<div class="grid-bottom">
+<section class="panel" id="decoder" aria-label="Decoder indipendente XAUUSD">
+<h2>Motore Decoder indipendente</h2>
+<p class="small">Filtri su dati OHLC: EMA 20/50, RSI 14, ATR 14, momentum e freschezza. Nessun dato passa dall'analisi BNB.</p>
+<div class="controls">
+<label for="interval">Periodo <select id="interval"><option value="5min">5 minuti</option><option value="15min" selected>15 minuti</option><option value="1h">1 ora</option><option value="4h">4 ore</option><option value="1day">1 giorno</option></select></label>
+<button class="control" id="refresh" type="button">Aggiorna feed</button>
+</div>
+<div class="signal wait" id="signal" role="status" aria-live="polite">ATTESA</div>
+<div class="meta" id="source">Fonte dati per il Decoder da verificare</div>
+<div class="meta" id="timestamp">Ultima candela: —</div>
+<div class="metrics">
+<div class="metric"><span>Prezzo chiusura (USD/oz)</span><b id="price">—</b></div>
+<div class="metric"><span>EMA 20 / 50</span><b id="ema">—</b></div>
+<div class="metric"><span>RSI 14</span><b id="rsi">—</b></div>
+<div class="metric"><span>ATR 14</span><b id="atr">—</b></div>
+<div class="metric"><span>Supporto 20 candele</span><b id="support">—</b></div>
+<div class="metric"><span>Resistenza 20 candele</span><b id="resistance">—</b></div>
+</div>
+<strong>Motivi del risultato</strong>
+<ul class="reasons" id="reasons"><li>In attesa di dati verificati</li></ul>
+<div class="info">Nota: nessuna esecuzione finanziaria; la coerenza fra indicatori non è una probabilità di guadagno. Verificare spread, costi e news prima di prendere decisioni.</div>
+</section>
+<section class="panel" aria-label="Filtri contesto e importazione">
+<h2>Filtri aggiuntivi</h2>
+<ul>
+<li><strong>Macro:</strong> Fed, tassi USA, CPI, NFP e dollaro. <span class="small">Feed eventi non ancora collegato; nessuna previsione macro inventata.</span></li>
+<li><strong>Sessioni:</strong> apertura Londra/New York e volatilità durante le news. <span class="small">Da integrare nella convalida.</span></li>
+<li><strong>Conflitto tecnico:</strong> se EMA, RSI o momentum non concordano → ATTESA.</li>
+<li><strong>Qualità feed:</strong> timestamp, almeno 60 candele e prezzi validi obbligatori.</li>
+</ul>
+<p><strong>Importa uno storico CSV</strong> per un controllo locale, senza inviare file al server.</p>
+<label class="upload" for="csvFile">Seleziona CSV OHLC (data in UTC, ordine libero)
+<input type="file" id="csvFile" accept=".csv,.txt,text/csv">
+</label>
+<p class="small">Intestazioni richieste: <code>time,open,high,low,close</code>. Date ISO, per esempio 2026-11-17T11:45:00Z. Imposta il periodo corretto sopra prima di importare; non viene eseguito ricampionamento.</p>
+<p class="small" id="csvMessage">Nessun file caricato.</p>
+<div class="info">Il feed automatico, se autorizzato, usa Twelve Data con chiave custodita sul server. Se il provider non è collegato, il Decoder segnala dati non disponibili; il grafico TradingView rimane consultabile.</div>
+</section>
+</div>
+<footer class="container small" style="padding:24px 0">Kibernetic Intelligence · XAU/USD isolato dall'ecosistema BNB · Prima validazione tecnica, poi backtest e confronto dei risultati.</footer>
+</div>
+<script src="/xau-analysis.js"></script>
+<script src="/xau-ui.js"></script>
+</body>
+</html>
