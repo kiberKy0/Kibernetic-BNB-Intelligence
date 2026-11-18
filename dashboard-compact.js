@@ -3,7 +3,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id), rootId='kiberCompactDashboard';
-let busy=false,lastRefresh=0,sectorLatest=null;
+let busy=false,lastRefresh=0,sectorLatest=null,dailyTokens=[],compareRows=[];
 function node(tag,cls,txt){const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x}
 function fmtMoney(raw){const n=Number(raw);if(raw==null||raw===''||!Number.isFinite(n))return '—';const a=Math.abs(n);if(a>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(a>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(a>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(a>=1e3)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toLocaleString('it-IT',{maximumFractionDigits:a<1?5:2})}
 function fmtPct(raw){const n=Number(raw);return raw==null||raw===''||!Number.isFinite(n)?'—':(n>0?'+':'')+n.toLocaleString('it-IT',{maximumFractionDigits:2})+'%'}
@@ -15,7 +15,7 @@ function navigate(action){
  if(action==='bnb'){navigateIntelligence('chain');return}
  if(action==='new'){navigateIntelligence('market');return}
  if(action==='defi'){navigateIntelligence('fundamentals');return}
- if(action==='compare'){navigateIntelligence('compare');return}
+ if(action==='compare'){openCompare();return}
  if(action==='market'){document.querySelector('[data-v241-open="market"]')?.click();return}
  if(action==='watch'){document.querySelector('[data-v241-open="market"]')?.click();setTimeout(()=>document.querySelector('[data-v241-sub="watch"]')?.click(),90);return}
  if(action==='news'){document.querySelector('[data-v241-open="news"]')?.click();return}
@@ -44,10 +44,10 @@ function renderSector(){
  const source=$('kiberMarketLeader'),target=$('kcdSectorText'),card=$('kcdSector');
  if(!target||!card)return;
  const raw=String(source?.textContent||'').trim();
- const m=raw.match(/Settore con variazione TVL più alta nel campione:\s*(.*?)\s*·\s*(UP|DOWN|FLAT)\s*([+\u2212-]?[\d.,]+%)/i);
+ const m=!sectorLatest&&raw.match(/Settore con variazione TVL più alta nel campione:\s*(.*?)\s*·\s*(UP|DOWN|FLAT)\s*([+\u2212-]?[\d.,]+%)/i);
  if(m){sectorLatest={name:m[1],value:m[3],tone:m[2].toUpperCase()==='UP'?'up':m[2].toUpperCase()==='DOWN'?'down':'unknown',sample:sectorLatest?.sample||null}}
  if(!sectorLatest){target.textContent='Dati settore in attesa di verifica';card.dataset.tone='unknown';return}
- target.textContent=sectorLatest.name+'  '+sectorLatest.value;
+ target.textContent=sectorLatest.name+'  '+sectorLatest.value+(sectorLatest.tvl!=null?'  ·  Capitale '+fmtMoney(sectorLatest.tvl):'');
  card.dataset.tone=sectorLatest.tone;
  card.title='TVL BNB Chain negli ultimi 7 giorni · campione limitato di '+(sectorLatest.sample||'alcuni')+' protocolli. Non indica l’andamento dei prezzi.';
  const info=card.querySelector('.kcd-leader-info');if(info)info.textContent='7G · TVL, non prezzo';
@@ -59,16 +59,17 @@ function updateSector(data){
  const valid=sectors.filter(x=>x&&Number.isFinite(Number(x.change7d))&&Number(x.count)>0&&Number(x.tvl)>0).sort((a,b)=>Number(b.change7d)-Number(a.change7d));
  if(!valid.length)return;
  const top=valid[0],v=Number(top.change7d),sample=Number(data.sampleSize);
- sectorLatest={name:String(top.name||'Settore'),value:fmtPct(v),tone:v>0?'up':v<0?'down':'unknown',sample:Number.isFinite(sample)?sample:null};
+ sectorLatest={name:String(top.name||'Settore'),value:fmtPct(v),tone:v>0?'up':v<0?'down':'unknown',sample:Number.isFinite(sample)?sample:null,tvl:Number(top.tvl)};
  renderSector()
 }
 function renderTokens(items){
  const host=$('kcdTokens');if(!host)return;host.replaceChildren();
- if(!Array.isArray(items)||items.length===0){host.append(node('div','kcd-empty','Non ci sono candidati verificabili con i filtri attuali. Apri Nuovi token per esplorare le coppie.'));return}
- for(const t of items.slice(0,4)){
+ dailyTokens=(Array.isArray(items)?items:[]).filter(t=>/^0x[a-f0-9]{40}$/i.test(String(t.address||''))&&Number(t.metrics?.liquidityUsd)>=20000&&Number(t.metrics?.volume24h)>=10000&&Number.isFinite(Number(t.metrics?.change24h))&&Number(t.score)>=35).sort((a,b)=>Number(b.metrics.change24h)-Number(a.metrics.change24h)||Number(b.score)-Number(a.score));
+ if(!dailyTokens.length){host.append(node('div','kcd-empty','Non ci sono candidati verificabili con i filtri attuali. Apri Nuovi token per esplorare le coppie.'));return}
+ for(const t of dailyTokens.slice(0,4)){
    const button=node('button','kcd-row');button.type='button';
    const info=node('span');info.append(node('span','kcd-row-name',String(t.symbol||t.name||'Token').slice(0,34)));
-   const extra=t.metrics||{},detail=extra.liquidityUsd!=null?'Liquidità '+fmtMoney(extra.liquidityUsd):'Apri analisi e rischio';
+   const extra=t.metrics||{},detail='24h · Liquidità '+fmtMoney(extra.liquidityUsd);
    info.append(node('span','kcd-row-sub',detail));
    let value=extra.priceChange24h??extra.change24h??t.priceChange24h??t.change24h;
    const score=Number(t.score),priceLabel=fmtPct(value);
@@ -108,8 +109,62 @@ async function load(force=false){
  else renderTokens([]);
  lastRefresh=Date.now();busy=false;if(refresh)refresh.disabled=false;renderSector();
 }
+
+function compareMoney(raw){return fmtMoney(raw)}
+function openCompare(){
+ let panel=$('kcdCompare');
+ if(!panel){
+  panel=node('section','kcd-compare');panel.id='kcdCompare';panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label','Confronto token BNB');
+  panel.innerHTML='<div class="kcd-compare-head"><div><strong>Confronta token</strong><small>Fino a 4 · prezzi, mercato e andamento reale</small></div><button id="kcdCompareClose" type="button" aria-label="Chiudi confronto">×</button></div><form id="kcdCompareForm"><input id="kcdCompareAddress" autocomplete="off" spellcheck="false" placeholder="Contratto token 0x… sulla BNB Chain" aria-label="Indirizzo contratto da aggiungere"><button type="submit">Aggiungi</button></form><div id="kcdCompareError" role="status" aria-live="polite"></div><div class="kcd-compare-picks" id="kcdComparePicks"></div><div class="kcd-compare-grid" id="kcdCompareRows"></div><p class="kcd-compare-note">Valore posseduto: stima da quantità inserita manualmente, non saldo rilevato dal wallet. Nessun ordine di acquisto o vendita.</p>';
+  document.body.append(panel);$('kcdCompareClose').onclick=()=>{panel.hidden=true};$('kcdCompareForm').onsubmit=e=>{e.preventDefault();void addCompare({address:$('kcdCompareAddress').value.trim()})};
+  panel.addEventListener('keydown',e=>{if(e.key==='Escape'){panel.hidden=true}});
+ }
+ panel.hidden=false;
+ const host=$('kcdComparePicks');host.replaceChildren();
+ for(const t of dailyTokens.slice(0,8)){const b=node('button','kcd-compare-chip','+ '+String(t.symbol||t.name||'Token').slice(0,14));b.type='button';b.title='Aggiungi '+String(t.name||t.symbol||'token');b.onclick=()=>void addCompare(t);host.append(b)}
+ renderCompare();
+ $('kcdCompareClose').focus();
+}
+async function addCompare(t){
+ const address=String(t.address||'').trim().toLowerCase(),msg=$('kcdCompareError');
+ if(!/^0x[a-f0-9]{40}$/.test(address)){msg.textContent='Inserisci un contratto BEP-20 valido.';return}
+ if(compareRows.some(r=>r.address===address)){msg.textContent='Token già presente.';return}
+ if(compareRows.length>=4){msg.textContent='Massimo 4 token. Rimuovine uno prima di aggiungerne altri.';return}
+ msg.textContent='Verifico dati e storico del token…';
+ try{
+  const data=await json('/api/token-intel-v26?period=7d&address='+encodeURIComponent(address));
+  if(!data?.token?.priceUsd||!data?.token?.address)throw Error('Prezzo verificabile non disponibile');
+  if(compareRows.some(r=>r.address===address))return;
+  compareRows.push({address,data});
+  msg.textContent='';$('kcdCompareAddress').value='';renderCompare()
+ }catch{msg.textContent='Token non disponibile nelle fonti BNB Chain. Nessun valore inventato.'}
+}
+function compareSpark(chart,values){
+ const points=values.filter(x=>Number.isFinite(x));if(points.length<3)return;
+ const min=Math.min(...points),max=Math.max(...points),range=max-min||Math.abs(max)||1;
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 240 65');svg.setAttribute('role','img');svg.setAttribute('aria-label','Andamento del prezzo osservato: ultime candele disponibili');
+ const path=document.createElementNS('http://www.w3.org/2000/svg','path');const d=points.map((p,i)=>(i?'L':'M')+(i*239/(points.length-1)).toFixed(1)+' '+(59-(p-min)/range*53).toFixed(1)).join(' ');
+ path.setAttribute('d',d);path.setAttribute('fill','none');path.setAttribute('stroke',points.at(-1)>=points[0]?'#5ae0a2':'#fc8895');path.setAttribute('stroke-width','2.5');svg.append(path);chart.append(svg)
+}
+function renderCompare(){
+ const host=$('kcdCompareRows');if(!host)return;host.replaceChildren();
+ if(!compareRows.length){host.append(node('p','kcd-empty','Aggiungi dai trend oppure inserisci il contratto di un token BNB Chain.'));return}
+ for(const row of compareRows){
+  const t=row.data.token,card=node('article','kcd-compare-item');
+  const h=node('header','kcd-compare-item-head'),title=node('strong','',t.symbol||t.name||'Token'),close=node('button','','×');close.type='button';close.title='Rimuovi '+(t.symbol||'token');close.onclick=()=>{compareRows=compareRows.filter(r=>r!==row);renderCompare()};h.append(title,close);card.append(h);
+  const stats=[['Prezzo',fmtMoney(t.priceUsd)],['24 ore',fmtPct(t.change24h)],['Capitalizzazione',fmtMoney(t.marketCap)],['Volume 24h',fmtMoney(t.volume24h)],['Liquidità',fmtMoney(t.liquidityUsd)],['RSI 14',Number.isFinite(Number(row.data.technical?.rsi14))?Number(row.data.technical.rsi14).toFixed(1):'—']];
+  for(const [k,v] of stats){const line=node('div','kcd-compare-stat'),a=node('span','',k),b=node('b','',v);line.append(a,b);card.append(line)}
+  const chart=node('div','kcd-compare-spark');const candles=row.data.chart?.candles||[];
+  compareSpark(chart,candles.slice(-48).map(c=>Number(c?.[4])));card.append(chart);
+  const field=node('label','kcd-compare-quantity','Quantità posseduta (manuale)');const input=node('input');input.type='number';input.min='0';input.step='any';input.placeholder='0';let saved=0;try{saved=Number(localStorage.getItem('kcd_qty_'+row.address))||0}catch{}
+  input.value=saved>0?String(saved):'';const total=node('strong','kcd-compare-total');function recalc(){const q=Number(input.value),p=Number(t.priceUsd);total.textContent=q>0&&Number.isFinite(q)&&q<1e16&&p>0?'Valore stimato '+fmtMoney(q*p):'Valore stimato —';}
+  input.addEventListener('input',()=>{try{if(Number(input.value)>=0)localStorage.setItem('kcd_qty_'+row.address,input.value)}catch{}recalc()});field.append(input);card.append(field,total);recalc();host.append(card)
+ }
+}
+
 function mount(){
  const home=$('v241Home');if(!home||$(rootId))return false;
+ const brand=document.querySelector('.brand-shell');if(brand&&!brand.dataset.kcdAi){brand.dataset.kcdAi='1';brand.setAttribute('role','button');brand.tabIndex=0;brand.title='Apri Kiber AI';brand.addEventListener('click',()=>navigate('ai'));brand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigate('ai')}})}
  const box=node('section');box.id=rootId;box.setAttribute('aria-label','Dashboard compatta Kiber');
  box.innerHTML=[
   '<div class="kcd-header"><div><h1>Panoramica BNB</h1><p>Il necessario, senza riquadri inutili</p></div><button id="kcdRefresh" type="button" class="kcd-icon-action" data-kcd-action="refresh" aria-label="Aggiorna dati">↻</button></div>',
@@ -119,20 +174,20 @@ function mount(){
   '<button type="button" data-kcd-action="defi"><span class="kcd-nav-icon">▱</span>DeFi</button>',
   '<button type="button" data-kcd-action="compare"><span class="kcd-nav-icon">⚖</span>Confronta</button></nav>',
   '<div class="kcd-leader" id="kcdSector" data-tone="unknown"><span class="kcd-leader-symbol" aria-hidden="true">▥</span>',
-  '<div class="kcd-leader-main"><small>Settore con maggiore variazione TVL nel campione</small><strong class="kcd-leader-value" id="kcdSectorText">Verifica in corso…</strong></div>',
+  '<div class="kcd-leader-main"><small>Settore più forte per crescita del capitale DeFi · 7G</small><strong class="kcd-leader-value" id="kcdSectorText">Verifica in corso…</strong></div>',
   '<span class="kcd-leader-info">7 giorni · TVL ≠ prezzo</span></div>',
-  '<section class="kcd-card"><header class="kcd-card-head"><h2>Token da osservare</h2><button type="button" data-kcd-action="new">Vedi tutti ›</button></header>',
-  '<div class="kcd-list" id="kcdTokens"><div class="kcd-empty">Caricamento delle selezioni disponibili…</div></div></section>',
+  '<section class="kcd-card"><header class="kcd-card-head"><h2>Trend del giorno · 24h</h2><button type="button" data-kcd-action="new">Vedi tutti ›</button></header>',
+  '<div class="kcd-list" id="kcdTokens"><div class="kcd-empty">Caricamento delle selezioni disponibili…</div></div><p class="kcd-sample-note">Nuove coppie del campione, ordinate per variazione 24h con filtri minimi di liquidità e attività. Non è l’intero mercato.</p></section>',
   '<div class="kcd-metrics" aria-label="Dati di mercato">',
   '<div><span>Prezzo BNB</span><strong id="kcdBnbPrice">—</strong></div>',
-  '<div><span>Capitale DeFi</span><strong id="kcdTvl">—</strong></div>',
-  '<div><span>Scambi DEX 24h</span><strong id="kcdDex">—</strong></div></div>',
+  '<div title="Valore degli asset depositati nei protocolli DeFi della BNB Chain; non è capitalizzazione di mercato"><span>TVL DeFi BNB</span><strong id="kcdTvl">—</strong></div>',
+  '<div title="Valore totale delle compravendite su exchange decentralizzati BNB Chain nelle ultime 24 ore"><span>Volume DEX 24h</span><strong id="kcdDex">—</strong></div></div>',
   '<p class="kcd-footnote"><span id="kcdUpdated">Caricamento…</span>. Candidati da Kiber Discovery; punteggi non equivalgono a rendimento o sicurezza.</p>',
   '<nav class="kcd-dock" aria-label="Navigazione rapida">',
   '<button type="button" data-kcd-action="home"><span>⌂</span>Home</button>',
-  '<button type="button" data-kcd-action="ai"><span>✧</span>Analisi</button>',
-  '<button type="button" data-kcd-action="gold"><span>🟡</span>Oro</button>',
-  '<button type="button" data-kcd-action="watch"><span>♧</span>Monitorati</button>',
+  '<button type="button" data-kcd-action="search"><span>⌕</span>Cerca</button>',
+  
+  '<button type="button" data-kcd-action="watch"><span>☆</span>Preferiti</button>',
   '<button type="button" data-kcd-action="profile"><span>⚙</span>Profilo</button></nav>',
   '<div style="text-align:center;padding:10px 0"><button type="button" id="kcdDetails" class="kcd-icon-action" data-kcd-action="details" aria-expanded="false">Mostra tutto</button></div>'
  ].join('');
