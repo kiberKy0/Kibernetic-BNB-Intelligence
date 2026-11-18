@@ -107,7 +107,7 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 .xau-guide-details summary{font-weight:750;font-size:13px;padding:7px 0;cursor:pointer;color:#e6c77f}
 .xau-guide-details p{font-size:12px;line-height:1.5;color:#b8cfdd}
 @media(max-width:650px){.xau-guidance{padding:11px 12px}.xau-guide-head h2{font-size:16px}.xau-guide-status{font-size:10px;padding:6px 7px;max-width:134px}.xau-guide-levels{gap:5px}.xau-guide-levels>div{padding:8px 6px}.xau-guide-levels small{font-size:10px}}
-</style><link rel="stylesheet" href="/profile-planets.css"><style>.xau-guidance{border-color:#806442}.xau-profile-btn{border-color:#6e7a68}.xau-topbar{border-bottom:1px solid #66513c}.panel[aria-label="Grafico oro"]{border-color:#82643e}.xau-guide-status{border-color:#b69552}.xau-topbar .identity h1 .gold{color:#f4c86d}</style></head>
+</style><style>.xau-feed-health{border:1px solid #7b643c;background:#24291f;color:#f4d8a4;padding:8px 10px;border-radius:10px;font-size:12px;margin:10px 0}.xau-feed-health[data-state="live"]{border-color:#3c9b75;background:#122f25;color:#b8f7d4}</style><link rel="stylesheet" href="/profile-planets.css"><link rel="stylesheet" href="/xau-kiber.css"><style>.xau-guidance{border-color:#806442}.xau-profile-btn{border-color:#6e7a68}.xau-topbar{border-bottom:1px solid #66513c}.panel[aria-label="Grafico oro"]{border-color:#82643e}.xau-guide-status{border-color:#b69552}.xau-topbar .identity h1 .gold{color:#f4c86d}</style></head>
 <body>
 <div class="container">
 <header class="xau-topbar">
@@ -171,7 +171,7 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 </section>
 <div class="grid-bottom">
 <section class="panel" id="decoder" aria-label="Decoder indipendente XAUUSD">
-<h2>Motore Decoder indipendente</h2>
+<h2>Motore Decoder indipendente</h2><div class="xau-feed-health" id="xauFeedHealth" role="status" aria-live="polite">Feed XAU/USD · verifica in corso…</div>
 <p class="small">Filtri su dati OHLC: EMA 20/50, RSI 14, ATR 14, momentum e freschezza. Nessun dato passa dall'analisi BNB.</p>
 <div class="controls">
 <label for="interval">Periodo <select id="interval"><option value="5min">5 minuti</option><option value="15min" selected>15 minuti</option><option value="1h">1 ora</option><option value="4h">4 ore</option><option value="1day">1 giorno</option></select></label>
@@ -250,5 +250,6 @@ apply();
 <script src="/xau-analysis.js"></script>
 <script src="/xau-guidance.js"></script>
 <script src="/xau-ui.js"></script>
+<script src="/xau-kiber.js"></script>
 </body>
 </html>
