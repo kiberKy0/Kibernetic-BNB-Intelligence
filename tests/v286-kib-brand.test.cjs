@@ -6,10 +6,10 @@ test('Kiber and scanner are mounted in production boot, with Kiber after scanner
  assert.match(index,/free-scanner-ui\.js/);assert.match(index,/kiber-assistant\.js/);
  assert(index.indexOf("'free-scanner-ui.js'")<index.indexOf("'kiber-assistant.js'"));
 });
-test('Kiber is clearly labeled rule-based and does not claim external LLM or wallet access',()=>{
+test('Kiber probes Gemini, retains a rule-based fallback and cannot operate a wallet',()=>{
  const q=fs.readFileSync(path.join(root,'kiber-assistant.js'),'utf8');
- assert.match(q,/non sono collegato a un modello linguistico esterno/i);
- assert.match(q,/Nessuna operazione finanziaria viene eseguita/i);
+ assert.match(q,/\/api\/kiber\?provider=1/);
+ assert.match(q,/Kiber non può comprare, vendere o gestire un wallet/i);
  assert.match(q,/Modalità locale a regole/i);
  assert.doesNotMatch(q,/OPENAI_API_KEY|process\.env|sk-proj/);
 });
