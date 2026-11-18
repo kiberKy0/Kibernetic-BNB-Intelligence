@@ -212,6 +212,7 @@ function mount(){
   '<div class="kcd-leader" id="kcdSector" data-tone="unknown"><span class="kcd-leader-symbol" aria-hidden="true">▥</span>',
   '<div class="kcd-leader-main"><small>Settore più forte per crescita del capitale DeFi · 7G</small><strong class="kcd-leader-value" id="kcdSectorText">Verifica in corso…</strong></div>',
   '<span class="kcd-leader-info">7 giorni · TVL ≠ prezzo</span></div>',
+  '<div class="kcd-external-source" aria-label="Fonti esterne"><span>Confronta i dati anche su</span><a href="https://www.coingecko.com/it/categories/binance-smart-chain" target="_blank" rel="noopener noreferrer" aria-label="Apri CoinGecko ecosistema BNB Chain in una nuova scheda">CoinGecko · BNB Chain ↗</a><a href="https://www.coingecko.com/it/monete/bnb" target="_blank" rel="noopener noreferrer" aria-label="Apri CoinGecko prezzo BNB in una nuova scheda">Prezzo BNB ↗</a></div>',
   '<section class="kcd-card"><header class="kcd-card-head"><h2>Trend del giorno · 24h</h2><button type="button" data-kcd-action="market">Tutte le monete ›</button></header>',
   '<div class="kcd-list" id="kcdTokens"><div class="kcd-empty">Caricamento delle selezioni disponibili…</div></div><p class="kcd-sample-note">Pool di tendenza BNB Chain, ordinati per variazione 24h e filtrati per liquidità e attività. Non è l’intero mercato.</p></section>',
   '<div class="kcd-metrics" aria-label="Dati di mercato">',
