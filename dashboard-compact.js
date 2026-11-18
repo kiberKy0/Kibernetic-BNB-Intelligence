@@ -12,7 +12,7 @@ function navigateIntelligence(sub){
  if(sub&&sub!=='chain')setTimeout(()=>document.querySelector('[data-v241-sub="'+sub+'"]')?.click(),90);
 }
 function navigate(action){
- if(action==='bnb'){navigateIntelligence('chain');return}
+ if(action==='bnb'){navigate('market');return}
  if(action==='new'){navigateIntelligence('market');return}
  if(action==='defi'){navigateIntelligence('fundamentals');return}
  if(action==='compare'){openCompare();return}
@@ -27,17 +27,11 @@ function navigate(action){
    $('xauUsdNav')?.click();return
  }
  if(action==='home'){$('v241Back')?.click();document.getElementById(rootId)?.scrollIntoView({block:'start',behavior:'smooth'});return}
- if(action==='details'){
-   document.body.classList.toggle('kcd-expanded');
-   const expanded=document.body.classList.contains('kcd-expanded');
-   const b=$('kcdDetails');if(b){b.textContent=expanded?'Vista compatta':'Mostra tutto';b.setAttribute('aria-expanded',String(expanded))}
-   syncParent();return
- }
  if(action==='refresh')void load(true);
 }
 function syncParent(){
  try{const p=window.parent;if(p&&p!==window){
-   p.document.body.classList.toggle('kiber-compact-home',document.body.dataset.v241View==='home'&&!document.body.classList.contains('kcd-expanded'));
+   p.document.body.classList.toggle('kiber-compact-home',document.body.dataset.v241View==='home');
  }}catch{}
 }
 function renderSector(){
@@ -209,16 +203,16 @@ function mount(){
  const brand=document.querySelector('.brand-shell');if(brand&&!brand.dataset.kcdAi){brand.dataset.kcdAi='1';brand.setAttribute('role','button');brand.tabIndex=0;brand.title='Apri Kiber AI';brand.addEventListener('click',()=>navigate('ai'));brand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigate('ai')}})}
  const box=node('section');box.id=rootId;box.setAttribute('aria-label','Dashboard compatta Kiber');
  box.innerHTML=[
-  '<div class="kcd-header"><div><h1>Panoramica BNB</h1><p>Il necessario, senza riquadri inutili</p></div><button id="kcdRefresh" type="button" class="kcd-icon-action" data-kcd-action="refresh" aria-label="Aggiorna dati">↻</button></div>',
+  '<div class="kcd-header"><div><h1>BNB Chain</h1><p>Trend giornalieri e accesso al catalogo token</p></div><button id="kcdRefresh" type="button" class="kcd-icon-action" data-kcd-action="refresh" aria-label="Aggiorna dati">↻</button></div>',
   '<nav class="kcd-nav" aria-label="Analisi principali">',
-  '<button type="button" data-kcd-action="bnb"><span class="kcd-nav-icon">⬡</span>BNB</button>',
+  '<button type="button" data-kcd-action="bnb" aria-label="Apri il catalogo delle monete BNB Chain"><span class="kcd-nav-icon">⬡</span>BNB Chain</button>',
   '<button type="button" data-kcd-action="new"><span class="kcd-nav-icon">✦</span>Nuovi token</button>',
   '<button type="button" data-kcd-action="defi"><span class="kcd-nav-icon">▱</span>DeFi</button>',
   '<button type="button" data-kcd-action="compare"><span class="kcd-nav-icon">⚖</span>Confronta</button></nav>',
   '<div class="kcd-leader" id="kcdSector" data-tone="unknown"><span class="kcd-leader-symbol" aria-hidden="true">▥</span>',
   '<div class="kcd-leader-main"><small>Settore più forte per crescita del capitale DeFi · 7G</small><strong class="kcd-leader-value" id="kcdSectorText">Verifica in corso…</strong></div>',
   '<span class="kcd-leader-info">7 giorni · TVL ≠ prezzo</span></div>',
-  '<section class="kcd-card"><header class="kcd-card-head"><h2>Trend del giorno · 24h</h2><button type="button" data-kcd-action="new">Vedi tutti ›</button></header>',
+  '<section class="kcd-card"><header class="kcd-card-head"><h2>Trend del giorno · 24h</h2><button type="button" data-kcd-action="market">Tutte le monete ›</button></header>',
   '<div class="kcd-list" id="kcdTokens"><div class="kcd-empty">Caricamento delle selezioni disponibili…</div></div><p class="kcd-sample-note">Pool di tendenza BNB Chain, ordinati per variazione 24h e filtrati per liquidità e attività. Non è l’intero mercato.</p></section>',
   '<div class="kcd-metrics" aria-label="Dati di mercato">',
   '<div><span>Prezzo BNB</span><strong id="kcdBnbPrice">—</strong></div>',
@@ -231,7 +225,7 @@ function mount(){
   
   '<button type="button" data-kcd-action="watch"><span>☆</span>Preferiti</button>',
   '<button type="button" data-kcd-action="profile"><span>⚙</span>Profilo</button></nav>',
-  '<div style="text-align:center;padding:10px 0"><button type="button" id="kcdDetails" class="kcd-icon-action" data-kcd-action="details" aria-expanded="false">Mostra tutto</button></div>'
+  
  ].join('');
  home.prepend(box);
  box.addEventListener('click',e=>{const b=e.target.closest('[data-kcd-action]');if(b){e.preventDefault();navigate(b.dataset.kcdAction)}});
