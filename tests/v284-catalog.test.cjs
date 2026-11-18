@@ -12,7 +12,7 @@ function setup(fetchStub){
     createElement:()=>({className:'',textContent:'',disabled:false,onclick:null})
   };
   const window={};
-  const context={document,window,fetch:fetchStub,localStorage:{setItem(){},getItem:()=>null},console};
+  const context={document,window,fetch:fetchStub,localStorage:{setItem(){},getItem:()=>null},console,setInterval:()=>0,clearInterval:()=>{}};
   vm.createContext(context);
   const original=fs.readFileSync(path.join(__dirname,'../v21-market-v2.js'),'utf8');
   const terminal="if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();";
