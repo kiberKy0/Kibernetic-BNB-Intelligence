@@ -3,7 +3,7 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id), rootId='kiberCompactDashboard';
-let busy=false,lastRefresh=0;
+let busy=false,lastRefresh=0,sectorLatest=null;
 function node(tag,cls,txt){const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x}
 function fmtMoney(raw){const n=Number(raw);if(raw==null||raw===''||!Number.isFinite(n))return '—';const a=Math.abs(n);if(a>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(a>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(a>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(a>=1e3)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toLocaleString('it-IT',{maximumFractionDigits:a<1?5:2})}
 function fmtPct(raw){const n=Number(raw);return raw==null||raw===''||!Number.isFinite(n)?'—':(n>0?'+':'')+n.toLocaleString('it-IT',{maximumFractionDigits:2})+'%'}
@@ -43,12 +43,24 @@ function syncParent(){
 function renderSector(){
  const source=$('kiberMarketLeader'),target=$('kcdSectorText'),card=$('kcdSector');
  if(!target||!card)return;
- const s=String(source?.textContent||'').trim();
- const m=s.match(/Settore con variazione TVL più alta nel campione:\s*(.*?)\s*·\s*(UP|DOWN|FLAT)\s*([+\u2212-]?[\d.,]+%)/i);
- if(!m){target.textContent='Settore: dati non disponibili';card.dataset.tone='unknown';return}
- target.textContent=m[1]+'  '+m[3];
- card.dataset.tone=m[2].toUpperCase()==='UP'?'up':m[2].toUpperCase()==='DOWN'?'down':'unknown';
- card.title='Variazione TVL a 7 giorni, su un campione limitato di protocolli. Non è una variazione di prezzo.';
+ const raw=String(source?.textContent||'').trim();
+ const m=raw.match(/Settore con variazione TVL più alta nel campione:\s*(.*?)\s*·\s*(UP|DOWN|FLAT)\s*([+\u2212-]?[\d.,]+%)/i);
+ if(m){sectorLatest={name:m[1],value:m[3],tone:m[2].toUpperCase()==='UP'?'up':m[2].toUpperCase()==='DOWN'?'down':'unknown',sample:sectorLatest?.sample||null}}
+ if(!sectorLatest){target.textContent='Dati settore in attesa di verifica';card.dataset.tone='unknown';return}
+ target.textContent=sectorLatest.name+'  '+sectorLatest.value;
+ card.dataset.tone=sectorLatest.tone;
+ card.title='TVL BNB Chain negli ultimi 7 giorni · campione limitato di '+(sectorLatest.sample||'alcuni')+' protocolli. Non indica l’andamento dei prezzi.';
+ const info=card.querySelector('.kcd-leader-info');if(info)info.textContent='7G · TVL, non prezzo';
+}
+function updateSector(data){
+ const stamp=Date.parse(data?.updatedAt||'');
+ if(!Number.isFinite(stamp)||Math.abs(Date.now()-stamp)>48*60*60*1000)return;
+ const sectors=Array.isArray(data?.sectors)?data.sectors:[];
+ const valid=sectors.filter(x=>x&&Number.isFinite(Number(x.change7d))&&Number(x.count)>0&&Number(x.tvl)>0).sort((a,b)=>Number(b.change7d)-Number(a.change7d));
+ if(!valid.length)return;
+ const top=valid[0],v=Number(top.change7d),sample=Number(data.sampleSize);
+ sectorLatest={name:String(top.name||'Settore'),value:fmtPct(v),tone:v>0?'up':v<0?'down':'unknown',sample:Number.isFinite(sample)?sample:null};
+ renderSector()
 }
 function renderTokens(items){
  const host=$('kcdTokens');if(!host)return;host.replaceChildren();
@@ -88,9 +100,10 @@ async function json(url){const r=await fetch(url,{cache:'no-store',signal:AbortS
 async function load(force=false){
  if(busy||(!force&&Date.now()-lastRefresh<90000))return;busy=true;
  const refresh=$('kcdRefresh');if(refresh)refresh.disabled=true;
- const res=await Promise.allSettled([json('/api/chain?v=kcd29'),json('/api/discovery-v26?v=kcd29')]);
+ const res=await Promise.allSettled([json('/api/chain?v=kcd29'),json('/api/discovery-v26?v=kcd29'),json('/api/intelligence?type=sectors')]);
  if(res[0].status==='fulfilled')renderChain(res[0].value);
  else{const b=$('v241Bnb')?.textContent||'—',t=$('v241Tvl')?.textContent||'—';if($('kcdBnbPrice'))$('kcdBnbPrice').textContent=b;if($('kcdTvl'))$('kcdTvl').textContent=t}
+ if(res[2].status==='fulfilled')updateSector(res[2].value);
  if(res[1].status==='fulfilled')renderTokens(res[1].value?.candidates||[]);
  else renderTokens([]);
  lastRefresh=Date.now();busy=false;if(refresh)refresh.disabled=false;renderSector();
