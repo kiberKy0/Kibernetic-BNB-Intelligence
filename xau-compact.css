@@ -63,3 +63,12 @@ body{background:#08121d}
 footer.container.small{padding:12px 0!important;font-size:10px;color:#6f93a5}
 @media(min-width:840px){.container{max-width:1080px;padding:14px 20px}.tv-widget{height:485px}.xau-compact-top{padding:15px 20px}.xau-supplement{grid-template-columns:1fr 1fr}.xau-supplement>details:last-child{grid-column:1/-1}}
 @media(max-width:460px){.tv-widget{height:340px;min-height:270px}.xau-compact-price strong{font-size:19px}.xau-compact-head{flex-wrap:nowrap}.xau-compact-title strong{font-size:12px}.xau-compact-price .xau-compact-unit{font-size:10px}.xau-compact-top{padding:10px}.xau-compact-top .controls{flex-wrap:wrap}.xau-supplement .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* External free XAU spot reference, explicitly NOT the analytics or MT5 feed. */
+.xau-spot-note{font-size:10px;color:#a0baca;line-height:1.35;max-width:270px;text-align:right;margin-top:2px}
+.xau-compact-price[data-spot="recent"] strong{color:#e3f7fc}
+.xau-compact-price[data-spot="stale"] strong,.xau-compact-price[data-spot="error"] strong{color:#9aaebc}
+.xau-ohlc-note{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#9db4c3}
+.xau-ohlc-note b{font-weight:750;color:#d0e4f0;font-variant-numeric:tabular-nums}
+.xau-compact-meta .meta{display:inline-block;max-width:100%;line-height:1.35}
+@media(max-width:460px){.xau-spot-note{font-size:9px;max-width:185px}.xau-compact-head{align-items:flex-start}.xau-compact-price strong{font-size:21px}}
