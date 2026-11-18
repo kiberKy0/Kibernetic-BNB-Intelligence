@@ -43,7 +43,7 @@ body:not([data-v241-view="home"]) #kiberCompactDashboard{display:none!important}
 .kcd-metrics span{display:block;font-size:10px;color:#9dbccc;margin-bottom:5px}
 .kcd-metrics strong{display:block;font-size:clamp(13px,2.5vw,18px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .kcd-footnote{font-size:11px;color:#8daabb;line-height:1.5;margin:0 1px 12px}
-.kcd-dock{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;position:sticky;bottom:8px;z-index:40;background:rgba(5,16,27,.96);backdrop-filter:blur(10px);border:1px solid #214a60;border-radius:15px;padding:6px 4px;box-shadow:0 9px 23px #0008}
+.kcd-dock{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;position:sticky;bottom:8px;z-index:40;background:rgba(5,16,27,.96);backdrop-filter:blur(10px);border:1px solid #214a60;border-radius:15px;padding:6px 4px;box-shadow:0 9px 23px #0008}
 .kcd-dock button{min-width:0;min-height:47px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:#bcd5e5;font-size:10px;padding:4px 0}
 .kcd-dock button:first-child{background:#0c4263;border-radius:10px;color:white}
 .kcd-dock button span{font-size:19px;line-height:1.05}
@@ -63,3 +63,38 @@ body.kcd-expanded .kcd-dock{position:static}
 }
 @media(max-width:380px){.kcd-nav button{font-size:10px}.kcd-leader-info{display:none}.kcd-row-name{font-size:12px}}
 @media(prefers-reduced-motion:reduce){#kiberCompactDashboard *{scroll-behavior:auto}}
+
+/* V29.1: daily sample labeling, a focused token view and comparable holdings */
+.kcd-sample-note{font-size:10px;color:#92adbf;margin:0;padding:0 12px 10px;line-height:1.45}
+.kcd-compare[hidden]{display:none!important}
+.kcd-compare{position:fixed;inset:8px;z-index:1000;background:#071522;border:1px solid #38708b;border-radius:16px;overflow-y:auto;overscroll-behavior:contain;color:#eef8ff;padding:14px;box-shadow:0 10px 30px #000b}
+.kcd-compare-head{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kcd-compare-head strong{display:block;font-size:20px}
+.kcd-compare-head small{display:block;font-size:12px;color:#9bbacd;margin-top:4px}
+.kcd-compare-head button,.kcd-compare-item-head button{border:1px solid #35596e;border-radius:9px;color:#eef8ff;background:#1a3649;min-width:37px;min-height:37px}
+#kcdCompareForm{display:flex;gap:7px;align-items:center}
+#kcdCompareForm input{background:#0d2536;border:1px solid #38576b;color:white;border-radius:9px;padding:10px;min-width:0;flex:1;font-size:12px}
+#kcdCompareForm button{background:#17445e;border:1px solid #3a91b9;color:white;border-radius:9px;min-height:40px;padding:8px 11px}
+#kcdCompareError{min-height:18px;color:#b8d3e4;font-size:12px;margin:6px 0}
+.kcd-compare-picks{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.kcd-compare-chip{font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;background:#153145;border:1px solid #39617b;color:#dff3ff;border-radius:999px;padding:8px 10px}
+.kcd-compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.kcd-compare-item{background:#0c2636;border:1px solid #285168;border-radius:12px;padding:10px;min-width:0}
+.kcd-compare-item-head{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-bottom:8px}
+.kcd-compare-item-head strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kcd-compare-stat{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #244255;padding:6px 0;font-size:11px}
+.kcd-compare-stat span{color:#91b0c0}.kcd-compare-stat b{text-align:right;overflow-wrap:anywhere}
+.kcd-compare-spark{height:65px;margin:5px 0}.kcd-compare-spark svg{width:100%;height:100%}
+.kcd-compare-quantity{font-size:11px;color:#a4c7d9;display:grid;gap:4px}
+.kcd-compare-quantity input{width:100%;padding:8px;border:1px solid #355970;background:#061824;color:white;border-radius:8px;font-size:12px}
+.kcd-compare-total{display:block;font-size:12px;margin-top:7px;color:#9fe6b8}
+.kcd-compare-note{font-size:11px;color:#9cb4c5;line-height:1.55}
+.kcd-compare :focus-visible{outline:2px solid #72dbff;outline-offset:2px}
+.v271-trade{margin:10px 0!important;border-color:#35607c!important}
+.v271-trade .kcd-trade-title{padding:13px 15px 5px;font-weight:800;font-size:14px}
+.v271-trade .kcd-trade-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:8px 12px}
+.v271-trade .kcd-trade-grid>div{border:1px solid #26495c;border-radius:9px;padding:9px 7px;min-width:0}
+.v271-trade .kcd-trade-grid small{display:block;color:#9cb9ce;font-size:10px}
+.v271-trade .kcd-trade-grid b{display:block;font-size:clamp(11px,2.5vw,16px);overflow-wrap:anywhere;margin-top:5px}
+.v271-trade .kcd-trade-note{font-size:11px;color:#a7bfd0;padding:3px 13px 13px;line-height:1.4}
+@media(max-width:550px){.kcd-compare{inset:0;border-radius:0;padding:12px}.kcd-compare-grid{gap:6px}.kcd-compare-item{padding:8px}.kcd-compare-stat{font-size:10px}.v271-trade .kcd-trade-grid{gap:4px;padding:7px}.v271-trade .kcd-trade-grid>div{padding:7px 5px}.v271-trade .kcd-trade-grid small{font-size:9px}}
