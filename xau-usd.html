@@ -174,7 +174,7 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 <h2>Motore Decoder indipendente</h2><div class="xau-feed-health" id="xauFeedHealth" role="status" aria-live="polite">Feed XAU/USD · verifica in corso…</div>
 <p class="small">Filtri su dati OHLC: EMA 20/50, RSI 14, ATR 14, momentum e freschezza. Nessun dato passa dall'analisi BNB.</p>
 <div class="controls">
-<label for="interval">Periodo <select id="interval"><option value="5min">5 minuti</option><option value="15min" selected>15 minuti</option><option value="1h">1 ora</option><option value="4h">4 ore</option><option value="1day">1 giorno</option></select></label>
+<label for="interval">Periodo <select id="interval"><option value="1min">1 minuto</option><option value="5min">5 minuti</option><option value="15min" selected>15 minuti</option><option value="1h">1 ora</option><option value="4h">4 ore</option><option value="1day">1 giorno</option></select></label>
 <button class="control" id="refresh" type="button">Aggiorna feed</button>
 </div>
 <div class="signal wait" id="signal" role="status" aria-live="polite">ATTESA</div>
@@ -195,7 +195,7 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 <section class="panel" aria-label="Filtri contesto e importazione">
 <h2>Filtri aggiuntivi</h2>
 <ul>
-<li><strong>Macro:</strong> Fed, tassi USA, CPI, NFP e dollaro. <span class="small">Feed eventi non ancora collegato; nessuna previsione macro inventata.</span></li>
+<li><strong>Macro:</strong> calendario USA ad alto impatto collegato via biquote.io. <span class="small">Controllo orario delle notizie. La previsione dell’effetto sui prezzi e il confronto con DXY e tassi reali non sono ancora validati.</span></li>
 <li><strong>Sessioni:</strong> apertura Londra/New York e volatilità durante le news. <span class="small">Da integrare nella convalida.</span></li>
 <li><strong>Conflitto tecnico:</strong> se EMA, RSI o momentum non concordano → ATTESA.</li>
 <li><strong>Qualità feed:</strong> timestamp, almeno 60 candele e prezzi validi obbligatori.</li>
@@ -206,7 +206,7 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 </label>
 <p class="small">Intestazioni richieste: <code>time,open,high,low,close</code>. Date ISO, per esempio 2026-11-17T11:45:00Z. Imposta il periodo corretto sopra prima di importare; non viene eseguito ricampionamento.</p>
 <p class="small" id="csvMessage">Nessun file caricato.</p>
-<div class="info">Il feed automatico, se autorizzato, usa Twelve Data con chiave custodita sul server. Se il provider non è collegato, il Decoder segnala dati non disponibili; il grafico TradingView rimane consultabile.</div>
+<div class="info">Il Decoder riceve candele e quotazioni da biquote.io (feed MT5 esterno, gratuito e distinto dal tuo conto Android). Il calendario USA evidenzia eventi ad alto impatto; la qualità dei dati viene controllata a ogni aggiornamento. Se la fonte non risponde o i dati sono vecchi, Kiber resta in ATTESA.</div>
 </section>
 </div>
 <footer class="container small" style="padding:24px 0">Kibernetic Intelligence · XAU/USD isolato dall'ecosistema BNB · Prima validazione tecnica, poi backtest e confronto dei risultati.</footer>
@@ -247,10 +247,10 @@ window.addEventListener('storage',e=>{if(['kiber_v17_profile','kiber_profile_pho
 apply();
 })();
 </script>
-<script src="/xau-analysis.js"></script>
+<script src="/xau-analysis.js?v=decoder-ohlc-2"></script>
 <script src="/xau-guidance.js"></script>
-<script src="/xau-advanced.js?v=1"></script>
-<script src="/xau-ui.js?v=xau-compact-2"></script>
+<script src="/xau-advanced.js?v=decoder-ohlc-2"></script>
+<script src="/xau-ui.js?v=decoder-ohlc-2"></script>
 <script src="/xau-kiber.js"></script>
 <script src="/xau-compact.js?v=3"></script>
 <script src="/xau-spot.js?v=1"></script>
