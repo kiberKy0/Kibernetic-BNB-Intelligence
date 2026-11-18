@@ -1,0 +1,12 @@
+/* Shared Kiber profile: name + illustrated planet, across BNB and XAU. */
+.kiber-planet-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:8px 0}
+.kiber-planet-option{display:flex;flex-direction:column;align-items:center;gap:5px;background:#0b2637!important;color:#e2f4ff!important;border:1px solid #395b71!important;border-radius:14px!important;padding:9px 6px!important;min-height:100px;font:700 11px system-ui!important;cursor:pointer}
+.kiber-planet-option.selected{border:2px solid #d7b66d!important;background:#24374a!important;box-shadow:0 0 0 1px #d0a65155}
+.kiber-planet-option:focus-visible{outline:3px solid #8defff;outline-offset:2px}
+.kiber-planet-thumbnail{display:block;width:62px;height:62px;border-radius:50%;background-size:cover;background-position:center;box-shadow:0 4px 14px #0007}
+#profileBtn #avatar{width:34px!important;height:34px!important;min-width:34px!important;border-radius:50%!important;font-size:0!important;border:1px solid #84dafa;display:inline-flex!important}
+#xauProfileBtn #xauProfileAvatar{display:inline-flex!important;width:33px;height:33px;border:1px solid #dbb365!important;border-radius:50%!important;font-size:0!important}
+#xauProfileBtn{gap:6px}
+#profileDrawer .kiber-profile-legacy, #xauProfileDrawer .kiber-profile-legacy, #profileDrawer .kcd-profile-extra{display:none!important}
+.kiber-planet-label{display:block;color:#accedb;font-size:12px;margin-top:10px}
+@media(max-width:480px){.kiber-planet-option{min-height:86px;padding:6px 4px!important}.kiber-planet-thumbnail{width:52px;height:52px}}
