@@ -34,7 +34,7 @@
         : 'Setup condizionato, basato sull’ultima candela chiusa (' + (result.time || 'data da verificare') + '). Non è un ordine. Verifica spread, news e quotazione del broker.');
   }
 
-  function render(result, source) {
+  function render(result, source, feedContext = null) {
     renderOperationalGuide(result, source);
     $('signal').className = 'signal ' + (result.signal === 'BUY' ? 'buy' : result.signal === 'SELL' ? 'sell' : 'wait');
     setText('signal', result.label);
@@ -59,7 +59,7 @@
     // indipendenti prevale: mai proporre BUY/SELL come decisione eseguibile.
     try {
       const advanced = window.KiberXauAdvanced;
-      const audit = advanced && advanced.evaluate(result, source);
+      const audit = advanced && advanced.evaluate(result, source, Date.now(), feedContext || {});
       if (audit) {
         advanced.render(audit);
         $('signal').className = 'signal wait';
@@ -101,14 +101,18 @@
       const response = await fetch('/api/xau?interval=' + encodeURIComponent($('interval').value),
         { cache: 'no-store' });
       const body = await response.json();
-      if (!response.ok) throw new Error(body.code === 'NO_FEED' ? 'Manca la chiave API Twelve Data nell’Oracolo. Il grafico TradingView è indipendente.' : (body.error || 'Errore provider'));
-      if (!Array.isArray(body.candles) || body.symbol !== 'XAU/USD') throw new Error('Dati provider non validi');
+      if (!response.ok) throw new Error(body.error || 'Dati XAU/USD non disponibili');
+      if (!Array.isArray(body.candles) || body.symbol !== 'XAU/USD' || !body.quality?.ok) throw new Error('Serie OHLC o controllo quotazioni non valido');
       const result=decoder.analyze(body.candles, $('interval').value);
       feedFailed=false;
       const lag=result.time?Math.max(0,Math.round((Date.now()-Date.parse(result.time))/60000)):null;
-      feedHealth(result.ready?'OHLC disponibili da '+String(body.source||'provider')+' · inizio ultima candela '+new Date(result.time).toLocaleString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'UTC'})+' UTC · età '+lag+' min · NON sono tick MT5':'Dati ricevuti ma non validati · '+(result.reasons||[]).join(' · '),result.ready?'ohlc':'offline');
-      render(result, body.source + ' · dati provider');
-      setText('csvMessage', 'Il grafico TradingView e il feed del Decoder sono sorgenti indipendenti.');
+      const q=body.quality.tick||{};
+      const bid=price(q.bid),ask=price(q.ask),seconds=q.ageSeconds;
+      const feedLine='Feed esterno '+String(body.source||'XAU')+' · Bid '+bid+' / Ask '+ask+
+        ' · tick '+seconds+' s · OHLC '+lag+' min dall’inizio candela · non è il tuo conto MT5';
+      feedHealth(result.ready?feedLine:'Dati ricevuti ma non validati · '+(result.reasons||[]).join(' · '),result.ready?'ohlc':'offline');
+      render(result, body.source + ' · feed esterno',body);
+      setText('csvMessage', 'Feed biquote esterno · candele completate per gli indicatori. TradingView e il conto MT5 Android sono separati.');
     } catch (error) {
       feedFailed=true;feedHealth('Feed non disponibile · '+String(error.message||'errore sorgente')+' · nessun segnale operativo');
       waiting(error.message, 'Feed automatico non operativo');
@@ -159,9 +163,9 @@
   });
   // Polling solo mentre il Decoder è aperto. Rispetta le quote del provider in caso di errore.
   setInterval(()=>{if(document.hidden||importActive||$('refresh').disabled)return;
-    const interval=feedFailed?300000:120000;
+    const interval=feedFailed?120000:60000;
     if(Date.now()-lastFetchAt>=interval)void loadFeed();
   },30000);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!importActive&&Date.now()-lastFetchAt>120000)void loadFeed();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!importActive&&Date.now()-lastFetchAt>60000)void loadFeed();});
   loadFeed();
 })();
