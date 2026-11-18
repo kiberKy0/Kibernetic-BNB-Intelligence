@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const endpoint=require('../api/bnb-dex-live.js');
+const endpoint=require('../server/bnb-dex-snapshot.cjs');
 const W='0x'+'1'.repeat(40),P='0x'+'2'.repeat(40);
 function fakePair(extra={}){return {chainId:'bsc',dexId:'pancakeswap-v3',pairAddress:P,baseToken:{address:W,symbol:'TKN'},quoteToken:{address:'0x'+'3'.repeat(40),symbol:'USDT'},priceUsd:'1.25',liquidity:{usd:900000},volume:{h24:320000},txns:{h24:{buys:100,sells:80}},...extra};}
 function mockRes(){
