@@ -169,14 +169,27 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 const $=id=>document.getElementById(id);
 let current={};
 function stored(){try{return JSON.parse(localStorage.getItem('kiber_v17_profile')||'{}')||{}}catch{return {}}}
-function apply(){current=stored();$('xauProfileName').textContent=current.name||'Profilo';$('xauProfileAvatar').textContent=current.avatar||'🤖';$('xauProfileEditName').value=current.name||'';$('xauProfileEditTagline').value=current.tagline||'';$('xauProfileEditBio').value=current.bio||'';const choices=[...$('xauProfileEditAvatar').options].map(o=>o.value);$('xauProfileEditAvatar').value=choices.includes(current.avatar)?current.avatar:'🤖'}
+function paintProfile(){
+ const avatar=$('xauProfileAvatar');if(!avatar)return;
+ let photo='',color='#23bbf6';try{photo=localStorage.getItem('kiber_profile_photo')||'';color=localStorage.getItem('kiber_profile_accent')||color}catch{}
+ if(!/^#[0-9a-f]{6}$/i.test(color))color='#23bbf6';
+ const valid=/^data:image\/(png|jpeg|webp);base64,/.test(photo);
+ avatar.style.display='inline-flex';avatar.style.alignItems='center';avatar.style.justifyContent='center';
+ avatar.style.width='29px';avatar.style.height='29px';avatar.style.flexShrink='0';
+ avatar.style.borderRadius='50%';avatar.style.border='2px solid '+color;
+ avatar.style.backgroundImage=valid?'url('+JSON.stringify(photo)+')':'';
+ avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center';
+ avatar.style.color=valid?'transparent':'';
+ $('xauProfileBtn').style.borderColor=color;
+}
+function apply(){current=stored();$('xauProfileName').textContent=current.name||'Profilo';$('xauProfileAvatar').textContent=current.avatar||'🤖';$('xauProfileEditName').value=current.name||'';$('xauProfileEditTagline').value=current.tagline||'';$('xauProfileEditBio').value=current.bio||'';const choices=[...$('xauProfileEditAvatar').options].map(o=>o.value);$('xauProfileEditAvatar').value=choices.includes(current.avatar)?current.avatar:'🤖';paintProfile()}
 function toggle(panelId,buttonId,show){for(const [p,b] of [['xauBrokerInfo','xauWalletAccountBtn'],['xauBrokerInfo','xauWalletBalanceBtn'],['xauProfileDrawer','xauProfileBtn']]){if(p!==panelId){$(p).hidden=true;$(b).setAttribute('aria-expanded','false')}}$(panelId).hidden=!show;$(buttonId).setAttribute('aria-expanded',String(show))}
 for(const id of ['xauWalletAccountBtn','xauWalletBalanceBtn'])$(id).addEventListener('click',()=>{const show=$('xauBrokerInfo').hidden;toggle('xauBrokerInfo',id,show);$('xauWalletAccountBtn').setAttribute('aria-expanded',String(show));$('xauWalletBalanceBtn').setAttribute('aria-expanded',String(show))});
 $('xauBrokerClose').addEventListener('click',()=>toggle('xauBrokerInfo','xauWalletBalanceBtn',false));
 $('xauProfileBtn').addEventListener('click',()=>{const show=$('xauProfileDrawer').hidden;apply();toggle('xauProfileDrawer','xauProfileBtn',show)});
 $('xauProfileClose').addEventListener('click',()=>toggle('xauProfileDrawer','xauProfileBtn',false));
 $('xauProfileForm').addEventListener('submit',e=>{e.preventDefault();const p={...stored(),name:$('xauProfileEditName').value.trim().slice(0,60),avatar:$('xauProfileEditAvatar').value,tagline:$('xauProfileEditTagline').value.trim().slice(0,50),bio:$('xauProfileEditBio').value.trim().slice(0,180)};try{localStorage.setItem('kiber_v17_profile',JSON.stringify(p));apply();toggle('xauProfileDrawer','xauProfileBtn',false)}catch{alert('Salvataggio locale non disponibile')}});
-window.addEventListener('storage',e=>{if(e.key==='kiber_v17_profile')apply()});
+window.addEventListener('storage',e=>{if(['kiber_v17_profile','kiber_profile_photo','kiber_profile_accent'].includes(e.key))apply()});
 apply();
 })();
 </script>
