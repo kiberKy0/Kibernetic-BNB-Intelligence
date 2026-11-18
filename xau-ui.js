@@ -54,6 +54,40 @@
       item.textContent = reason;
       list.append(item);
     });
+    // Validazione finale sovrapposta ai setup tecnici esistenti.
+    // Anche se gli indicatori coincidono, l'assenza di dati live/costi/test
+    // indipendenti prevale: mai proporre BUY/SELL come decisione eseguibile.
+    try {
+      const advanced = window.KiberXauAdvanced;
+      const audit = advanced && advanced.evaluate(result, source);
+      if (audit) {
+        advanced.render(audit);
+        $('signal').className = 'signal wait';
+        setText('signal', 'ATTESA · verifica avanzata');
+        setText('xauGuideStatus', 'ATTESA');
+        setText('xauGuideSummary', audit.reason);
+        setText('xauGuideEntry', '—');
+        setText('xauGuideStop', '—');
+        setText('xauGuideTarget', '—');
+        setText('xauGuideReason', audit.reason);
+        setText('xauGuideWhen', 'Controllare feed, più timeframe, news, costi broker e test indipendenti prima di valutare un ingresso.');
+        setText('xauGuideInvalidation', 'Nessuna operazione aperta o proposta.');
+        setText('xauGuideMode', 'Validatore avanzato attivo. Il precedente setup tecnico non è un ordine.');
+        setText('xauGuideDisclosure', 'Ipotesi tecniche non eseguibili senza tutte le verifiche critiche. Nessun dato MT5 collegato automaticamente.');
+        $('xauOperationalGuide').dataset.state = 'WAIT';
+        window.KiberXauContext = {
+          ...(window.KiberXauContext || {}), state: 'WAIT',
+          mode: 'advanced-unverified', entry: null, stop: null, target: null,
+          advanced: {decision:'WAIT', reason:audit.reason, source:audit.source, timestamp:audit.timestamp}
+        };
+      }
+    } catch (_) {
+      $('signal').className = 'signal wait';
+      setText('signal', 'ATTESA · errore validatore');
+      setText('xauGuideStatus', 'ATTESA');
+      setText('xauGuideSummary', 'Impossibile validare il setup in sicurezza.');
+      window.KiberXauContext = { state:'WAIT', mode:'validator-error' };
+    }
   }
   function waiting(reason, source = 'Nessun feed affidabile') {
     render({ signal: 'WAIT', label: 'ATTESA', samples: 0, interval: $('interval').value,
