@@ -8,10 +8,11 @@ const profile=fs.readFileSync(require.resolve('../v17.js'),'utf8');
 const gold=fs.readFileSync(require.resolve('../xau-usd.html'),'utf8');
 const css=fs.readFileSync(require.resolve('../wallet-monitor.css'),'utf8');
 
-test('BNB header has centered circular MetaMask and Saldo directly before profile actions',()=>{
+test('BNB header has one centered Portafoglio and adjacent Oro before profile actions',()=>{
   assert.match(bnb,/<header class="top kiber-wallet-top">/);
-  assert.match(bnb,/<nav class="kiber-header-wallet"[^>]*>[\s\S]*?id="kiberHeaderWalletLink"[\s\S]*?id="kiberHeaderWalletBalance"[\s\S]*?<\/nav><div class="top-actions">/);
-  assert.match(bnb, /\.kiber-header-wallet a\{width:43px;height:43px;padding:0;border-radius:50%/);
+  assert.match(bnb,/<nav class="kiber-header-wallet"[^>]*>[\s\S]*?id="kiberHeaderWalletBalance"[\s\S]*?id="kiberHeaderGold"[\s\S]*?<\/nav><div class="top-actions">/);
+  assert.doesNotMatch(bnb,/id="kiberHeaderWalletLink"/);
+  assert.match(bnb,/\.kiber-header-wallet #kiberHeaderWalletBalance/);
   assert.match(bnb, /header\.top\.kiber-wallet-top\{display:grid!important/);
 });
 
@@ -24,10 +25,12 @@ test('BNB shell bridges the real Saldo button without duplicating buttons over t
   assert.match(index,/id="walletMini"/);
 });
 
-test('XAU/USD also has round independent broker button and adjacent Saldo in top header',()=>{
+test('XAU/USD has one visible Portafoglio button while broker remains unconnected',()=>{
   assert.match(gold,/<header class="xau-topbar">/);
   assert.match(gold,/<nav class="xau-finance"[^>]*>[\s\S]*?id="xauWalletAccountBtn"[\s\S]*?id="xauWalletBalanceBtn"[\s\S]*?<\/nav>/);
-  assert.match(gold, /\.xau-finance \.xau-wallet-round\{height:42px;width:42px;padding:0;border-radius:50%/);
+  assert.match(gold,/id="xauWalletBalanceBtn"[^>]*hidden/);
+  assert.match(gold, /class="xau-wallet-round"[^>]*id="xauWalletAccountBtn"/);
+  assert.match(gold,/Portafoglio<\/span>/);
   assert.match(gold,/Broker non collegato/);
   assert.match(gold,/Nessun movimento automatico è attivo/);
   assert.doesNotMatch(gold,/id="xauWalletAccountBtn"[^>]*MetaMask/);
