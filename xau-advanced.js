@@ -10,7 +10,7 @@
  if(root)root.KiberXauAdvanced=api;
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const minutes={'5min':5,'15min':15,'1h':60,'4h':240,'1day':1440};
+ const minutes={'1min':1,'5min':5,'15min':15,'1h':60,'4h':240,'1day':1440};
  const n=x=>typeof x==='number'&&Number.isFinite(x);
  const fmt=x=>n(x)?x.toLocaleString('it-IT',{maximumFractionDigits:2,minimumFractionDigits:2}):'—';
  const labels=[
@@ -23,7 +23,7 @@
   '07 · Costi e protezione del capitale',
   '08 · Verifica indipendente finale'
  ];
- function evaluate(analysis,source,now=Date.now()){
+ function evaluate(analysis,source,now=Date.now(),context={}){
   const a=analysis||{},m=a.metrics||{};
   const type=/CSV locale/i.test(String(source||''))?'csv':'provider';
   const duration=minutes[a.interval]||null;
@@ -33,29 +33,63 @@
   const maxAge=duration===null?null:Math.max(duration*2+2,15);
   // A timestamp check is only one component of feed integrity, not proof of no delay.
   const temporallyValid=type==='provider'&&present&&age!==null&&age>=-1&&age<=maxAge;
+  const quality=context?.quality||null;
+  const feedVerified=type==='provider'&&!!quality?.ok&&quality?.tick?.fresh===true;
+  const frames=Object.entries(context?.multiTimeframe||{});
+  const observed=frames.filter(([,item])=>item?.status==='observed');
+  const frameSummary=observed.map(([k,x])=>k+' '+x.direction).join(' · ');
+  const frameCovered=observed.length>=4;
+  const macro=context?.calendar||null;
+  const macroConnected=macro?.connected===true;
+  const macroNear=macroConnected&&macro.highImpactNear===true;
+  const macroNext=macroConnected&&macro.next?.name?
+    String(macro.next.name)+' ('+String(macro.next.time||'').slice(0,16).replace('T',' ')+' UTC)' : 'Nessun evento USA ad alto impatto rilevato nella finestra interrogata.';
+  const spread=Number(quality?.tick?.spread);
+  const spreadValid=feedVerified&&n(spread)&&spread>0;
+  const patternFromData=Array.isArray(context?.candles)&&context.candles.length>=60;
+  const last3=patternFromData?context.candles.slice(-3):[];
+  const redCount=last3.filter(c=>c.close<c.open).length;
+  const greenCount=last3.filter(c=>c.close>c.open).length;
+  const patternText=last3.length===3?
+    'Ultime 3 candele: '+greenCount+' rialziste, '+redCount+' ribassiste. Ricorrenza solo descrittiva, nessuna previsione provata.':
+    'Pattern non disponibili: almeno tre candele OHLC verificate necessarie.';
   const statuses=[
-    {status:temporallyValid?'PARZIALE':'BLOCCATO',note:type==='csv'?'CSV importato: storico, mai segnale live.':
-       !present?'Feed OHLC insufficiente o indicatori mancanti.':
-       age===null?'Timestamp mancante.':
-       !temporallyValid?'Candela vecchia o nel futuro ('+age+' min).':
-       'Timestamp coerente ('+age+' min). Ritardo del provider NON certificato.'},
-    {status:'NON COMPLETO',note:'È analizzato solo '+String(a.interval||'il periodo selezionato')+'. M1, M5, M15, H1, H4 e D1 devono essere confrontati con feed verificati distinti.'},
-    {status:present?'DESCRITTIVO':'IN ATTESA',note:present?
-      'EMA20 '+fmt(m.ema20)+' / EMA50 '+fmt(m.ema50)+'. Supporto '+fmt(m.support20)+' e resistenza '+fmt(m.resistance20)+'. Livelli osservati, non capacità predittiva.':
-      'Servono almeno 60 candele valide con OHLC.'},
-    {status:'NON COLLEGATO',note:'Dollaro, tassi reali, Fed, CPI e NFP non sono acquisiti da fonti aggiornate: nessuna conferma macro.'},
-    {status:'NON VALIDATO',note:'Non esistono risultati certificati di backtest fuori campione, walk-forward e costi per questo setup: nessuna probabilità attribuita.'},
-    {status:present?'PRELIMINARE':'IN ATTESA',note:present?
-      'ATR '+fmt(m.atr14)+' USD / '+fmt(m.atrPct)+'% del prezzo. La classificazione trend/range richiede ulteriore verifica.':
-      'Senza volatilità valida non è possibile classificare il regime.'},
-    {status:'BLOCCATO',note:'Spread, slippage, commissioni, swap, leva e dimensione del contratto del broker MT5 non sono collegati e verificati.'},
-    {status:'ATTESA',note:'I controlli critici sopra non sono superati: nessuna indicazione eseguibile di acquisto o vendita.'}
+    {status:feedVerified&&temporallyValid?'MONITORATO':temporallyValid?'PARZIALE':'BLOCCATO',
+      note:type==='csv'?'Storico CSV locale: mai feed live.':
+      !present?'Feed/indicatori non disponibili.':
+      !temporallyValid?'Candela troppo vecchia o nel futuro ('+age+' min).':
+      feedVerified?'Tick e OHLC esterni recenti; latenza a monte non certificata.': 
+      'Timestamp plausibile, fonte e freschezza tick da verificare.'},
+    {status:frameCovered?'MONITORATO':'NON COMPLETO',
+      note:frameCovered?frameSummary+'. Direzione degli intervalli misurata, non previsione.':
+      'Intervalli confrontati: '+observed.length+'/5. Mancano dati o controlli sui timeframe.'},
+    {status:present?'CALCOLATO':'IN ATTESA',
+      note:present?'EMA20 '+fmt(m.ema20)+' / EMA50 '+fmt(m.ema50)+'. Supporto '+fmt(m.support20)+
+      ', resistenza '+fmt(m.resistance20)+'. Livelli sulle ultime candele (non garanzie).':
+      'Servono almeno 60 candele OHLC valide e recenti.'},
+    {status:macroConnected?'CALENDARIO ATTIVO':'NON COLLEGATO',
+      note:macroConnected?(macroNear?'Evento USA ad alto impatto vicino: nessun ingresso. ':'Prossimo evento USA: ')+macroNext+
+      '. Il calendario non equivale a una previsione macro.':
+      'Calendario eventi USA non disponibile; analisi macro non autorizzata.'},
+    {status:patternFromData?'OSSERVATO':'NON VALIDATO',
+      note:patternFromData?patternText+' Backtest fuori campione e walk-forward ancora assenti.':
+      'Pattern non misurabili. Nessuna probabilità di rendimento attribuibile.'},
+    {status:present?'MISURATO':'IN ATTESA',
+      note:present?'ATR14 '+fmt(m.atr14)+' USD, '+fmt(m.atrPct)+'% del prezzo; volatilità del timeframe.':
+      'Senza ATR e prezzi affidabili non si può classificare la volatilità.'},
+    {status:spreadValid?'PARZIALE':'BLOCCATO',
+      note:spreadValid?'Spread esterno '+fmt(spread)+' USD/oncia. Non è il conto MT5 Android: slippage, leva e costi del tuo broker restano sconosciuti.':
+      'Spread, leva, commissioni e regole del tuo broker MT5 non verificati.'},
+    {status:'ATTESA',note:'Dati tecnici ora verificabili, ma senza backtest indipendenti e costi del broker non esiste un segnale eseguibile.'}
   ];
   const technical=a.signal==='BUY'?'Ipotesi tecnica rialzista':a.signal==='SELL'?'Ipotesi tecnica ribassista':'Nessuna ipotesi operativa';
   const blockers=[
-    !temporallyValid?'feed non confermato come recente':'latency del provider non verificata indipendentemente',
-    'multi-timeframe incompleto','calendario macro non collegato','backtest non validato','costi reali del broker assenti'
-  ];
+    !feedVerified||!temporallyValid?'freschezza del feed da confermare':'feed recente senza garanzia di latenza a monte',
+    !frameCovered?'timeframe insufficienti':null,
+    !macroConnected?'calendario macro non raggiungibile':macroNear?'notizia USA ad alto impatto vicina':null,
+    'backtest fuori campione non validato',
+    'costi e condizioni del tuo broker MT5 assenti'
+  ].filter(Boolean);
   const result={
     decision:'WAIT',
     title:'ASPETTA',
