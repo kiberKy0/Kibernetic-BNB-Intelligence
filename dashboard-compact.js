@@ -101,7 +101,7 @@ async function json(url){const r=await fetch(url,{cache:'no-store',signal:AbortS
 async function load(force=false){
  if(busy||(!force&&Date.now()-lastRefresh<90000))return;busy=true;
  const refresh=$('kcdRefresh');if(refresh)refresh.disabled=true;
- const res=await Promise.allSettled([json('/api/chain?v=kcd29'),json('/api/discovery-v26?v=kcd29'),json('/api/intelligence?type=sectors')]);
+ const res=await Promise.allSettled([json('/api/chain?v=kcd29'),json('/api/discovery-v26?mode=daily&limit=40&v=307').catch(()=>json('/api/discovery-v26?limit=40&v=307')),json('/api/intelligence?type=sectors')]);
  if(res[0].status==='fulfilled')renderChain(res[0].value);
  else{const b=$('v241Bnb')?.textContent||'—',t=$('v241Tvl')?.textContent||'—';if($('kcdBnbPrice'))$('kcdBnbPrice').textContent=b;if($('kcdTvl'))$('kcdTvl').textContent=t}
  if(res[2].status==='fulfilled')updateSector(res[2].value);
@@ -219,12 +219,12 @@ function mount(){
   '<div class="kcd-leader-main"><small>Settore più forte per crescita del capitale DeFi · 7G</small><strong class="kcd-leader-value" id="kcdSectorText">Verifica in corso…</strong></div>',
   '<span class="kcd-leader-info">7 giorni · TVL ≠ prezzo</span></div>',
   '<section class="kcd-card"><header class="kcd-card-head"><h2>Trend del giorno · 24h</h2><button type="button" data-kcd-action="new">Vedi tutti ›</button></header>',
-  '<div class="kcd-list" id="kcdTokens"><div class="kcd-empty">Caricamento delle selezioni disponibili…</div></div><p class="kcd-sample-note">Nuove coppie del campione, ordinate per variazione 24h con filtri minimi di liquidità e attività. Non è l’intero mercato.</p></section>',
+  '<div class="kcd-list" id="kcdTokens"><div class="kcd-empty">Caricamento delle selezioni disponibili…</div></div><p class="kcd-sample-note">Pool di tendenza BNB Chain, ordinati per variazione 24h e filtrati per liquidità e attività. Non è l’intero mercato.</p></section>',
   '<div class="kcd-metrics" aria-label="Dati di mercato">',
   '<div><span>Prezzo BNB</span><strong id="kcdBnbPrice">—</strong></div>',
   '<div title="Valore degli asset depositati nei protocolli DeFi della BNB Chain; non è capitalizzazione di mercato"><span>TVL DeFi BNB</span><strong id="kcdTvl">—</strong></div>',
   '<div title="Valore totale delle compravendite su exchange decentralizzati BNB Chain nelle ultime 24 ore"><span>Volume DEX 24h</span><strong id="kcdDex">—</strong></div></div>',
-  '<p class="kcd-footnote"><span id="kcdUpdated">Caricamento…</span>. Candidati da Kiber Discovery; punteggi non equivalgono a rendimento o sicurezza.</p>',
+  '<p class="kcd-footnote"><span id="kcdUpdated">Caricamento…</span>. Trend BNB da GeckoTerminal; variazioni passate non indicano guadagni futuri.</p>',
   '<nav class="kcd-dock" aria-label="Navigazione rapida">',
   '<button type="button" data-kcd-action="home"><span>⌂</span>Home</button>',
   '<button type="button" data-kcd-action="search"><span>⌕</span>Cerca</button>',
