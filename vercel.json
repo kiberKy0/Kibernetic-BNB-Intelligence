@@ -7,6 +7,10 @@
       "destination": "/api/coingecko?type=xau"
     },
     {
+      "source": "/api/xau-spot",
+      "destination": "/api/coingecko?type=xau&mode=spot"
+    },
+    {
       "source": "/api/token-safety",
       "destination": "/api/token-search?mode=safety"
     },
