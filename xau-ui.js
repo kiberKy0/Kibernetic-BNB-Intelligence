@@ -39,7 +39,7 @@
     $('signal').className = 'signal ' + (result.signal === 'BUY' ? 'buy' : result.signal === 'SELL' ? 'sell' : 'wait');
     setText('signal', result.label);
     setText('source', source + ' · ' + result.samples + ' candele · ' + result.interval);
-    setText('timestamp', 'Ultima candela chiusa UTC: ' + (result.time || '—'));
+    setText('timestamp', 'Inizio ultima candela completata (UTC): ' + (result.time || '—'));
     const m = result.metrics;
     setText('price', price(m.price));
     setText('ema', m.ema20 == null ? '—' : price(m.ema20) + ' / ' + price(m.ema50));
@@ -101,12 +101,12 @@
       const response = await fetch('/api/xau?interval=' + encodeURIComponent($('interval').value),
         { cache: 'no-store' });
       const body = await response.json();
-      if (!response.ok) throw new Error(body.error || 'Errore provider');
+      if (!response.ok) throw new Error(body.code === 'NO_FEED' ? 'Manca la chiave API Twelve Data nell’Oracolo. Il grafico TradingView è indipendente.' : (body.error || 'Errore provider'));
       if (!Array.isArray(body.candles) || body.symbol !== 'XAU/USD') throw new Error('Dati provider non validi');
       const result=decoder.analyze(body.candles, $('interval').value);
       feedFailed=false;
       const lag=result.time?Math.max(0,Math.round((Date.now()-Date.parse(result.time))/60000)):null;
-      feedHealth(result.ready?'Fonte '+String(body.source||'feed XAU/USD')+' · ultima candela '+new Date(result.time).toLocaleString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'UTC'})+' UTC · ritardo '+lag+' min':'Dati ricevuti ma non validati · '+(result.reasons||[]).join(' · '),result.ready?'live':'offline');
+      feedHealth(result.ready?'OHLC disponibili da '+String(body.source||'provider')+' · inizio ultima candela '+new Date(result.time).toLocaleString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'UTC'})+' UTC · età '+lag+' min · NON sono tick MT5':'Dati ricevuti ma non validati · '+(result.reasons||[]).join(' · '),result.ready?'ohlc':'offline');
       render(result, body.source + ' · dati provider');
       setText('csvMessage', 'Il grafico TradingView e il feed del Decoder sono sorgenti indipendenti.');
     } catch (error) {
@@ -149,6 +149,7 @@
       const candles = parseCsv(await file.text());
       if (candles.length < 60) throw new Error('Meno di 60 candele valide: ' + candles.length);
       importActive = true;
+      feedHealth('STORICO CSV · dati locali, non in tempo reale', 'offline');
       render(decoder.analyze(candles, $('interval').value), 'CSV locale (non collegato al mercato live)');
       setText('csvMessage', 'Storico letto localmente: ' + candles.length + ' candele. Non salvato e non inviato al server.');
     } catch (error) {
@@ -158,9 +159,9 @@
   });
   // Polling solo mentre il Decoder è aperto. Rispetta le quote del provider in caso di errore.
   setInterval(()=>{if(document.hidden||importActive||$('refresh').disabled)return;
-    const interval=feedFailed?300000:60000;
+    const interval=feedFailed?300000:120000;
     if(Date.now()-lastFetchAt>=interval)void loadFeed();
   },30000);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!importActive&&Date.now()-lastFetchAt>90000)void loadFeed();});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!importActive&&Date.now()-lastFetchAt>120000)void loadFeed();});
   loadFeed();
 })();
