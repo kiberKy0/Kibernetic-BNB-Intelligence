@@ -23,3 +23,8 @@
 .wallet-mini-note{display:block;margin-top:9px;font-size:12px;color:#9fb8c8}
 .wallet-mini-note a{color:#a6dfff}
 @media(max-width:500px){#walletShortcuts{left:9px;bottom:calc(9px + env(safe-area-inset-bottom,0px));gap:5px}#walletShortcuts a,#walletShortcuts button{min-height:51px;font-size:13px;padding:10px 11px}#walletMini{bottom:calc(68px + env(safe-area-inset-bottom,0px));left:9px;width:min(340px,calc(100vw - 18px));padding:12px}}
+
+/* MetaMask/Saldo: controlli ora nella testata del profilo BNB, non sopra la chat */
+#walletShortcuts{display:none!important}
+#walletMini{top:72px;bottom:auto!important;left:50%;right:auto;transform:translateX(-50%);max-height:min(73dvh,510px)}
+@media(max-width:500px){#walletMini{top:66px;bottom:auto!important;left:50%;right:auto;width:min(338px,calc(100vw - 20px));transform:translateX(-50%)}}
