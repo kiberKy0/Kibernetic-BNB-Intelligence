@@ -30,13 +30,13 @@ async function start(){if(started)return;let d;try{d=f.contentDocument;if(!d?.bo
 const goldButton=document.getElementById('switchGold'),goldPanel=document.getElementById('goldPanel'),goldFrame=document.getElementById('goldFrame');
 function showGold(){if(!goldFrame.src)goldFrame.src=goldFrame.dataset.src;goldPanel.hidden=false;goldButton.setAttribute('aria-expanded','true');goldFrame.focus()}
 function hideGold(){goldPanel.hidden=true;goldButton.setAttribute('aria-expanded','false');goldButton.focus()}
-if(goldButton&&goldPanel&&goldFrame){
+if(goldButton&&goldPanel&&goldFrame&&typeof goldButton.addEventListener==='function'){
   goldButton.addEventListener('click',showGold);
-  window.addEventListener('message',e=>{
+  if(typeof window.addEventListener==='function')window.addEventListener('message',e=>{
     if(e.origin!==window.location.origin||e.data?.type!=='KIBER_XAU_CLOSE')return;
     hideGold();
   });
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!goldPanel.hidden)hideGold()});
+  if(typeof document.addEventListener==='function')document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!goldPanel.hidden)hideGold()});
 }
 f.addEventListener('load',start);poll=setInterval(start,200);frameTimer=setTimeout(()=>{if(!started)fail('La pagina non risponde. Premi Riprova per riavviare.')},20000);f.src='v20-production.html?v='+V;
 })();</script><script src="wallet-ledger.js?v=wallet-20261117-simple"></script><script src="wallet-monitor.js?v=wallet-20261117-simple"></script></body></html>
