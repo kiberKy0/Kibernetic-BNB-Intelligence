@@ -199,7 +199,7 @@ function enhanceProfile(){
 }
 
 function mount(){
- const home=$('v241Home');if(!home||$(rootId))return false;enhanceProfile();
+ const home=$('v241Home');if(!home||$(rootId))return false;
  const brand=document.querySelector('.brand-shell');if(brand&&!brand.dataset.kcdAi){brand.dataset.kcdAi='1';brand.setAttribute('role','button');brand.tabIndex=0;brand.title='Apri Kiber AI';brand.addEventListener('click',()=>navigate('ai'));brand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigate('ai')}})}
  const box=node('section');box.id=rootId;box.setAttribute('aria-label','Dashboard compatta Kiber');
  box.innerHTML=[
