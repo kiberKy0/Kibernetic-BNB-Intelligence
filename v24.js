@@ -17,7 +17,7 @@
   function cleanupProfile(){
     const grid=id('v21AvatarGrid');if(grid)grid.remove();const title=id('v21AvatarTitle');if(title)title.remove();
     qa('.v21-avatar-choice').forEach(x=>x.remove());const sel=id('avatarSelect');if(sel){const lab=sel.closest('label');if(lab)lab.remove()}
-    const pv=id('v23ProfileAvatar');if(pv)pv.textContent='🤖';const av=id('avatar');if(av)av.textContent='🤖';
+    const pv=id('v23ProfileAvatar');if(pv)pv.textContent='🤖';const av=id('avatar');if(av){if(window.KiberPlanets?.refresh)window.KiberPlanets.refresh();else av.textContent='🤖'}
     const small=q('#profileDrawer .drawer-head small');if(small)small.textContent='Nome e modalità di lettura';
   }
 
