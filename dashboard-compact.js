@@ -5,7 +5,7 @@
 const $=id=>document.getElementById(id), rootId='kiberCompactDashboard';
 let busy=false,lastRefresh=0,sectorLatest=null,dailyTokens=[],compareRows=[];
 function node(tag,cls,txt){const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x}
-function fmtMoney(raw){const n=Number(raw);if(raw==null||raw===''||!Number.isFinite(n))return '—';const a=Math.abs(n);if(a>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(a>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(a>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(a>=1e3)return '$'+(n/1e3).toFixed(1)+'K';return '$'+n.toLocaleString('it-IT',{maximumFractionDigits:a<1?5:2})}
+function fmtMoney(raw){const n=Number(raw);if(raw==null||raw===''||!Number.isFinite(n))return '—';const a=Math.abs(n);if(a>=1e12)return '$'+(n/1e12).toFixed(2)+'T';if(a>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(a>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(a>=1e3)return '$'+(n/1e3).toFixed(1)+'K';if(a>0&&a<1e-12)return '$'+n.toExponential(4);return '$'+n.toLocaleString('it-IT',{maximumFractionDigits:a<0.0001?12:a<1?8:2})}
 function fmtPct(raw){const n=Number(raw);return raw==null||raw===''||!Number.isFinite(n)?'—':(n>0?'+':'')+n.toLocaleString('it-IT',{maximumFractionDigits:2})+'%'}
 function navigateIntelligence(sub){
  $('v241Details')?.click();
@@ -152,7 +152,7 @@ function renderCompare(){
  for(const row of compareRows){
   const t=row.data.token,card=node('article','kcd-compare-item');
   const h=node('header','kcd-compare-item-head'),title=node('strong','',t.symbol||t.name||'Token'),close=node('button','','×');close.type='button';close.title='Rimuovi '+(t.symbol||'token');close.onclick=()=>{compareRows=compareRows.filter(r=>r!==row);renderCompare()};h.append(title,close);card.append(h);
-  const stats=[['Prezzo',fmtMoney(t.priceUsd)],['24 ore',fmtPct(t.change24h)],['Capitalizzazione',fmtMoney(t.marketCap)],['Volume 24h',fmtMoney(t.volume24h)],['Liquidità',fmtMoney(t.liquidityUsd)],['RSI 14',Number.isFinite(Number(row.data.technical?.rsi14))?Number(row.data.technical.rsi14).toFixed(1):'—']];
+  const stats=[['Prezzo',fmtMoney(t.priceUsd)],['24 ore',fmtPct(t.change24h)],['Capitalizzazione',fmtMoney(t.marketCap)],['Volume 24h',fmtMoney(t.volume24h)],['Liquidità',fmtMoney(t.liquidityUsd)],['RSI 14',row.data.technical?.rsi14!=null&&Number.isFinite(Number(row.data.technical.rsi14))?Number(row.data.technical.rsi14).toFixed(1):'—']];
   for(const [k,v] of stats){const line=node('div','kcd-compare-stat'),a=node('span','',k),b=node('b','',v);line.append(a,b);card.append(line)}
   const chart=node('div','kcd-compare-spark');const candles=row.data.chart?.candles||[];
   compareSpark(chart,candles.slice(-48).map(c=>Number(c?.[4])));card.append(chart);
@@ -162,8 +162,50 @@ function renderCompare(){
  }
 }
 
+
+function enhanceProfile(){
+ const drawer=$('profileDrawer'),button=$('profileBtn');if(!drawer||!button||drawer.dataset.kcdEnhanced)return;
+ drawer.dataset.kcdEnhanced='1';
+ const before=$('saveProfile'),wrap=node('div','kcd-profile-extra');
+ wrap.innerHTML='<label class="kcd-profile-label">Foto profilo (solo in questo browser)<input id="kcdProfilePhoto" type="file" accept="image/png,image/jpeg,image/webp"></label><button type="button" id="kcdProfileRemovePhoto" class="kcd-icon-action">Rimuovi foto</button><label class="kcd-profile-label">Colore personale<input id="kcdProfileAccent" type="color" value="#23bbf6"></label><small>Nome, avatar, descrizione, tema e colore restano modificabili. La foto non viene caricata su server.</small>';
+ if(before)before.before(wrap);else drawer.append(wrap);
+ const photoKey='kiber_profile_photo',accentKey='kiber_profile_accent';
+ function applyPhoto(){
+  const a=$('avatar');if(!a)return;
+  let data='',color='#23bbf6';try{data=localStorage.getItem(photoKey)||'';color=localStorage.getItem(accentKey)||color}catch{}
+  if(!/^#[0-9a-f]{6}$/i.test(color))color='#23bbf6';
+  const img=/^data:image\/(jpeg|png|webp);base64,/.test(data);
+  a.style.backgroundImage=img?'url('+JSON.stringify(data)+')':'';
+  a.style.backgroundPosition='center';a.style.backgroundSize='cover';a.style.backgroundRepeat='no-repeat';
+  a.style.color=img?'transparent':'';a.style.minWidth='30px';a.style.minHeight='30px';
+  a.style.border='2px solid '+color;
+  button.style.borderColor=color;
+  $('kcdProfileAccent').value=color;
+ }
+ $('kcdProfilePhoto').onchange=()=>{
+  const file=$('kcdProfilePhoto').files?.[0];if(!file)return;
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>6000000){alert('Usa JPG, PNG o WebP sotto 6 MB.');return}
+  const img=new Image();const url=URL.createObjectURL(file);
+  img.onload=()=>{try{
+   const cv=document.createElement('canvas');cv.width=128;cv.height=128;
+   const ctx=cv.getContext('2d');if(!ctx)throw Error('Canvas unavailable');
+   const edge=Math.min(img.width,img.height),sx=(img.width-edge)/2,sy=(img.height-edge)/2;
+   ctx.drawImage(img,sx,sy,edge,edge,0,0,128,128);
+   localStorage.setItem(photoKey,cv.toDataURL('image/webp',.75));
+   applyPhoto();
+  }catch{alert('Impossibile salvare la foto in questo browser.')}finally{URL.revokeObjectURL(url)}};
+  img.onerror=()=>{URL.revokeObjectURL(url);alert('Immagine non leggibile.')};
+  img.src=url
+ };
+ $('kcdProfileRemovePhoto').onclick=()=>{try{localStorage.removeItem(photoKey)}catch{}applyPhoto();const p=$('avatarSelect')?.value||'🤖';if($('avatar'))$('avatar').textContent=p};
+ $('kcdProfileAccent').oninput=e=>{try{localStorage.setItem(accentKey,e.target.value)}catch{}applyPhoto()};
+ before?.addEventListener('click',()=>setTimeout(applyPhoto,60));
+ window.addEventListener('storage',e=>{if(e.key===photoKey||e.key===accentKey)applyPhoto()});
+ applyPhoto();
+}
+
 function mount(){
- const home=$('v241Home');if(!home||$(rootId))return false;
+ const home=$('v241Home');if(!home||$(rootId))return false;enhanceProfile();
  const brand=document.querySelector('.brand-shell');if(brand&&!brand.dataset.kcdAi){brand.dataset.kcdAi='1';brand.setAttribute('role','button');brand.tabIndex=0;brand.title='Apri Kiber AI';brand.addEventListener('click',()=>navigate('ai'));brand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();navigate('ai')}})}
  const box=node('section');box.id=rootId;box.setAttribute('aria-label','Dashboard compatta Kiber');
  box.innerHTML=[
