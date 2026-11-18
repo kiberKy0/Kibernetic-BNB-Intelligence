@@ -61,6 +61,21 @@
   const x=document.getElementById('xauProfileName');if(x)x.textContent=p.name||'Profilo';
   const b=document.getElementById('profileNameTop');if(b)b.textContent=p.name||'Profilo';
  }
+ function init(){
+  const b=document.getElementById('bnbPlanetChoices');
+  const x=document.getElementById('xauPlanetChoices');
+  if(b){build(b,read().planet);document.getElementById('saveProfile')?.addEventListener('click',()=>{
+    write({name:document.getElementById('profileName')?.value?.trim().slice(0,60)||'',planet:selection(b)});
+  });}
+  if(x){build(x,read().planet);document.getElementById('xauProfileForm')?.addEventListener('submit',()=>{
+    write({name:document.getElementById('xauProfileEditName')?.value?.trim().slice(0,60)||'',planet:selection(x)});
+  });}
+  refresh();
+ }
  root.KiberPlanets={items,read,write,svg,paint,build,select,selection,refresh};
+ if(typeof document!=='undefined'){
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
+ }
  if(typeof window!=='undefined')window.addEventListener('storage',e=>{if(e.key===KEY)refresh()});
 })(typeof window!=='undefined'?window:globalThis);
