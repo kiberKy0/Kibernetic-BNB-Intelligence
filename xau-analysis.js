@@ -5,7 +5,7 @@
   root.XauDecoder = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-  const minutes = { '5min': 5, '15min': 15, '1h': 60, '4h': 240, '1day': 1440 };
+  const minutes = { '1min': 1, '5min': 5, '15min': 15, '1h': 60, '4h': 240, '1day': 1440 };
   const average = (list) => list.reduce((a, b) => a + b, 0) / list.length;
   const round = (x, dp = 2) => Number.isFinite(x) ? Number(x.toFixed(dp)) : null;
 
