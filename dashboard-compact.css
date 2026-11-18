@@ -98,3 +98,12 @@ body.kcd-expanded .kcd-dock{position:static}
 .v271-trade .kcd-trade-grid b{display:block;font-size:clamp(11px,2.5vw,16px);overflow-wrap:anywhere;margin-top:5px}
 .v271-trade .kcd-trade-note{font-size:11px;color:#a7bfd0;padding:3px 13px 13px;line-height:1.4}
 @media(max-width:550px){.kcd-compare{inset:0;border-radius:0;padding:12px}.kcd-compare-grid{gap:6px}.kcd-compare-item{padding:8px}.kcd-compare-stat{font-size:10px}.v271-trade .kcd-trade-grid{gap:4px;padding:7px}.v271-trade .kcd-trade-grid>div{padding:7px 5px}.v271-trade .kcd-trade-grid small{font-size:9px}}
+
+/* Profilo personalizzato: strumenti locali senza ingombrare la home */
+.kcd-profile-extra{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;border-top:1px solid #2e4b60;margin:8px 0 12px;padding-top:12px}
+.kcd-profile-label{display:grid;gap:5px;font-size:12px;color:#adcedf}
+.kcd-profile-extra input[type=file]{width:100%;max-width:100%;font-size:11px;color:#eaf6ff}
+.kcd-profile-extra input[type=color]{width:52px;height:34px;border:1px solid #567c90;border-radius:8px;background:#102a3b;padding:2px;cursor:pointer}
+.kcd-profile-extra small{grid-column:1/-1;font-size:11px;color:#91b1c4;line-height:1.45}
+.kcd-profile-extra #kcdProfileRemovePhoto{font-size:11px;min-height:35px}
+#profileBtn #avatar{flex:0 0 auto;box-sizing:border-box;border-radius:50%!important;display:inline-flex;align-items:center;justify-content:center;min-width:30px;min-height:30px}
