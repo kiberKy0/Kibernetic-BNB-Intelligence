@@ -31,3 +31,20 @@ F. Paper trading verificato, test su fork/testnet e, solo dopo, prove con import
 Eseguire test locali: node --test tests/bnb-trading-core.test.cjs
 
 Questo ramo non esegue ordini. Non fornisce segnali affidabili o rendimenti garantiti; è una struttura per collegare in sicurezza i servizi mancanti.
+
+## Primo collegamento di mercato implementato (ramo PR #19)
+- **Snapshot read-only**: GET \`/api/bnb-dex-live?address=<contratto-BSC>\`, riscritto verso \`/api/coingecko?type=bnb-dex-live\`, che usa \`server/bnb-dex-snapshot.cjs\`. Utilizza DEX Screener per scegliere la pool PancakeSwap BSC con maggiore liquidità dove il contratto richiesto è **base token**, non quote token.
+- Dati esposti: prezzo USD, liqudità, volume 24h, acquisti/vendite 24h, market cap/FDV se presenti, indirizzo pool, fonte, ora di **acquisizione**. Non promette il timestamp dell'ultima transazione; non è una quotazione eseguibile e non giustifica un ordine.
+- Pannello mobile preesistente nel Laboratorio Token: solo quando aperto, acquisisce al massimo ogni 15 secondi; aggiorna ogni secondo soltanto il testo sulla vecchiaia del campione; a pannello chiuso non continua il polling e non svolge lavoro H24.
+- **Stream on-chain predisposto ma non attivo**: \`server/bnb-ws-subscribe.cjs\` sottoscrive eventi \`Swap\` PancakeSwap V3 filtrati per pool tramite \`eth_subscribe logs\`, verifica \`eth_chainId=0x38\`, controlla indirizzi e topic, deduplica, segnala reconnect e removed. Reagisce solo a eventi reali. **Non** fornisce ancora prezzi USD, necessita di pool verificate contro la factory, decimali dei token, sorgente RPC WSS e servizio cloud persistente. Per pool V2 serve un decoder separato.
+- Il nuovo endpoint non crea la 13ª funzione Vercel: viene gestito dal proxy esistente per rispettare il limite Hobby di 12 funzioni serverless.
+- Le API pubbliche BNB non garantiscono \`eth_getLogs\`: per lo stream continuativo occorre un endpoint RPC WebSocket affidabile compatibile con \`eth_subscribe logs\`. Conservare URL e chiavi di connessione esclusivamente nei Secrets del worker.
+- Test in \`tests/bnb-dex-live.test.cjs\` e \`tests/bnb-ws-subscribe.test.cjs\`. Non equivalgono a test di tenuta con dati reali per 24 ore.
+
+### Prossimi requisiti di integrazione
+1. Verifica on-chain della pool V3 scelta e relativa identità/decimali dei token; fonte primaria dello stato pool.
+2. Configurazione sicura del nodo WSS nel worker cloud sempre attivo, recupero gap di blocchi dopo una disconnessione, e un canale per aggiornare grafici del telefono.
+3. Monitoraggio ricorrente server-side dei token scelti anche quando il telefono è spento.
+4. Quote Smart Router e controllo della sicurezza prima della firma, poi registro Supabase idempotente e transazioni via wallet operativo strettamente limitato.
+
+Questo ramo **non** esegue operazioni reali e **non** aggiorna ancora i grafici ad ogni nuovo evento on-chain.
