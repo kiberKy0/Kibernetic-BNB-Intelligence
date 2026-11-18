@@ -36,7 +36,8 @@
  function paint(el,id){
   if(!el)return;
   const src=svg(id);
-  el.style.backgroundImage='url("'+src+'")';
+  el.style.setProperty('background-image','url("'+src+'")','important');
+  el.style.setProperty('background-color','transparent','important');
   el.style.backgroundPosition='center';el.style.backgroundSize='cover';el.style.backgroundRepeat='no-repeat';
   el.style.borderRadius='50%';el.style.color='transparent';el.style.overflow='hidden';
   const img=document.createElement('img');img.src=src;img.alt='';img.setAttribute('aria-hidden','true');
