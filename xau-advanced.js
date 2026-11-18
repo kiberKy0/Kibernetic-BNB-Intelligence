@@ -72,10 +72,10 @@
  }
  function mount(){
   if(typeof document==='undefined')return null;
-  const anchor=document.querySelector('.grid-bottom');
-  if(!anchor)return null;
   let root=document.getElementById('xauAdvancedPanel');
   if(root)return root;
+  const anchor=document.querySelector('.grid-bottom');
+  if(!anchor)return null;
   root=document.createElement('section');
   root.id='xauAdvancedPanel';root.className='panel xau-advanced';
   root.setAttribute('aria-label','Filtri Kiber avanzati XAU/USD');
