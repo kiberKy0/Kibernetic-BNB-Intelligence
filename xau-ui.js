@@ -3,14 +3,20 @@
   const decoder = window.XauDecoder;
   const $ = id => document.getElementById(id);
   const price = n => Number.isFinite(n) ? Number(n).toLocaleString('it-IT', { maximumFractionDigits: 2, minimumFractionDigits: 2 }) : '—';
-  let importActive = false;
+  let importActive = false, lastFetchAt = 0, feedFailed = false;
   const setText = (id, value) => { $(id).textContent = String(value); };
+  function feedHealth(message,state='offline'){const e=$('xauFeedHealth');if(e){e.textContent=message;e.dataset.state=state;}}
+
   function renderOperationalGuide(result, source) {
     const helper = window.XauGuidance;
     const area = $('xauOperationalGuide');
     if (!helper || !area) return;
     const sourceType = /CSV locale/i.test(source) ? 'csv' : 'feed';
     const plan = helper.advise(result, { source: sourceType });
+    const m=result.metrics||{};
+    window.KiberXauContext={state:plan.state,mode:sourceType==='csv'?'csv':result.ready?'feed':'unverified',
+      timeframe:result.interval,timestamp:result.time,source,price:m.price,ema20:m.ema20,ema50:m.ema50,
+      rsi14:m.rsi14,atr14:m.atr14,entry:plan.entry,stop:plan.stop,target:plan.target};
     area.dataset.state = plan.state;
     setText('xauGuideStatus', plan.title);
     setText('xauGuideSummary', plan.summary);
@@ -54,8 +60,8 @@
       metrics: {}, time: null, reasons: [reason] }, source);
   }
   async function loadFeed() {
-    importActive = false;
-    $('refresh').disabled = true;
+    importActive = false;lastFetchAt=Date.now();
+    $('refresh').disabled = true;feedHealth('Feed XAU/USD · verifica connessione…');
     waiting('Verifica della disponibilità del feed…', 'Decoder XAU/USD');
     try {
       const response = await fetch('/api/xau?interval=' + encodeURIComponent($('interval').value),
@@ -63,9 +69,14 @@
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || 'Errore provider');
       if (!Array.isArray(body.candles) || body.symbol !== 'XAU/USD') throw new Error('Dati provider non validi');
-      render(decoder.analyze(body.candles, $('interval').value), body.source + ' · dati provider');
+      const result=decoder.analyze(body.candles, $('interval').value);
+      feedFailed=false;
+      const lag=result.time?Math.max(0,Math.round((Date.now()-Date.parse(result.time))/60000)):null;
+      feedHealth(result.ready?'Fonte '+String(body.source||'feed XAU/USD')+' · ultima candela '+new Date(result.time).toLocaleString('it-IT',{hour:'2-digit',minute:'2-digit',timeZone:'UTC'})+' UTC · ritardo '+lag+' min':'Dati ricevuti ma non validati · '+(result.reasons||[]).join(' · '),result.ready?'live':'offline');
+      render(result, body.source + ' · dati provider');
       setText('csvMessage', 'Il grafico TradingView e il feed del Decoder sono sorgenti indipendenti.');
     } catch (error) {
+      feedFailed=true;feedHealth('Feed non disponibile · '+String(error.message||'errore sorgente')+' · nessun segnale operativo');
       waiting(error.message, 'Feed automatico non operativo');
       setText('csvMessage', 'Per lo storico puoi usare un CSV con candele OHLC valide. Nessun segnale senza dati.');
     } finally { $('refresh').disabled = false; }
@@ -111,5 +122,11 @@
       setText('csvMessage', 'Controlla il formato CSV e la data UTC.');
     }
   });
+  // Polling solo mentre il Decoder è aperto. Rispetta le quote del provider in caso di errore.
+  setInterval(()=>{if(document.hidden||importActive||$('refresh').disabled)return;
+    const interval=feedFailed?300000:60000;
+    if(Date.now()-lastFetchAt>=interval)void loadFeed();
+  },30000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!importActive&&Date.now()-lastFetchAt>90000)void loadFeed();});
   loadFeed();
 })();
