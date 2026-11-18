@@ -1,0 +1,65 @@
+
+/* Kiber Compact Dashboard V29: presentation only, existing analysis modules untouched */
+#kiberCompactDashboard{color:#eaf6ff;font-family:inherit;box-sizing:border-box;max-width:1100px;margin:8px auto 28px;padding:0 6px}
+#kiberCompactDashboard *{box-sizing:border-box}
+#kiberCompactDashboard button{font-family:inherit;cursor:pointer}
+#kiberCompactDashboard button:focus-visible{outline:2px solid #70dcff;outline-offset:3px}
+body[data-v241-view="home"]:not(.kcd-expanded) #v241Home>:not(#kiberCompactDashboard){display:none!important}
+body:not([data-v241-view="home"]) #kiberCompactDashboard{display:none!important}
+.kcd-header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:0 0 12px}
+.kcd-header h1{font-size:clamp(20px,3.9vw,27px);margin:0;color:#f1f9ff;line-height:1.2}
+.kcd-header p{margin:4px 0 0;color:#91aec1;font-size:12px}
+.kcd-icon-action{background:#0b283c;color:#bdeaff;border:1px solid #28526c;border-radius:11px;min-width:38px;min-height:38px;padding:7px 10px}
+.kcd-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.kcd-nav button{background:#0b2134;border:1px solid #22455f;border-radius:14px;min-height:68px;color:#e6f6ff;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;padding:9px 5px;text-align:center;font-weight:750;font-size:13px;line-height:1.2}
+.kcd-nav button:first-child{background:linear-gradient(150deg,#08385c,#0b263c);border-color:#23b9f2}
+.kcd-nav button .kcd-nav-icon{font-size:21px;line-height:1.1}
+.kcd-leader{border:1px solid #305268;background:#0a2330;border-radius:13px;padding:11px 12px;display:flex;gap:10px;align-items:center;min-height:64px;margin-bottom:12px}
+.kcd-leader[data-tone="up"]{background:#092d2b;border-color:#187e64}
+.kcd-leader[data-tone="down"]{background:#30212b;border-color:#9f5260}
+.kcd-leader[data-tone="up"] .kcd-leader-value{color:#60e9a6}
+.kcd-leader[data-tone="down"] .kcd-leader-value{color:#ff91a2}
+.kcd-leader-symbol{font-size:23px;flex:0 0 auto}
+.kcd-leader-main{flex:1;min-width:0}
+.kcd-leader-main small{display:block;color:#b2c9d5;font-size:11px;margin-bottom:3px}
+.kcd-leader-value{font-size:16px;line-height:1.25;font-weight:800;display:block;overflow-wrap:anywhere}
+.kcd-leader-info{color:#9bb6c7;font-size:11px;white-space:nowrap}
+.kcd-card{background:#081c2d;border:1px solid #1d4056;border-radius:15px;overflow:hidden;margin-bottom:11px}
+.kcd-card-head{display:flex;justify-content:space-between;align-items:center;padding:12px 13px 9px;gap:10px}
+.kcd-card-head h2{font-size:16px;line-height:1.3;margin:0;color:#eef7ff}
+.kcd-card-head button{background:transparent;color:#9ed9f4;border:0;font-size:12px;padding:5px}
+.kcd-list{padding:0 9px 8px}
+.kcd-row{width:100%;border:1px solid transparent;border-top-color:#1b394d;background:transparent;color:#f4faff;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto 18px;gap:10px;align-items:center;padding:10px 7px;min-height:54px;border-radius:7px}
+.kcd-row:hover{background:#102f42}
+.kcd-row-name{display:block;font-weight:760;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.kcd-row-sub{display:block;color:#91aebd;font-size:11px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kcd-row-price{font-weight:800;font-variant-numeric:tabular-nums;font-size:13px}
+.kcd-row-price.up{color:#61eaa9}.kcd-row-price.down{color:#ff8393}
+.kcd-row-arrow{color:#79b6cf;font-size:20px}
+.kcd-empty{padding:12px 13px 18px;color:#9cb4c5;font-size:13px;line-height:1.5}
+.kcd-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-bottom:12px;background:#092337;border:1px solid #1d425d;border-radius:13px;padding:10px 3px}
+.kcd-metrics>div{text-align:center;padding:4px 5px;min-width:0}
+.kcd-metrics>div+div{border-left:1px solid #2d4e61}
+.kcd-metrics span{display:block;font-size:10px;color:#9dbccc;margin-bottom:5px}
+.kcd-metrics strong{display:block;font-size:clamp(13px,2.5vw,18px);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.kcd-footnote{font-size:11px;color:#8daabb;line-height:1.5;margin:0 1px 12px}
+.kcd-dock{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;position:sticky;bottom:8px;z-index:40;background:rgba(5,16,27,.96);backdrop-filter:blur(10px);border:1px solid #214a60;border-radius:15px;padding:6px 4px;box-shadow:0 9px 23px #0008}
+.kcd-dock button{min-width:0;min-height:47px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:#bcd5e5;font-size:10px;padding:4px 0}
+.kcd-dock button:first-child{background:#0c4263;border-radius:10px;color:white}
+.kcd-dock button span{font-size:19px;line-height:1.05}
+body.kcd-expanded #v241Home>:not(#kiberCompactDashboard){display:block}
+body.kcd-expanded #kiberCompactDashboard{padding-bottom:0}
+body.kcd-expanded .kcd-dock{position:static}
+@media(max-width:650px){
+ #kiberCompactDashboard{margin:4px 0 18px;padding:0 3px}
+ .kcd-nav{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .kcd-nav button{min-height:64px;font-size:11px;border-radius:12px;padding:8px 2px}
+ .kcd-nav button .kcd-nav-icon{font-size:19px}
+ .kcd-leader{min-height:58px;padding:9px}
+ .kcd-leader-value{font-size:14px}
+ .kcd-leader-info{font-size:10px}
+ .kcd-card-head{padding:10px 11px 6px}
+ .kcd-row{padding:10px 5px}
+}
+@media(max-width:380px){.kcd-nav button{font-size:10px}.kcd-leader-info{display:none}.kcd-row-name{font-size:12px}}
+@media(prefers-reduced-motion:reduce){#kiberCompactDashboard *{scroll-behavior:auto}}
