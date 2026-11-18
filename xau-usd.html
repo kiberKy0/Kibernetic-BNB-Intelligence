@@ -88,6 +88,25 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
  .xau-profile-controls .back{white-space:nowrap}
  .xau-disclosure summary{padding:10px 12px}
 }
+
+/* Guida operativa compatta: chart first, explanations on demand. */
+.xau-guidance{margin-top:14px;padding:14px 16px}
+.xau-guide-head{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.xau-guide-head small{display:block;color:#8fb4c8;font-size:10px;font-weight:750;letter-spacing:.08em}
+.xau-guide-head h2{font-size:19px;margin:4px 0 0}
+.xau-guide-status{font-size:11px;font-weight:800;padding:8px 10px;border-radius:999px;white-space:normal;text-align:center;max-width:165px;border:1px solid #b79252;color:#f4d18a;background:#382f22}
+.xau-guidance[data-state="WATCH_BUY"] .xau-guide-status{color:#a7f5c7;border-color:#348f68;background:#153b2b}
+.xau-guidance[data-state="WATCH_SELL"] .xau-guide-status{color:#ffc0bf;border-color:#b45d5b;background:#462628}
+.xau-guidance>p{font-size:13px;color:#d2e3ef;line-height:1.45}
+.xau-guide-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0 6px}
+.xau-guide-levels>div{min-width:0;background:#0a1925;border:1px solid #2b4c60;border-radius:10px;padding:10px}
+.xau-guide-levels small{display:block;font-size:11px;color:#9ab5c8}
+.xau-guide-levels strong{display:block;font-size:clamp(13px,2.9vw,18px);margin-top:6px;overflow-wrap:anywhere}
+.xau-guide-note{font-size:11px!important;color:#a3b8c4!important}
+.xau-guide-details{border-top:1px solid #2e4a5b;margin-top:11px;padding-top:8px}
+.xau-guide-details summary{font-weight:750;font-size:13px;padding:7px 0;cursor:pointer;color:#e6c77f}
+.xau-guide-details p{font-size:12px;line-height:1.5;color:#b8cfdd}
+@media(max-width:650px){.xau-guidance{padding:11px 12px}.xau-guide-head h2{font-size:16px}.xau-guide-status{font-size:10px;padding:6px 7px;max-width:134px}.xau-guide-levels{gap:5px}.xau-guide-levels>div{padding:8px 6px}.xau-guide-levels small{font-size:10px}}
 </style></head>
 <body>
 <div class="container">
@@ -133,6 +152,23 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 </div>
 </section>
 </div>
+<section class="panel xau-guidance" id="xauOperationalGuide" aria-label="Kiber guida operativa XAU/USD">
+ <div class="xau-guide-head"><div><small>KIBER · ASSISTENTE OPERATIVO</small><h2>Quando entrare o uscire?</h2></div><span id="xauGuideStatus" class="xau-guide-status" role="status" aria-live="polite">ATTESA</span></div>
+ <p id="xauGuideSummary">Per un'indicazione condizionata servono dati OHLC validi e aggiornati.</p>
+ <div class="xau-guide-levels">
+  <div><small>Zona ingresso indicativa</small><strong id="xauGuideEntry">—</strong></div>
+  <div><small>Stop / invalidazione</small><strong id="xauGuideStop">—</strong></div>
+  <div><small>Obiettivo teorico</small><strong id="xauGuideTarget">—</strong></div>
+ </div>
+ <p id="xauGuideMode" class="xau-guide-note">Non è un ordine. Spread e notizie non sono verificati.</p>
+ <details class="xau-guide-details"><summary>Perché? · condizioni per decidere</summary>
+  <p id="xauGuideReason">In attesa delle verifiche tecniche.</p>
+  <p><strong>Quando:</strong> <span id="xauGuideWhen">Attendere candele complete e dati validi.</span></p>
+  <p><strong>Uscita:</strong> <span id="xauGuideInvalidation">—</span></p>
+  <p id="xauGuideDisclosure" class="xau-guide-note">I livelli sono ipotesi tecniche, da validare su dati storici.</p>
+  <p><a href="#decoder">Imposta periodo o aggiorna il feed</a> · <a href="https://it.tradingview.com/symbols/XAUUSD/technicals/?exchange=OANDA" target="_blank" rel="noopener noreferrer">Confronta TradingView ↗</a></p>
+ </details>
+</section>
 <div class="grid-bottom">
 <section class="panel" id="decoder" aria-label="Decoder indipendente XAUUSD">
 <h2>Motore Decoder indipendente</h2>
@@ -210,6 +246,7 @@ apply();
 })();
 </script>
 <script src="/xau-analysis.js"></script>
+<script src="/xau-guidance.js"></script>
 <script src="/xau-ui.js"></script>
 </body>
 </html>
