@@ -1,0 +1,65 @@
+/* Kibernetic Oracolo · XAU/USD mobile-first. Nessuna seconda app. */
+:root{--xau-accent:#54c7ee}
+body{background:#08121d}
+.container{max-width:1020px;padding:10px 13px}
+.xau-topbar{padding:6px 0 12px;border-bottom:1px solid #284359;margin-bottom:9px}
+.xau-topbar .identity h1{font-size:clamp(18px,4vw,25px)}
+.xau-topbar .identity .sub{display:none}
+.panel{border-color:#2a465b;background:#101f30;border-radius:14px}
+.gold{color:#e4c47e}
+.xau-disclosure{display:none}
+.layout{display:block;margin:0}
+.layout>.panel[aria-label="Grafico oro"]{padding:11px;margin-bottom:10px}
+.layout>.panel[aria-label="Grafico oro"]>h2{font-size:14px;margin:1px 0 10px;font-weight:800;color:#d6e5ee}
+.layout>.panel[aria-label="Grafico oro"]>p.small,.layout>.panel[aria-label="Grafico oro"]>.tags,.layout>.panel[aria-label="Grafico oro"]>a{display:none}
+.tv-widget{height:min(52vh,490px);min-height:280px}
+.xau-compact-top{border:1px solid #355a6e;background:linear-gradient(115deg,#0c2235,#112c3b);border-radius:14px;margin-bottom:10px;padding:12px}
+.xau-compact-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.xau-compact-head .xau-compact-title{display:flex;flex-direction:column;gap:3px}
+.xau-compact-title strong{color:#d9edf7;font-size:14px}
+.xau-compact-title small,.xau-compact-price small{color:#9bb8ca;font-size:10px}
+.xau-compact-price{text-align:right;display:flex;flex-direction:column;gap:4px}
+.xau-compact-price strong{color:#e7effa;font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.xau-compact-price .xau-compact-unit{font-size:11px;color:#9fb6c7}
+.xau-compact-top .xau-feed-health{margin:11px 0 8px;padding:10px;font-size:12px;border-radius:8px}
+.xau-compact-top .xau-feed-health[data-state="live"]{color:#cff4e1}
+.xau-compact-top .xau-feed-health:not([data-state="live"]){border-color:#b38a50;color:#f7d1a5;background:#332a1f}
+.xau-compact-meta{font-size:11px;color:#8faec0;line-height:1.4;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.xau-compact-top .controls{display:flex;justify-content:space-between;gap:8px;margin:10px 0 0}
+.xau-compact-top .controls label{display:flex;align-items:center;gap:6px;font-size:12px;color:#adcad6}
+.xau-compact-top .controls select,.xau-compact-top .controls button{min-height:38px;padding:8px 11px;border-color:#3a6071;font-size:12px}
+.xau-compact-top .controls button{background:#164862;color:#e3f7ff;font-weight:750}
+.xau-guidance{margin:0 0 10px;padding:13px!important;border-color:#48617a!important}
+.xau-guidance .xau-guide-head small{color:#8ac8df;font-size:10px}
+.xau-guidance .xau-guide-head h2{font-size:16px;margin:4px 0}
+.xau-guidance .xau-guide-status{font-size:11px}
+.xau-guidance>p#xauGuideSummary{font-size:12px;margin:7px 0;color:#c2d4df;line-height:1.5}
+.xau-guidance>.xau-guide-details{margin-top:4px}
+.xau-guidance .xau-guide-levels{margin:10px 0}
+.xau-guidance .xau-guide-levels strong{font-size:13px}
+.xau-guidance .xau-guide-details>summary{font-size:12px;color:#a8d0df;padding:9px 0}
+.xau-advanced{margin:0 0 10px!important;padding:12px!important;border-color:#35556c!important}
+.xau-adv-head small{font-size:9px!important;color:#83cee7!important}
+.xau-adv-head h2{font-size:15px!important;margin:4px 0!important}
+.xau-adv-head p{display:none}
+.xau-adv-stats{display:none!important}
+.xau-adv-reason{font-size:11px!important;line-height:1.45!important;margin:9px 0 4px!important;padding:8px 10px!important}
+.xau-adv-details>summary{font-size:12px!important;padding:9px 0!important;color:#b4d5e4!important}
+.xau-adv-note{display:none}
+.xau-adv-row{padding:8px 0!important}
+.xau-adv-row-head strong{font-size:12px!important}
+.xau-adv-row p{font-size:11px!important}
+.xau-supplement{display:grid;gap:8px;margin-bottom:14px}
+.xau-supplement>details{border:1px solid #2e495c;background:#0e1e2b;border-radius:12px;overflow:hidden}
+.xau-supplement>details>summary{padding:13px 14px;cursor:pointer;font-size:12px;font-weight:750;color:#bad6e6;list-style:revert}
+.xau-supplement>details[open]>summary{border-bottom:1px solid #2b495d}
+.xau-supplement>details>.panel{border:0;border-radius:0;margin:0;padding:12px!important}
+.xau-supplement .tv-technical{height:410px}
+.xau-supplement .metrics{gap:6px}
+.xau-supplement .metric{padding:8px}
+.xau-supplement .metric b{font-size:13px}
+.grid-bottom{display:none}
+.xau-compact-top .meta{font-size:10px;margin-top:4px}
+footer.container.small{padding:12px 0!important;font-size:10px;color:#6f93a5}
+@media(min-width:840px){.container{max-width:1080px;padding:14px 20px}.tv-widget{height:485px}.xau-compact-top{padding:15px 20px}.xau-supplement{grid-template-columns:1fr 1fr}.xau-supplement>details:last-child{grid-column:1/-1}}
+@media(max-width:460px){.tv-widget{height:340px;min-height:270px}.xau-compact-price strong{font-size:19px}.xau-compact-head{flex-wrap:nowrap}.xau-compact-title strong{font-size:12px}.xau-compact-price .xau-compact-unit{font-size:10px}.xau-compact-top{padding:10px}.xau-compact-top .controls{flex-wrap:wrap}.xau-supplement .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
