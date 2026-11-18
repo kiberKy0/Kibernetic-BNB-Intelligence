@@ -107,3 +107,8 @@ body.kcd-expanded .kcd-dock{position:static}
 .kcd-profile-extra small{grid-column:1/-1;font-size:11px;color:#91b1c4;line-height:1.45}
 .kcd-profile-extra #kcdProfileRemovePhoto{font-size:11px;min-height:35px}
 #profileBtn #avatar{flex:0 0 auto;box-sizing:border-box;border-radius:50%!important;display:inline-flex;align-items:center;justify-content:center;min-width:30px;min-height:30px}
+
+/* Fonti alternative BNB: link ufficiali, senza duplicare la dashboard. */
+.kcd-external-source{display:flex;align-items:center;flex-wrap:wrap;gap:5px 12px;margin:9px 1px 12px;padding:7px 10px;border:1px solid #29485a;border-radius:10px;background:#0b2331;color:#a9c2d3;font-size:11px}
+.kcd-external-source a{color:#88dafe!important;text-decoration:underline;text-underline-offset:3px;font-weight:700;white-space:nowrap}
+.kcd-external-source a:focus-visible{outline:2px solid #92e2ff;outline-offset:3px}
