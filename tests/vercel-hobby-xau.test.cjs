@@ -23,18 +23,26 @@ function response() {
   };
   return res;
 }
-test('shared proxy routes missing gold feed to clear NO_FEED, not a BNB market error', async () => {
-  const old=process.env.TWELVEDATA_API_KEY;
-  delete process.env.TWELVEDATA_API_KEY;
-  try {
-    const handler = require('../api/coingecko.js');
+test('shared proxy keeps unverified gold feed blocked and distinct from BNB', async () => {
+  const engine=require('../server/xau-biquote.cjs');
+  const previous=engine.getSnapshot;
+  const xauFile=require.resolve('../server/xau-handler.cjs');
+  engine.getSnapshot=async()=>({
+    quality:{ok:false,reason:'feed XAU/USD non verificato'},
+    source:'test offline',
+    timestamp:'2026-11-18T20:00:00.000Z'
+  });
+  delete require.cache[xauFile];
+  try{
+    const handler=require('../api/coingecko.js');
     const res=response();
     await handler({method:'GET',query:{type:'xau',interval:'15min'}},res);
     assert.equal(res.code,503);
-    assert.equal(res.body.code,'NO_FEED');
+    assert.equal(res.body.code,'FEED_BLOCKED');
     assert.match(res.body.error,/XAU\/USD/);
-  } finally {
-    if (old !== undefined) process.env.TWELVEDATA_API_KEY=old;
+  }finally{
+    engine.getSnapshot=previous;
+    delete require.cache[xauFile];
   }
 });
 test('shared proxy BNB health endpoint remains operational', async () => {
