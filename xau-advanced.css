@@ -1,0 +1,31 @@
+/* Advanced intelligence stays inside the Oracolo BNB XAU/USD view. */
+.xau-advanced{margin-top:14px;border-color:#38596a;padding:14px 16px}
+.xau-adv-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.xau-adv-head small{font-size:10px;color:#82bcd2;font-weight:800;letter-spacing:.08em}
+.xau-adv-head h2{font-size:19px;margin:5px 0}
+.xau-adv-head p{font-size:12px;color:#aac1d1;margin:0}
+.xau-adv-final{border:1px solid #b38e50;background:#362e22;color:#f7d68f;padding:9px 11px;border-radius:11px;letter-spacing:.03em;font-size:14px}
+.xau-adv-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}
+.xau-adv-stats>div{background:#081c2b;border:1px solid #2b4659;border-radius:10px;padding:11px;min-width:0}
+.xau-adv-stats small{font-size:10px;letter-spacing:.04em;color:#89abc0;display:block;margin-bottom:6px}
+.xau-adv-stats strong{font-size:12px;display:block;overflow-wrap:anywhere}
+.xau-adv-reason{font-size:12px;line-height:1.5;color:#f0d3a2;border-radius:10px;border:1px solid #735d38;background:#28271e;padding:11px 12px}
+.xau-adv-details{border-top:1px solid #315064;margin-top:12px}
+.xau-adv-details>summary{cursor:pointer;padding:13px 2px;color:#e7c781;font-size:13px;font-weight:750}
+.xau-adv-row{border-top:1px solid #294556;padding:11px 0}
+.xau-adv-row-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.xau-adv-row-head strong{color:#e1f1fb;font-size:12px}
+.xau-adv-row-head span{font-size:10px;flex-shrink:0;border:1px solid #53677a;color:#b2cbd8;border-radius:999px;padding:3px 6px;white-space:nowrap}
+.xau-adv-row-head .xau-adv-fail{border-color:#b1874a;color:#f0d3a2}
+.xau-adv-row p{font-size:12px;line-height:1.5;color:#9eb9c9;margin:6px 0 0}
+.xau-adv-note{font-size:11px;line-height:1.5;color:#8eaabc;margin:12px 0 0}
+@media(max-width:600px){
+ .xau-advanced{padding:11px}
+ .xau-adv-head h2{font-size:16px}
+ .xau-adv-head p{font-size:11px}
+ .xau-adv-final{font-size:12px;padding:7px}
+ .xau-adv-stats{gap:5px}
+ .xau-adv-stats>div{padding:8px 6px}
+ .xau-adv-stats strong{font-size:11px}
+ .xau-adv-row-head{flex-wrap:wrap}
+}
