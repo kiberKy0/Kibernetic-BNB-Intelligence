@@ -5,7 +5,31 @@
   const price = n => Number.isFinite(n) ? Number(n).toLocaleString('it-IT', { maximumFractionDigits: 2, minimumFractionDigits: 2 }) : '—';
   let importActive = false;
   const setText = (id, value) => { $(id).textContent = String(value); };
+  function renderOperationalGuide(result, source) {
+    const helper = window.XauGuidance;
+    const area = $('xauOperationalGuide');
+    if (!helper || !area) return;
+    const sourceType = /CSV locale/i.test(source) ? 'csv' : 'feed';
+    const plan = helper.advise(result, { source: sourceType });
+    area.dataset.state = plan.state;
+    setText('xauGuideStatus', plan.title);
+    setText('xauGuideSummary', plan.summary);
+    setText('xauGuideEntry', helper.format(plan.entry) + (plan.entry === null ? '' : ' USD/oz'));
+    setText('xauGuideStop', helper.format(plan.stop) + (plan.stop === null ? '' : ' USD/oz'));
+    setText('xauGuideTarget', helper.format(plan.target) + (plan.target === null ? '' : ' USD/oz'));
+    setText('xauGuideReason', plan.reason);
+    setText('xauGuideWhen', plan.when);
+    setText('xauGuideInvalidation', plan.invalid);
+    setText('xauGuideDisclosure', plan.disclosure);
+    setText('xauGuideMode', plan.mode === 'simulation'
+      ? 'Esempio su storico CSV: non è un segnale sul mercato attuale.'
+      : plan.state === 'WAIT'
+        ? 'Nessuna operazione proposta. Il feed separato deve essere verificato.'
+        : 'Setup condizionato, basato sull’ultima candela chiusa (' + (result.time || 'data da verificare') + '). Non è un ordine. Verifica spread, news e quotazione del broker.');
+  }
+
   function render(result, source) {
+    renderOperationalGuide(result, source);
     $('signal').className = 'signal ' + (result.signal === 'BUY' ? 'buy' : result.signal === 'SELL' ? 'sell' : 'wait');
     setText('signal', result.label);
     setText('source', source + ' · ' + result.samples + ' candele · ' + result.interval);
