@@ -56,7 +56,7 @@
     if(mode)mode.textContent=p.mode==='advanced'?'Lettura completa':'Lettura essenziale';
     const topA=byId('avatar');
     const topN=byId('profileNameTop');
-    if(topA)topA.textContent=p.avatar;
+    if(topA){if(window.KiberPlanets?.refresh)window.KiberPlanets.refresh();else topA.textContent=p.avatar;}
     if(topN&&p.name)topN.textContent=p.name;
   }
 
