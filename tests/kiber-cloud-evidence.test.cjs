@@ -66,3 +66,39 @@ test('assistant UI sends selected token contract and backend includes cloud evid
  assert.doesNotThrow(()=>new Function(front));
  assert.doesNotThrow(()=>new Function('require','process','module','exports',back));
 });
+
+test('explicit CAKE wins over displayed BNB and BNB Chain geography',()=>{
+ const focus=C.resolveRequestedToken('Analizza CAKE su BNB Chain: ultimi 5 e 15 minuti, stato server H24, quale pool?',BNB);
+ assert.equal(focus.subject,'CAKE');
+ assert.equal(focus.address,CAKE);
+ assert.equal(focus.explicit,true);
+ assert.equal(C.isCloudDataQuestion('Analizza CAKE: è monitorata dal server H24? Quali dati 5 e 15 minuti?'),true);
+});
+test('unknown PEPE and multi-token questions never inherit BNB data',async()=>{
+ const unknown=C.resolveRequestedToken('Analizza PEPE');
+ const multi=C.resolveRequestedToken('Confronta BNB e CAKE');
+ assert.equal(unknown.unknown,true);assert.equal(unknown.address,'');
+ assert.equal(multi.ambiguous,true);assert.equal(multi.address,'');
+ const fake=await C.fetchEvidence({address:unknown.address,allowDefaultBNB:false,now,fetchImpl:async()=>({ok:true,json:async()=>raw})});
+ assert.equal(fake.status,'CURRENT');assert.equal(fake.tokenStatus,'NOT_MONITORED');
+ assert.equal(fake.token,undefined);assert.doesNotMatch(C.summarize(fake),/1\.60%/);
+});
+test('cloud snapshot report contains precise pool and source timestamp not last trade time',()=>{
+ const example={...raw,token:{...raw.token,asset:'pancakeswap-token',pool:'0x'+'b'.repeat(40)}};
+ const a=C.analyze(example,{address:CAKE,now}),message=C.summarize(a,{subject:'CAKE'});
+ assert.equal(a.tokenStatus,'CURRENT');
+ assert.match(message,/CAKE/);
+ assert.match(message,/Pool PER QUESTO STORICO/);
+ assert.match(message,/pool differenti/);
+ assert.match(message,/Snapshot:/);
+ assert.match(message,/non ora ultimo trade on-chain/);
+});
+test('backend rejects generic welcome in market answer and exposes requested asset info',()=>{
+ const src=fs.readFileSync('api/kiber.js','utf8');
+ assert.match(src,/CloudEvidence\.resolveRequestedToken/);
+ assert.match(src,/const cloudQuestion=/);
+ assert.match(src,/genericWelcome/);
+ assert.match(src,/verifiedSummary/);
+ assert.match(src,/requestedAsset:tokenFocus\.subject/);
+ assert.match(src,/verified-cloud/);
+});
