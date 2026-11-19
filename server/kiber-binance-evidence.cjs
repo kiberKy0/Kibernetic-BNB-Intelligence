@@ -16,12 +16,13 @@ function parseTicker(raw,now=Date.now()){
  const price=asFinite(raw.lastPrice,1e7),pct=asFinite(raw.priceChangePercent,10000),volume=asFinite(raw.quoteVolume,1e15),
   high=asFinite(raw.highPrice,1e7),low=asFinite(raw.lowPrice,1e7),timestamp=asFinite(raw.closeTime,1e16);
  if(price===null||price<=0||timestamp===null)return {status:'UNAVAILABLE',reason:'Prezzo o timestamp Binance mancanti'};
- const age=Math.floor((now-timestamp)/1000);
+ const age=Math.max(0,Math.floor((now-timestamp)/1000));
+ const reasonableClock=timestamp<=now+10000;
  const common={source:'Binance Spot (API pubblica Binance Vision)',market:'BNB/USDT',quoteCurrency:'USDT',
    lastPrice:price,change24Pct:pct,quoteVolume24:volume,high24:high,low24:low,
    sourceTimestamp:new Date(timestamp).toISOString(),sourceAgeSeconds:age,
    accountConnected:false,privateApiAccess:false,tradeExecution:false};
- return age>=-10&&age<=240?{...common,status:'CURRENT'}:
+ return reasonableClock&&age<=240?{...common,status:'CURRENT'}:
   {status:'STALE',source:common.source,market:common.market,sourceTimestamp:common.sourceTimestamp,sourceAgeSeconds:age,
    accountConnected:false,privateApiAccess:false,tradeExecution:false,reason:'Orario di aggiornamento oltre il limite di 240 secondi; prezzo non mostrato come attuale'};
 }
