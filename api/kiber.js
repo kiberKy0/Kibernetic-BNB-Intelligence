@@ -1,5 +1,5 @@
 const VERSION='27.7';
-const CloudEvidence=require('../server/kiber-cloud-evidence.cjs');
+const CloudEvidence=typeof require==='function'?require('../server/kiber-cloud-evidence.cjs'):{fetchEvidence:async()=>null,wantsBackground:()=>false,summarize:()=>''};
 const num=v=>v===null||v===undefined||v===''?null:(Number.isFinite(Number(v))?Number(v):null);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function pct(v){v=num(v);return v===null?'—':`${v>=0?'+':''}${v.toFixed(2)}%`}
