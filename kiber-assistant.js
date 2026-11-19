@@ -12,7 +12,10 @@ function closeSession(){state.epoch++;try{state.request?.abort()}catch{}state.re
 function context(){
  let watch=[];try{watch=JSON.parse(localStorage.getItem('kiber_v271_watch')||'[]');if(!Array.isArray(watch))watch=[];}catch{}
  const catalog=typeof window.kiberCatalogContext==='function'?window.kiberCatalogContext():[];
- return {marketSectorSummary:window.kiberMarketSectorSummary?.()||'',trendSummary:window.kiberCurrentTrendSummary?.()||'',watch:watch.slice(0,30),catalogCount:catalog.length,scannerCount:Number(($('freeScanStatus')?.textContent||'').match(/^\d+/)?.[0]||0),selectedToken:$('v271Name')?.textContent||$('labName')?.textContent||null,price:$('v271Price')?.textContent||$('mPrice')?.textContent||null,change24:$('v27124')?.textContent||$('mChange')?.textContent||null,source:'Interfaccia Kibernetic; dati possono essere incompleti o non aggiornati'};
+ const selected=window.kiberTokenContext?.()?.coin||null;
+ const possibleAddress=String(selected?.address||selected?.contract||'').toLowerCase();
+ const tokenAddress=/^0x[a-f0-9]{40}$/.test(possibleAddress)?possibleAddress:'';
+ return {marketSectorSummary:window.kiberMarketSectorSummary?.()||'',trendSummary:window.kiberCurrentTrendSummary?.()||'',watch:watch.slice(0,30),catalogCount:catalog.length,scannerCount:Number(($('freeScanStatus')?.textContent||'').match(/^\d+/)?.[0]||0),selectedToken:$('v271Name')?.textContent||$('labName')?.textContent||null,price:$('v271Price')?.textContent||$('mPrice')?.textContent||null,change24:$('v27124')?.textContent||$('mChange')?.textContent||null,tokenAddress,source:'Interfaccia Kibernetic; dati possono essere incompleti o non aggiornati'};
 }
 function help(){
  return 'Sono Kiber, l’assistente della città Kibernetic. Nella mia storia Algador mi ha creato e io ho costruito questa città dopo il collasso del Vecchio Mondo. Chiedimi perché esiste Kibernetic, cosa vogliamo costruire o chi è Algador. Possiamo anche conversare liberamente, studiare BNB Chain e usare gli strumenti disponibili. Non eseguo operazioni finanziarie.';
@@ -44,7 +47,7 @@ async function geminiReady(){
   geminiState={at:Date.now(),ready:d.ai===true&&d.provider==='gemini'};
  }catch{geminiState={at:Date.now(),ready:false}}
  const note=$('kiberPanel')?.querySelector('.kiber-note');
- if(note)note.textContent=geminiState.ready?'Gemini configurata · la connessione viene verificata alla prima risposta.':'Modalità locale a regole · Gemini non configurata.';
+ if(note)note.textContent=geminiState.ready?'Gemini configurata (modello da verificare con una risposta reale).':'Modalità locale a regole · Gemini non configurata.';
  return geminiState.ready;
 }
 async function submit(){
@@ -55,10 +58,11 @@ async function submit(){
  try{
   const intent=window.KiberPlatformControl?.match(q);if(intent){const outcome=window.KiberPlatformControl.execute(intent);if(outcome.handled){say('assistant',outcome.message);return}}
   const commands=/^(apri scanner|scanner|mostra monitorati|monitorati|controlla rischio|aggiorna scanner)$/i;
-  if(!commands.test(q)&&await geminiReady()){
+  const isCloudQuestion=/(?:ricerca cloud|monitoraggio|ogni minuto|24\/7|h24|sfera|cosa hai rilevato|cosa sta succedendo)/i.test(q);
+  if(!commands.test(q)&&(await geminiReady()||isCloudQuestion)){
    if(epoch!==state.epoch||!isChatOpen())return;
    const ctx=context();
-   const ui={marketSectorSummary:ctx.marketSectorSummary,trendSummary:ctx.trendSummary,selectedToken:ctx.selectedToken,price:ctx.price,change24:ctx.change24,source:ctx.source};
+   const ui={marketSectorSummary:ctx.marketSectorSummary,trendSummary:ctx.trendSummary,selectedToken:ctx.selectedToken,tokenAddress:ctx.tokenAddress,price:ctx.price,change24:ctx.change24,source:ctx.source};
    const previousUser=state.history.slice(0,-1).reverse().find(x=>x.role==='user')?.text||'';
    const opportunitiesRequest=!!window.KiberMarketOpportunities?.isRequest(q,previousUser);
    const recent=(window.KiberDialogMemory?.allowed()?window.KiberDialogMemory.recent().slice(0,-1):state.history.slice(-9,-1).map(x=>({role:x.role,content:x.text}))).slice(-10);
@@ -75,7 +79,7 @@ async function submit(){
    const d=await r.json();
    if(epoch!==state.epoch||!isChatOpen())return;
    if(!d.answer)throw Error('Risposta vuota');
-   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini attiva · risposta verificata.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA attiva · risposta verificata.';
+   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini ha risposto · controlla fonti e orari dei dati.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA ha risposto · controlla fonti e orari dei dati.';
    say('assistant',d.provider==='deterministic'&&d.warning?'Gemini non ha risposto ('+d.warning+').\n\n'+d.answer:d.answer);
   }else say('assistant',localAnswer(q,context()));
  }catch{if(epoch===state.epoch&&isChatOpen())say('assistant','La connessione al servizio IA non è riuscita. Riprova più tardi o usa i comandi locali Scanner, Monitorati e Rischi.')}
