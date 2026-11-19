@@ -93,6 +93,7 @@ function summarize(result,{subject=''}={}){
  const x=result||{status:'UNAVAILABLE'};
  if(x.status==='UNAVAILABLE')return 'Non riesco a verificare lo stato della ricerca cloud in questo momento. Non invento risultati o movimenti.';
  const lines=['RICERCA AUTOMATICA KIBER BNB',x.status==='CURRENT'?'Scanner server aggiornato (cadenza prevista: 60 secondi).':'Scanner server non abbastanza recente.'];
+ if(subject)lines.push('Moneta richiesta: '+String(subject).slice(0,20)+'.');
  if(x.scanAgeSeconds!==null&&x.scanAgeSeconds!==undefined)lines.push('Ultimo controllo: '+x.scanAgeSeconds+' secondi fa.');
  if(x.monitoredTokens!==null)lines.push('Token controllati: '+x.monitoredTokens+'; raccolta limitata a 12 token.');
  if(x.tokenStatus==='CURRENT'){
