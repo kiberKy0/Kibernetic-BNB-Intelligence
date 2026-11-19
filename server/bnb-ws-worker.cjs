@@ -40,12 +40,12 @@ function createWorker({env=process.env,fetchImpl=fetch,WebSocketImpl=globalThis.
   const db=store||makeStore({url:env.SUPABASE_URL,key:env.SUPABASE_SERVICE_ROLE_KEY,fetchImpl});
   const rpcHttp=env.BSC_RPC_HTTP_URL||BSC_RPC;
   const wss=env.BSC_WSS_URL;
-  let watcher=null,heartbeat=null,running=false,seenBlock=0;
+  let watcher=null,heartbeat=null,running=false,seenBlock=0,lastEventAt=null;
   let events=0,pending=Promise.resolve(),backlog=0,failed=false,streamStage='NOT_CONFIGURED',details='';
   const statusMap={CONNECTING:'CONNECTING',SUBSCRIBED:'SUBSCRIBED',RECONNECTING:'RECONNECTING',BLOCKED:'ERROR',UNAVAILABLE:'ERROR',ERROR:'ERROR',STOPPED:'STOPPED'};
   async function state(){
     await db.state({worker_id:workerId,chain_id:56,status:streamStage,subscribed_pools:watcher?.state().subscribed?watcher.state().poolCount:0,
-      last_block:seenBlock||null,last_event_at:events?new Date(clock()).toISOString():null,last_heartbeat_at:new Date(clock()).toISOString(),
+      last_block:seenBlock||null,last_event_at:lastEventAt,last_heartbeat_at:new Date(clock()).toISOString(),
       details:details.slice(0,500),updated_at:new Date(clock()).toISOString()});
   }
   function enqueue(event){
@@ -61,6 +61,7 @@ function createWorker({env=process.env,fetchImpl=fetch,WebSocketImpl=globalThis.
         event_received_at:event.receivedAt,price_usd:null,payload:{source:event.source,unconfirmed:true,priceAvailable:false}};
       await db.insertEvent(payload);
       events++;
+      lastEventAt=event.receivedAt;
       seenBlock=Math.max(seenBlock,blockNumber);
     }).catch(err=>{failed=true;streamStage='ERROR';details='Errore archiviazione eventi: '+String(err?.message||'').slice(0,120)})
       .finally(()=>{backlog--});
@@ -85,7 +86,7 @@ function createWorker({env=process.env,fetchImpl=fetch,WebSocketImpl=globalThis.
       if(typeof wss!=='string'||!wss.startsWith('wss://')){streamStage='NOT_CONFIGURED';details='Manca BSC_WSS_URL: sottoscrizione non avviata';await state();running=false;return {active:false,reason:details}}
       watcher=makeWatcher({url:wss,pools,WebSocketImpl,now:clock,
         onState:info=>{
-          streamStage=statusMap[info.stage]||'ERROR';details=info.details;
+          streamStage=failed?'ERROR':statusMap[info.stage]||'ERROR';details=info.details;
           // Reconnect gaps are not recovered. Do not label stream complete.
           if(info.stage==='RECONNECTING')details+=' · eventuali blocchi mancanti da recuperare';
           state().catch(()=>{failed=true});
