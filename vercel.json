@@ -7,6 +7,14 @@
       "destination": "/api/coingecko?type=xau"
     },
     {
+      "source": "/api/bnb-dex-live",
+      "destination": "/api/coingecko?type=bnb-dex-live"
+    },
+    {
+      "source": "/api/bnb-pool-verify",
+      "destination": "/api/coingecko?type=bnb-pool-verify"
+    },
+    {
       "source": "/api/xau-spot",
       "destination": "/api/coingecko?type=xau&mode=spot"
     },

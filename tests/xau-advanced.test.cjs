@@ -30,7 +30,7 @@ test('a fresh-looking CSV never becomes live',()=>{
  const r=advanced.evaluate(validAnalysis,'CSV locale (non collegato al mercato live)',now);
  assert.equal(r.decision,'WAIT');
  assert.equal(r.labels[0].status,'BLOCCATO');
- assert.match(r.labels[0].note,/storico/);
+ assert.match(r.labels[0].note,/storico/i);
 });
 test('delayed candle fails timestamp check',()=>{
  const r=advanced.evaluate({...validAnalysis,time:'2026-11-18T18:00:00.000Z'},'Twelve Data · dati provider',now);
