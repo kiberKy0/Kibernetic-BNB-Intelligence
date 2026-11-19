@@ -61,7 +61,7 @@ test('assistant UI sends selected token contract and backend includes cloud evid
  assert.match(front,/isCloudQuestion/);
  assert.match(back,/CloudEvidence\.fetchEvidence/);
  assert.match(back,/context\.verifiedCloud=cloudEvidence/);
- assert.match(back,/CloudEvidence\.summarize\(cloudEvidence\)/);
+ assert.match(back,/CloudEvidence\.summarize\(cloudEvidence,\{subject:tokenFocus\.subject\}\)/);
  assert.doesNotMatch(front,/Gemini attiva · risposta verificata/);
  assert.doesNotThrow(()=>new Function(front));
  assert.doesNotThrow(()=>new Function('require','process','module','exports',back));
