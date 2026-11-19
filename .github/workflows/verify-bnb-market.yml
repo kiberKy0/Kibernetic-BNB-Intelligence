@@ -1,0 +1,29 @@
+name: Verify BNB market pipeline
+
+on:
+  push:
+    branches:
+      - feat/bnb-trading-pipeline-foundation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bnb-unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout source without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Verify read-only BNB adapters and execution guards
+        run: node --test tests/bnb-*.test.cjs
+      - name: Validate JavaScript syntax
+        run: |
+          node --check server/bnb-pool-verify.cjs
+          node --check server/bnb-ws-worker.cjs
+          node --check server/bnb-ws-subscribe.cjs
+          node --check server/bnb-dex-snapshot.cjs
+          node --check bnb-trading-panel.js
