@@ -89,14 +89,14 @@ function analyze(raw,{address='',now=Date.now()}={}){
 function prettyPct(n){
  return typeof n==='number'&&Number.isFinite(n)?(n>0?'+':'')+n.toFixed(2)+'%':'non disponibile';
 }
-function summarize(result){
+function summarize(result,{subject=''}={}){
  const x=result||{status:'UNAVAILABLE'};
  if(x.status==='UNAVAILABLE')return 'Non riesco a verificare lo stato della ricerca cloud in questo momento. Non invento risultati o movimenti.';
  const lines=['RICERCA AUTOMATICA KIBER BNB',x.status==='CURRENT'?'Scanner server aggiornato (cadenza prevista: 60 secondi).':'Scanner server non abbastanza recente.'];
  if(x.scanAgeSeconds!==null&&x.scanAgeSeconds!==undefined)lines.push('Ultimo controllo: '+x.scanAgeSeconds+' secondi fa.');
  if(x.monitoredTokens!==null)lines.push('Token controllati: '+x.monitoredTokens+'; raccolta limitata a 12 token.');
  if(x.tokenStatus==='CURRENT'){
-  const t=x.token;lines.push('TOKEN MONITORATO '+t.asset+'.');
+  const t=x.token;lines.push('TOKEN MONITORATO '+(subject||t.asset)+' (identificativo fonte: '+t.asset+').');
   lines.push('Pool PER QUESTO STORICO: '+t.pool+'. Il feed PancakeSwap principale può riferirsi a un’altra pool. Non unire dati di pool differenti.');
   lines.push('Snapshot: '+t.lastSourceAt+' · '+t.sourceAgeSeconds+' secondi fa, non ora ultimo trade on-chain.');
   lines.push('Prezzo snapshot: '+(t.priceUsd===null?'non disponibile':'$'+t.priceUsd)+' · liquidità pool: '+(t.liquidityUsd===null?'non disponibile':'$'+t.liquidityUsd)+'.');
