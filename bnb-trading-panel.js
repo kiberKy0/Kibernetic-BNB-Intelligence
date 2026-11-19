@@ -38,6 +38,7 @@ function mount(){
   sourceLink.rel='noopener noreferrer';sourceLink.target='_blank';
   const note=document.createElement('p');note.style.cssText='font-size:12px;color:#9ab9c9;margin:8px 0 0';
   let address='', snapshot=null, error='', busy=false, controller=null;
+  const poolChecks=new Map();
   const tokenAddress=()=>{
     const c=window.kiberTokenContext?.()?.coin;
     if(!c)return '';
@@ -53,7 +54,12 @@ function mount(){
     cells.get('ANALIZZA').textContent=snapshot&&snapshot.address.toLowerCase()===address.toLowerCase()
       ? 'DEX Screener · PancakeSwap · acquisizione HTTP, non stream on-chain.'
       : address?'Contratto BSC trovato; acquisizione snapshot quando il pannello è aperto.':'Seleziona un token con contratto verificato su BNB Chain.';
-    cells.get('VERIFICA').textContent='Controlli rischio predisposti; analisi sicurezza on-chain da collegare.';
+    const poolId=String(snapshot?.pair?.address||'').toLowerCase();
+    const check=poolChecks.get(poolId);
+    cells.get('VERIFICA').textContent=check?.verified===true
+      ? 'Pool PancakeSwap V3 verificata dalla factory BNB. Sicurezza dei token ancora da valutare.'
+      : check?.verified===false?'Pool non confermata dalla factory V3. Nessuna operazione autorizzata.'
+      : 'Origine della pool da verificare. Analisi rischio token non conclusa.';
     cells.get('CALCOLA').textContent='Calcoli predisposti; quote Smart Router da collegare.';
     cells.get('ESEGUE').textContent='DISATTIVATO: nessun acquisto o vendita reale.';
     cells.get('MONITORA').textContent='Adattatore eventi Swap V3 predisposto; nodo WSS e servizio H24 da collegare.';
@@ -68,6 +74,18 @@ function mount(){
     }
     note.textContent=hasCore?'Controlli software caricati · nessuna autorizzazione wallet o esecuzione automatica attivata.':'Motore non caricato: verificare gli script della piattaforma.';
   }
+  async function checkPool(pool){
+    if(!/^0x[0-9a-fA-F]{40}$/.test(String(pool||'')))return;
+    const id=pool.toLowerCase(),cached=poolChecks.get(id);
+    if(cached&&Date.now()-cached.checked<300000)return;
+    poolChecks.set(id,{verified:null,checked:Date.now()});
+    try{
+      const res=await fetch('/api/bnb-pool-verify?pool='+encodeURIComponent(id),{signal:AbortSignal.timeout(9000)});
+      const data=await res.json();
+      poolChecks.set(id,{verified:res.ok&&data.verified===true?true:res.ok&&data.verified===false?false:null,checked:Date.now()});
+    }catch{poolChecks.set(id,{verified:null,checked:Date.now()})}
+    refresh();
+  }
   async function load(){
     if(!box.open||document.hidden||busy)return;
     refresh();
@@ -81,7 +99,7 @@ function mount(){
       const data=await r.json();
       if(target!==address)return;
       if(!r.ok||!data.ok){snapshot=null;error=data?.status==='NO_VERIFIED_PANCAKE_POOL'?'Nessuna pool PancakeSwap verificata per questa moneta.':'Fonte di mercato non disponibile: nessun prezzo mostrato.'}
-      else {snapshot=data;error=''}
+      else {snapshot=data;error='';void checkPool(data.pair?.address)}
     }catch{if(target===address){snapshot=null;error='Connessione di mercato non disponibile.'}}
     finally{clearTimeout(cutoff);busy=false;refresh()}
   }
