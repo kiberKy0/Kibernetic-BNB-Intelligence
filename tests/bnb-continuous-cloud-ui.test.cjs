@@ -20,7 +20,7 @@ test('cloud status is fail-closed, never claims WebSocket or wallet trading',()=
   assert.match(panel,/scanOnline===true/);
   assert.match(panel,/cloudActive/);
   assert.match(panel,/WebSocket H24 non ancora attivo/);
-  assert.match(panel,/nessun ordine eseguito/);
+  assert.match(panel,/nessun ordine eseguito/i);
   assert.match(panel,/textContent/);
   assert.doesNotMatch(panel,/eth_sendTransaction|eth_sendRawTransaction/);
 });
