@@ -80,6 +80,9 @@ function mount(){
       const t=cloud.token;
       if(!t)cloudDetails.textContent='Questa moneta non risulta nella raccolta cloud: le altre monete monitorate continuano ad essere controllate.';
       else if(t.status==='STALE'||!cloudActive)cloudDetails.textContent='Ultimi dati del token non recenti: sospese le valutazioni sul movimento.';
+      else if(snapshot?.pair?.address && String(t.pool||'').toLowerCase()!==String(snapshot.pair.address).toLowerCase()){
+        cloudDetails.textContent='La raccolta cloud misura una pool differente da quella mostrata qui: variazioni non confrontabili. La ricerca continua sul server.';
+      }
       else{
         const pct=value=>Number.isFinite(value)?(value>=0?'+':'')+value.toLocaleString('it-IT',{maximumFractionDigits:2})+'%':'—';
         const observations='Prezzo 5 min '+pct(t.priceChange5mPct)+' · 15 min '+pct(t.priceChange15mPct)+' · liquidità 15 min '+pct(t.liquidityChange15mPct)+'.';
