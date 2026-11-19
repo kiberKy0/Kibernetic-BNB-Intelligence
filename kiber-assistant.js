@@ -79,7 +79,7 @@ async function submit(){
    const d=await r.json();
    if(epoch!==state.epoch||!isChatOpen())return;
    if(!d.answer)throw Error('Risposta vuota');
-   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini ha risposto · controlla fonti e orari dei dati.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA ha risposto · controlla fonti e orari dei dati.';
+   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini ha risposto · verifica dati e fonti.':d.provider==='verified-cloud'?'Dati cloud verificati · risposta IA non pertinente esclusa.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA ha risposto · verifica dati e fonti.';
    say('assistant',d.provider==='deterministic'&&d.warning?'Gemini non ha risposto ('+d.warning+').\n\n'+d.answer:d.answer);
   }else say('assistant',localAnswer(q,context()));
  }catch{if(epoch===state.epoch&&isChatOpen())say('assistant','La connessione al servizio IA non è riuscita. Riprova più tardi o usa i comandi locali Scanner, Monitorati e Rischi.')}
