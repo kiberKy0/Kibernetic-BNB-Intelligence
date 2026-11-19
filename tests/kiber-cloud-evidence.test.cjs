@@ -102,3 +102,13 @@ test('backend rejects generic welcome in market answer and exposes requested ass
  assert.match(src,/requestedAsset:tokenFocus\.subject/);
  assert.match(src,/verified-cloud/);
 });
+
+test('pool switch findings do not invent a percentage and no V3 safety claim',()=>{
+ const data={...raw,findings:[{type:'POOL_CHANGED',at:iso(22),changePct:null}]};
+ const x=C.analyze(data,{address:BNB,now}),txt=C.summarize(x,{subject:'BNB'});
+ assert.match(txt,/cambio della pool principale nel campione/);
+ assert.doesNotMatch(txt,/cambio della pool principale nel campione \(non disponibile\)/);
+ assert.match(txt,/factory PancakeSwap V3/);
+ const backend=fs.readFileSync('api/kiber.js','utf8');
+ assert.match(backend,/Non chiamare verificata on-chain una pool/);
+});

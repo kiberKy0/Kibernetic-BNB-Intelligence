@@ -98,12 +98,12 @@ function summarize(result,{subject=''}={}){
  if(x.monitoredTokens!==null)lines.push('Token controllati: '+x.monitoredTokens+'; raccolta limitata a 12 token.');
  if(x.tokenStatus==='CURRENT'){
   const t=x.token;lines.push('TOKEN MONITORATO '+(subject||t.asset)+' (identificativo fonte: '+t.asset+').');
-  lines.push('Pool PER QUESTO STORICO: '+t.pool+'. Il feed PancakeSwap principale può riferirsi a un’altra pool. Non unire dati di pool differenti.');
+  lines.push('Pool PER QUESTO STORICO: '+t.pool+'. Il feed PancakeSwap principale può riferirsi a un’altra pool. Non unire dati di pool differenti. La presenza nel feed non prova la verifica dalla factory PancakeSwap V3; il controllo RPC va eseguito a parte.');
   lines.push('Snapshot: '+t.lastSourceAt+' · '+t.sourceAgeSeconds+' secondi fa, non ora ultimo trade on-chain.');
   lines.push('Prezzo snapshot: '+(t.priceUsd===null?'non disponibile':'$'+t.priceUsd)+' · liquidità pool: '+(t.liquidityUsd===null?'non disponibile':'$'+t.liquidityUsd)+'.');
   lines.push('Prezzo su circa 5 minuti: '+prettyPct(t.priceChange5mPct)+'; su 15 minuti: '+prettyPct(t.priceChange15mPct)+'.');
   lines.push('Liquidità su circa 15 minuti: '+prettyPct(t.liquidityChange15mPct)+'.');
-  lines.push(x.findings.length?'Eventi rilevati: '+x.findings.map(f=>f.description+' ('+prettyPct(f.changePct)+')').join('; ')+'.':'Nessuna anomalia registrata recentemente per questo token: non equivale ad assenza di rischio.');
+  lines.push(x.findings.length?'Eventi rilevati: '+x.findings.map(f=>f.description+(typeof f.changePct==='number'?' ('+prettyPct(f.changePct)+')':'')).join('; ')+'.':'Nessuna anomalia registrata recentemente per questo token: non equivale ad assenza di rischio.');
  }else lines.push(x.reason||'Lettura specifica del token non disponibile.');
  lines.push('Fonte: '+x.source+'. Non è uno stream WebSocket, non copre l’intera BNB Chain e non autorizza operazioni.');
  return lines.join('\n');
