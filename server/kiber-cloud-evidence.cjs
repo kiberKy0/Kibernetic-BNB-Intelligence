@@ -48,7 +48,8 @@ function resolveRequestedToken(question,selectedAddress=''){
 }
 function isCloudDataQuestion(question){
  const q=String(question||'');
- return wantsBackground(q)||/\b(?:5|15)\s*(?:minuti?|min)\b/i.test(q)&&/\b(?:BNB|CAKE|LINK)\b/i.test(q)||
+ return wantsBackground(q)||
+   /\b(?:5|15)\s*(?:minuti?|min)\b/i.test(q)&&/\b(?:BNB|CAKE|LINK)\b/i.test(q)||
    /\b(?:BNB|CAKE|LINK)\b/i.test(q)&&/\bpool\b/i.test(q);
 }
 function analyze(raw,{address='',now=Date.now()}={}){
@@ -98,7 +99,7 @@ function summarize(result){
   const t=x.token;lines.push('TOKEN MONITORATO '+t.asset+'.');
   lines.push('Pool PER QUESTO STORICO: '+t.pool+'. Il feed PancakeSwap principale può riferirsi a un’altra pool. Non unire dati di pool differenti.');
   lines.push('Snapshot: '+t.lastSourceAt+' · '+t.sourceAgeSeconds+' secondi fa, non ora ultimo trade on-chain.');
-  lines.push('Prezzo snapshot: '+(t.priceUsd===null?'non disponibile':'
+  lines.push('Prezzo snapshot: '+(t.priceUsd===null?'non disponibile':'$'+t.priceUsd)+' · liquidità pool: '+(t.liquidityUsd===null?'non disponibile':'$'+t.liquidityUsd)+'.');
   lines.push('Prezzo su circa 5 minuti: '+prettyPct(t.priceChange5mPct)+'; su 15 minuti: '+prettyPct(t.priceChange15mPct)+'.');
   lines.push('Liquidità su circa 15 minuti: '+prettyPct(t.liquidityChange15mPct)+'.');
   lines.push(x.findings.length?'Eventi rilevati: '+x.findings.map(f=>f.description+' ('+prettyPct(f.changePct)+')').join('; ')+'.':'Nessuna anomalia registrata recentemente per questo token: non equivale ad assenza di rischio.');
@@ -124,53 +125,3 @@ async function fetchEvidence({fetchImpl=fetch,address='',now=Date.now(),timeoutM
 }
 const FIXED_ADDRESS='0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
 module.exports={API,FIXED_ADDRESS,identity,resolveRequestedToken,isCloudDataQuestion,analyze,summarize,wantsBackground,fetchEvidence};
-+t.priceUsd)+' · liquidità pool: '+(t.liquidityUsd===null?'non disponibile':'
-  lines.push('Prezzo su circa 5 minuti: '+prettyPct(t.priceChange5mPct)+'; su 15 minuti: '+prettyPct(t.priceChange15mPct)+'.');
-  lines.push('Liquidità su circa 15 minuti: '+prettyPct(t.liquidityChange15mPct)+'.');
-  lines.push(x.findings.length?'Eventi rilevati: '+x.findings.map(f=>f.description+' ('+prettyPct(f.changePct)+')').join('; ')+'.':'Nessuna anomalia registrata recentemente per questo token: non equivale ad assenza di rischio.');
- }else lines.push(x.reason||'Lettura specifica del token non disponibile.');
- lines.push('Fonte: '+x.source+'. Non è uno stream WebSocket, non copre l’intera BNB Chain e non autorizza operazioni.');
- return lines.join('\n');
-}
-function wantsBackground(question){
- return /(?:monitoraggi|monitorat|ricerca cloud|ricerca automatica|controll(?:a|i|o).*mercato|ogni minuto|h24|24\/7|sfera|scanner.*(?:attiv|cloud)|cosa (?:hai|avete) (?:rilevat|trovat)|moviment[io] (?:recent|anomali)|cosa sta succedendo)/i.test(String(question||''));
-}
-async function fetchEvidence({fetchImpl=fetch,address='',now=Date.now(),timeoutMs=4200}={}){
- const selected=identity(address),path=selected?'?address='+encodeURIComponent(selected.address):'?id=binancecoin';
- try{
-  const response=await fetchImpl(API+path,{
-   method:'GET',headers:{Accept:'application/json'},
-   cache:'no-store',signal:AbortSignal.timeout(timeoutMs)
-  });
-  if(!response.ok)return analyze(null,{address:targetAddress,now});
-  const raw=await response.json();
-  return analyze(raw,{address:targetAddress,now});
- }catch{return analyze(null,{address:targetAddress,now})}
-}
-const FIXED_ADDRESS='0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
-module.exports={API,FIXED_ADDRESS,identity,analyze,summarize,wantsBackground,fetchEvidence};
-+t.liquidityUsd)+'.');
-  lines.push('Prezzo su circa 5 minuti: '+prettyPct(t.priceChange5mPct)+'; su 15 minuti: '+prettyPct(t.priceChange15mPct)+'.');
-  lines.push('Liquidità su circa 15 minuti: '+prettyPct(t.liquidityChange15mPct)+'.');
-  lines.push(x.findings.length?'Eventi rilevati: '+x.findings.map(f=>f.description+' ('+prettyPct(f.changePct)+')').join('; ')+'.':'Nessuna anomalia registrata recentemente per questo token: non equivale ad assenza di rischio.');
- }else lines.push(x.reason||'Lettura specifica del token non disponibile.');
- lines.push('Fonte: '+x.source+'. Non è uno stream WebSocket, non copre l’intera BNB Chain e non autorizza operazioni.');
- return lines.join('\n');
-}
-function wantsBackground(question){
- return /(?:monitoraggi|monitorat|ricerca cloud|ricerca automatica|controll(?:a|i|o).*mercato|ogni minuto|h24|24\/7|sfera|scanner.*(?:attiv|cloud)|cosa (?:hai|avete) (?:rilevat|trovat)|moviment[io] (?:recent|anomali)|cosa sta succedendo)/i.test(String(question||''));
-}
-async function fetchEvidence({fetchImpl=fetch,address='',now=Date.now(),timeoutMs=4200}={}){
- const selected=identity(address),path=selected?'?address='+encodeURIComponent(selected.address):'?id=binancecoin';
- try{
-  const response=await fetchImpl(API+path,{
-   method:'GET',headers:{Accept:'application/json'},
-   cache:'no-store',signal:AbortSignal.timeout(timeoutMs)
-  });
-  if(!response.ok)return analyze(null,{address:targetAddress,now});
-  const raw=await response.json();
-  return analyze(raw,{address:targetAddress,now});
- }catch{return analyze(null,{address:targetAddress,now})}
-}
-const FIXED_ADDRESS='0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
-module.exports={API,FIXED_ADDRESS,identity,analyze,summarize,wantsBackground,fetchEvidence};
