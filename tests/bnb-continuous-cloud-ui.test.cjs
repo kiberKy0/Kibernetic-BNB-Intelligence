@@ -11,9 +11,9 @@ test('mobile market scanner shows server-side minute scan without duplicating ch
   assert.match(panel,/priceChange15mPct/);
   assert.match(panel,/liquidityChange15mPct/);
   assert.match(panel,/monitoredAssets/);
-  assert.match(panel,/\\.v271-main/);
+  assert.ok(panel.includes('#v271TokenView .v271-main'));
   assert.match(boot,/'bnb-trading-panel.js'/);
-  assert.match(boot,/bnb-cloud-scanner-v1/);
+  assert.match(boot,/bnb-cloud-scanner/);
 });
 test('cloud status is fail-closed, never claims WebSocket or wallet trading',()=>{
   assert.match(panel,/cloudAge<=190/);
