@@ -3,6 +3,9 @@
 'use strict';
 const ADDRESS=/^0x[0-9a-fA-F]{40}$/;
 const WBNB='0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
+const CAKE='0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82';
+const LINK='0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd';
+const CLOUD_URL='https://iytjxruxpvwjjhbndkzo.supabase.co/functions/v1/kibernetic-bnb-scan';
 const labels={
   ANALIZZA:'Analisi e feed token',VERIFICA:'Sicurezza e rischio',CALCOLA:'Preventivo PancakeSwap',
   ESEGUE:'Swap autorizzato',MONITORA:'Ordini e posizioni H24',REGISTRA:'Registro persistente'
@@ -37,19 +40,24 @@ function mount(){
   sourceLink.textContent='Apri la pool su DEX Screener';
   sourceLink.rel='noopener noreferrer';sourceLink.target='_blank';
   const note=document.createElement('p');note.style.cssText='font-size:12px;color:#9ab9c9;margin:8px 0 0';
+  const cloudLine=document.createElement('p');
+  cloudLine.style.cssText='font-size:12px;line-height:1.55;font-weight:600;margin:11px 0 2px;color:#d9efff';
+  const cloudDetails=document.createElement('p');
+  cloudDetails.style.cssText='font-size:12px;line-height:1.55;color:#adcbdc;margin:0 0 10px';
   let address='', snapshot=null, error='', busy=false, controller=null;
+  let cloud=null,cloudError='',cloudBusy=false,cloudUpdatedAt=0,cloudController=null;
   const poolChecks=new Map();
   const tokenAddress=()=>{
     const c=window.kiberTokenContext?.()?.coin;
     if(!c)return '';
     const v=String(c.address||c.contract||'').trim();
     if(ADDRESS.test(v))return v;
-    return c.id==='binancecoin'?WBNB:'';
+    return c.id==='binancecoin'?WBNB:c.id==='pancakeswap-token'?CAKE:c.id==='chainlink'?LINK:'';
   };
   const money=v=>Number.isFinite(v)&&v>0?'$'+v.toLocaleString('it-IT',{maximumSignificantDigits:8}):'—';
   function refresh(){
     const current=tokenAddress();
-    if(current!==address){address=current;snapshot=null;error='';controller?.abort();}
+    if(current!==address){address=current;snapshot=null;error='';cloud=null;cloudError='';cloudUpdatedAt=0;controller?.abort();cloudController?.abort();}
     const hasCore=Boolean(window.KiberBNBTradingCore?.createPipeline);
     cells.get('ANALIZZA').textContent=snapshot&&snapshot.address.toLowerCase()===address.toLowerCase()
       ? 'DEX Screener · PancakeSwap · acquisizione HTTP, non stream on-chain.'
@@ -62,8 +70,26 @@ function mount(){
       : 'Origine della pool da verificare. Analisi rischio token non conclusa.';
     cells.get('CALCOLA').textContent='Calcoli predisposti; quote Smart Router da collegare.';
     cells.get('ESEGUE').textContent='DISATTIVATO: nessun acquisto o vendita reale.';
-    cells.get('MONITORA').textContent='Adattatore eventi Swap V3 predisposto; nodo WSS e servizio H24 da collegare.';
-    cells.get('REGISTRA').textContent='Interfaccia registro pronta; archivio persistente da collegare.';
+    const cloudAge=cloud?.lastAnalysisAt?Math.max(0,Math.floor((Date.now()-Date.parse(cloud.lastAnalysisAt))/1000)):null;
+    const cloudActive=cloud?.scanOnline===true&&cloudAge!==null&&cloudAge<=190;
+    cells.get('MONITORA').textContent=cloudActive?'Monitoraggio cloud ogni 60 secondi su '+Number(cloud.monitoredAssets||0)+' token, anche a telefono spento. WebSocket H24 non ancora attivo.':'Monitor cloud non verificato o temporaneamente non disponibile. WebSocket H24 non ancora attivo.';
+    cells.get('REGISTRA').textContent=cloudActive?'Stato dei token ed eventi significativi registrati in Supabase. Nessun ordine eseguito.':'Archivio predisposto; lo stato dei nuovi eventi non è verificabile ora.';
+    if(!cloud){cloudLine.textContent=cloudError?'Ricerca cloud · non disponibile':'Ricerca cloud · verifica in corso';cloudDetails.textContent=cloudError||'La ricerca server è indipendente dall’apertura di questa pagina.';}
+    else{
+      cloudLine.textContent=cloudActive?'Ricerca cloud attiva · ogni 60 s · '+Number(cloud.monitoredAssets||0)+' token monitorati · ultimo controllo '+cloudAge+' s fa':'Ricerca cloud · controllo non recente o non confermato';
+      const t=cloud.token;
+      if(!t)cloudDetails.textContent='Questa moneta non risulta nella raccolta cloud: le altre monete monitorate continuano ad essere controllate.';
+      else if(t.status==='STALE'||!cloudActive)cloudDetails.textContent='Ultimi dati del token non recenti: sospese le valutazioni sul movimento.';
+      else if(snapshot?.pair?.address && String(t.pool||'').toLowerCase()!==String(snapshot.pair.address).toLowerCase()){
+        cloudDetails.textContent='La raccolta cloud misura una pool differente da quella mostrata qui: variazioni non confrontabili. La ricerca continua sul server.';
+      }
+      else{
+        const pct=value=>Number.isFinite(value)?(value>=0?'+':'')+value.toLocaleString('it-IT',{maximumFractionDigits:2})+'%':'—';
+        const observations='Prezzo 5 min '+pct(t.priceChange5mPct)+' · 15 min '+pct(t.priceChange15mPct)+' · liquidità 15 min '+pct(t.liquidityChange15mPct)+'.';
+        const latest=(cloud.findings||[]).find(x=>Number.isFinite(Date.parse(x.at))&&Date.now()-Date.parse(x.at)<86400000);
+        cloudDetails.textContent=observations+(latest?' Evento rilevato: '+latest.summary+' ('+pct(latest.changePct)+').':' Nessuna anomalia recente registrata.');
+      }
+    }
     const p=snapshot?.pair,age=snapshot?Math.max(0,Math.floor((Date.now()-Date.parse(snapshot.fetchedAt))/1000)):null;
     if(p&&snapshot.address.toLowerCase()===address.toLowerCase()){
       report.textContent='Prezzo '+money(p.priceUsd)+' · liquidità '+money(p.liquidityUsd)+' · volume 24h '+money(p.volume24Usd)+' · acquisto/vendita 24h '+(p.buys24??'—')+'/'+(p.sells24??'—')+' · snapshot acquisito '+age+'s fa'+(age>45?' (da aggiornare)':'')+'. Ora dell’ultimo trade non verificata.';
@@ -86,6 +112,23 @@ function mount(){
     }catch{poolChecks.set(id,{verified:null,checked:Date.now()})}
     refresh();
   }
+  async function loadCloud(){
+    if(!box.open||document.hidden||cloudBusy)return;
+    refresh();
+    const target=address;
+    cloudBusy=true;
+    cloudController=new AbortController();
+    const timer=setTimeout(()=>cloudController.abort(),10500);
+    try{
+      const query=target?'?address='+encodeURIComponent(target):'';
+      const r=await fetch(CLOUD_URL+query,{signal:cloudController.signal,cache:'no-store'});
+      const data=await r.json();
+      if(target!==address)return;
+      if(!r.ok||data.ok!==true){cloud=null;cloudError='Servizio di monitoraggio non raggiungibile: nessuna conferma H24.';}
+      else {cloud=data;cloudError='';}
+    }catch{if(target===address){cloud=null;cloudError='Controllo cloud temporaneamente non disponibile.';}}
+    finally{clearTimeout(timer);cloudBusy=false;if(target===address)cloudUpdatedAt=Date.now();refresh();}
+  }
   async function load(){
     if(!box.open||document.hidden||busy)return;
     refresh();
@@ -103,16 +146,17 @@ function mount(){
     }catch{if(target===address){snapshot=null;error='Connessione di mercato non disponibile.'}}
     finally{clearTimeout(cutoff);busy=false;refresh()}
   }
-  box.append(header,description,grid,report,sourceLink,note);
-  box.addEventListener('toggle',()=>{refresh();if(box.open)load();else controller?.abort()});
+  box.append(header,description,cloudLine,cloudDetails,grid,report,sourceLink,note);
+  box.addEventListener('toggle',()=>{refresh();if(box.open){load();loadCloud();}else{controller?.abort();cloudController?.abort();}});
   const metrics=parent.querySelector('.v271-metrics');
   if(metrics)metrics.insertAdjacentElement('afterend',box);
   else parent.insertBefore(box,parent.firstChild);
   refresh();
   setInterval(()=>{if(!box.isConnected)return;if(box.open){refresh();}},1000);
   setInterval(()=>{if(box.open&&!document.hidden)load()},15000);
-  document.addEventListener('visibilitychange',()=>{if(box.open&&!document.hidden)load()});
-  document.addEventListener('kiber:analysis-updated',()=>{if(box.open&&tokenAddress()!==address){refresh();load()}});
+  setInterval(()=>{if(box.open&&!document.hidden&&Date.now()-cloudUpdatedAt>=60000)loadCloud()},15000);
+  document.addEventListener('visibilitychange',()=>{if(box.open&&!document.hidden){load();loadCloud()}});
+  document.addEventListener('kiber:analysis-updated',()=>{if(box.open&&tokenAddress()!==address){refresh();load();loadCloud()}});
 }
 function enableMount(){
   if(document.getElementById('kiberBnbTradingPipeline'))return;
