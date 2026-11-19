@@ -29,6 +29,28 @@ function identity(address){
  if(!ADDR.test(v))return null;
  return {address:v,asset:FIXED[v]||'address:'+v};
 }
+function resolveRequestedToken(question,selectedAddress=''){
+ const q=String(question||'').slice(0,1100);
+ const candidates=[
+  {subject:'CAKE',address:'0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',match:/\bCAKE\b|\b(?:token|moneta|coin)\s+(?:di\s+)?PancakeSwap\b/i},
+  {subject:'LINK',address:'0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd',match:/\bLINK\b|\bChainlink\b/i},
+  {subject:'BNB',address:FIXED_ADDRESS,match:/\bBNB\b(?!\s*Chain\b)/i}
+ ];
+ const hits=candidates.filter(x=>x.match.test(q));
+ if(hits.length>1)return {subject:hits.map(x=>x.subject).join(' e '),address:'',explicit:true,ambiguous:true};
+ if(hits.length===1)return {subject:hits[0].subject,address:hits[0].address,explicit:true};
+ const unknown=/\b(?:analizza|monitora|token|moneta|coin)\s+([a-z0-9]{2,15})\b/i.exec(q);
+ if(unknown&&!/^(?:il|la|lo|un|una|mercato|prezzo|contratto|grafico|rischio|settore|token|moneta)$/i.test(unknown[1]))
+  return {subject:unknown[1].toUpperCase(),address:'',explicit:true,unknown:true};
+ const selected=identity(selectedAddress);
+ if(selected)return {subject:selected.asset,address:selected.address,explicit:false};
+ return {subject:'BNB',address:FIXED_ADDRESS,explicit:false};
+}
+function isCloudDataQuestion(question){
+ const q=String(question||'');
+ return wantsBackground(q)||/\b(?:5|15)\s*(?:minuti?|min)\b/i.test(q)&&/\b(?:BNB|CAKE|LINK)\b/i.test(q)||
+   /\b(?:BNB|CAKE|LINK)\b/i.test(q)&&/\bpool\b/i.test(q);
+}
 function analyze(raw,{address='',now=Date.now()}={}){
  const selected=identity(address);
  if(!raw||raw.ok!==true)return {status:'UNAVAILABLE',scanner:'BACKGROUND_SQL_1M',reason:'Nessuna risposta valida dal monitor cloud',source:'Kibernetic BNB / Supabase',tradingEnabled:false,websocket:false};
@@ -74,6 +96,35 @@ function summarize(result){
  if(x.monitoredTokens!==null)lines.push('Token controllati: '+x.monitoredTokens+'; raccolta limitata a 12 token.');
  if(x.tokenStatus==='CURRENT'){
   const t=x.token;lines.push('TOKEN MONITORATO '+t.asset+'.');
+  lines.push('Pool PER QUESTO STORICO: '+t.pool+'. Il feed PancakeSwap principale può riferirsi a un’altra pool. Non unire dati di pool differenti.');
+  lines.push('Snapshot: '+t.lastSourceAt+' · '+t.sourceAgeSeconds+' secondi fa, non ora ultimo trade on-chain.');
+  lines.push('Prezzo snapshot: '+(t.priceUsd===null?'non disponibile':'
+  lines.push('Prezzo su circa 5 minuti: '+prettyPct(t.priceChange5mPct)+'; su 15 minuti: '+prettyPct(t.priceChange15mPct)+'.');
+  lines.push('Liquidità su circa 15 minuti: '+prettyPct(t.liquidityChange15mPct)+'.');
+  lines.push(x.findings.length?'Eventi rilevati: '+x.findings.map(f=>f.description+' ('+prettyPct(f.changePct)+')').join('; ')+'.':'Nessuna anomalia registrata recentemente per questo token: non equivale ad assenza di rischio.');
+ }else lines.push(x.reason||'Lettura specifica del token non disponibile.');
+ lines.push('Fonte: '+x.source+'. Non è uno stream WebSocket, non copre l’intera BNB Chain e non autorizza operazioni.');
+ return lines.join('\n');
+}
+function wantsBackground(question){
+ return /(?:monitoraggi|monitorat|ricerca cloud|ricerca automatica|controll(?:a|i|o).*mercato|ogni minuto|h24|24\/7|sfera|scanner.*(?:attiv|cloud)|cosa (?:hai|avete) (?:rilevat|trovat)|moviment[io] (?:recent|anomali)|cosa sta succedendo)/i.test(String(question||''));
+}
+async function fetchEvidence({fetchImpl=fetch,address='',now=Date.now(),timeoutMs=4200,allowDefaultBNB=true}={}){
+ const selected=identity(address),path=selected?'?address='+encodeURIComponent(selected.address):'?id=binancecoin';
+ const targetAddress=selected?.address||(allowDefaultBNB?FIXED_ADDRESS:'');
+ try{
+  const response=await fetchImpl(API+path,{
+   method:'GET',headers:{Accept:'application/json'},
+   cache:'no-store',signal:AbortSignal.timeout(timeoutMs)
+  });
+  if(!response.ok)return analyze(null,{address:targetAddress,now});
+  const raw=await response.json();
+  return analyze(raw,{address:targetAddress,now});
+ }catch{return analyze(null,{address:targetAddress,now})}
+}
+const FIXED_ADDRESS='0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
+module.exports={API,FIXED_ADDRESS,identity,resolveRequestedToken,isCloudDataQuestion,analyze,summarize,wantsBackground,fetchEvidence};
++t.priceUsd)+' · liquidità pool: '+(t.liquidityUsd===null?'non disponibile':'
   lines.push('Prezzo su circa 5 minuti: '+prettyPct(t.priceChange5mPct)+'; su 15 minuti: '+prettyPct(t.priceChange15mPct)+'.');
   lines.push('Liquidità su circa 15 minuti: '+prettyPct(t.liquidityChange15mPct)+'.');
   lines.push(x.findings.length?'Eventi rilevati: '+x.findings.map(f=>f.description+' ('+prettyPct(f.changePct)+')').join('; ')+'.':'Nessuna anomalia registrata recentemente per questo token: non equivale ad assenza di rischio.');
@@ -91,10 +142,35 @@ async function fetchEvidence({fetchImpl=fetch,address='',now=Date.now(),timeoutM
    method:'GET',headers:{Accept:'application/json'},
    cache:'no-store',signal:AbortSignal.timeout(timeoutMs)
   });
-  if(!response.ok)return analyze(null,{address:address||FIXED_ADDRESS,now});
+  if(!response.ok)return analyze(null,{address:targetAddress,now});
   const raw=await response.json();
-  return analyze(raw,{address:address||FIXED_ADDRESS,now});
- }catch{return analyze(null,{address:address||FIXED_ADDRESS,now})}
+  return analyze(raw,{address:targetAddress,now});
+ }catch{return analyze(null,{address:targetAddress,now})}
+}
+const FIXED_ADDRESS='0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
+module.exports={API,FIXED_ADDRESS,identity,analyze,summarize,wantsBackground,fetchEvidence};
++t.liquidityUsd)+'.');
+  lines.push('Prezzo su circa 5 minuti: '+prettyPct(t.priceChange5mPct)+'; su 15 minuti: '+prettyPct(t.priceChange15mPct)+'.');
+  lines.push('Liquidità su circa 15 minuti: '+prettyPct(t.liquidityChange15mPct)+'.');
+  lines.push(x.findings.length?'Eventi rilevati: '+x.findings.map(f=>f.description+' ('+prettyPct(f.changePct)+')').join('; ')+'.':'Nessuna anomalia registrata recentemente per questo token: non equivale ad assenza di rischio.');
+ }else lines.push(x.reason||'Lettura specifica del token non disponibile.');
+ lines.push('Fonte: '+x.source+'. Non è uno stream WebSocket, non copre l’intera BNB Chain e non autorizza operazioni.');
+ return lines.join('\n');
+}
+function wantsBackground(question){
+ return /(?:monitoraggi|monitorat|ricerca cloud|ricerca automatica|controll(?:a|i|o).*mercato|ogni minuto|h24|24\/7|sfera|scanner.*(?:attiv|cloud)|cosa (?:hai|avete) (?:rilevat|trovat)|moviment[io] (?:recent|anomali)|cosa sta succedendo)/i.test(String(question||''));
+}
+async function fetchEvidence({fetchImpl=fetch,address='',now=Date.now(),timeoutMs=4200}={}){
+ const selected=identity(address),path=selected?'?address='+encodeURIComponent(selected.address):'?id=binancecoin';
+ try{
+  const response=await fetchImpl(API+path,{
+   method:'GET',headers:{Accept:'application/json'},
+   cache:'no-store',signal:AbortSignal.timeout(timeoutMs)
+  });
+  if(!response.ok)return analyze(null,{address:targetAddress,now});
+  const raw=await response.json();
+  return analyze(raw,{address:targetAddress,now});
+ }catch{return analyze(null,{address:targetAddress,now})}
 }
 const FIXED_ADDRESS='0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c';
 module.exports={API,FIXED_ADDRESS,identity,analyze,summarize,wantsBackground,fetchEvidence};
