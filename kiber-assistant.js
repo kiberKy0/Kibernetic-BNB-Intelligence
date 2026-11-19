@@ -59,7 +59,8 @@ async function submit(){
   const intent=window.KiberPlatformControl?.match(q);if(intent){const outcome=window.KiberPlatformControl.execute(intent);if(outcome.handled){say('assistant',outcome.message);return}}
   const commands=/^(apri scanner|scanner|mostra monitorati|monitorati|controlla rischio|aggiorna scanner)$/i;
   const isCloudQuestion=/(?:ricerca cloud|monitoraggio|ogni minuto|24\/7|h24|sfera|cosa hai rilevato|cosa sta succedendo)/i.test(q);
-  if(!commands.test(q)&&(await geminiReady()||isCloudQuestion)){
+  const isBinanceQuestion=/\bbinance\b|\bBNBUSDT\b/i.test(q);
+  if(!commands.test(q)&&(await geminiReady()||isCloudQuestion||isBinanceQuestion)){
    if(epoch!==state.epoch||!isChatOpen())return;
    const ctx=context();
    const ui={marketSectorSummary:ctx.marketSectorSummary,trendSummary:ctx.trendSummary,selectedToken:ctx.selectedToken,tokenAddress:ctx.tokenAddress,price:ctx.price,change24:ctx.change24,source:ctx.source};
@@ -79,7 +80,7 @@ async function submit(){
    const d=await r.json();
    if(epoch!==state.epoch||!isChatOpen())return;
    if(!d.answer)throw Error('Risposta vuota');
-   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini ha risposto · verifica dati e fonti.':d.provider==='verified-cloud'?'Dati cloud verificati · risposta IA non pertinente esclusa.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA ha risposto · verifica dati e fonti.';
+   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini ha risposto · verifica dati e fonti.':d.provider==='verified-cloud'?'Dati cloud verificati · risposta IA non pertinente esclusa.':d.provider==='verified-binance-spot'?'Binance Spot pubblico · dati verificati dal server.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA ha risposto · verifica dati e fonti.';
    say('assistant',d.provider==='deterministic'&&d.warning?'Gemini non ha risposto ('+d.warning+').\n\n'+d.answer:d.answer);
   }else say('assistant',localAnswer(q,context()));
  }catch{if(epoch===state.epoch&&isChatOpen())say('assistant','La connessione al servizio IA non è riuscita. Riprova più tardi o usa i comandi locali Scanner, Monitorati e Rischi.')}
