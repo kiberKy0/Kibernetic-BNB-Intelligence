@@ -67,3 +67,18 @@ test('server and UI route the exact question to verified public data, not fictio
  assert.doesNotThrow(()=>new Function(ui));
  assert.doesNotThrow(()=>new Function('require','process','module','exports',backend));
 });
+
+test('clock skew of one second never displays a negative age; excessive future timestamps are rejected',()=>{
+ const oneSecond=E.parseTicker({...ticker,closeTime:now+1000},now);
+ assert.equal(oneSecond.status,'CURRENT');
+ assert.equal(oneSecond.sourceAgeSeconds,0);
+ assert.match(E.summarize(oneSecond),/0 secondi/);
+ const wrongClock=E.parseTicker({...ticker,closeTime:now+15000},now);
+ assert.equal(wrongClock.status,'STALE');
+ assert.doesNotMatch(E.summarize(wrongClock),/591,08/);
+});
+test('chat header does not say Gemini generated every response',()=>{
+ const ui=fs.readFileSync('kiber-assistant.js','utf8');
+ assert.match(ui,/Analisi BNB · IA e fonti/);
+ assert.doesNotMatch(ui,/<small>Analisi BNB · Gemini<\/small>/);
+});
