@@ -8,7 +8,7 @@ const labels={
   ESEGUE:'Swap autorizzato',MONITORA:'Ordini e posizioni H24',REGISTRA:'Registro persistente'
 };
 function mount(){
-  const parent=document.querySelector('#section-lab .section-body');
+  const parent=document.querySelector('#v271TokenView .v271-main');
   if(!parent||document.getElementById('kiberBnbTradingPipeline'))return;
   const box=document.createElement('details');
   box.id='kiberBnbTradingPipeline';
@@ -105,13 +105,29 @@ function mount(){
   }
   box.append(header,description,grid,report,sourceLink,note);
   box.addEventListener('toggle',()=>{refresh();if(box.open)load();else controller?.abort()});
-  parent.insertBefore(box,parent.firstChild);
+  const metrics=parent.querySelector('.v271-metrics');
+  if(metrics)metrics.insertAdjacentElement('afterend',box);
+  else parent.insertBefore(box,parent.firstChild);
   refresh();
   setInterval(()=>{if(!box.isConnected)return;if(box.open){refresh();}},1000);
   setInterval(()=>{if(box.open&&!document.hidden)load()},15000);
   document.addEventListener('visibilitychange',()=>{if(box.open&&!document.hidden)load()});
   document.addEventListener('kiber:analysis-updated',()=>{if(box.open&&tokenAddress()!==address){refresh();load()}});
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);
-else mount();
+function enableMount(){
+  if(document.getElementById('kiberBnbTradingPipeline'))return;
+  mount();
+  if(document.getElementById('kiberBnbTradingPipeline'))return;
+  // The token detail overlay is created only when a user opens a coin.
+  // Watch direct additions to body rather than polling hidden legacy panels.
+  const observer=new MutationObserver(()=>{
+    if(document.getElementById('v271TokenView')){
+      mount();
+      if(document.getElementById('kiberBnbTradingPipeline'))observer.disconnect();
+    }
+  });
+  observer.observe(document.body,{childList:true});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',enableMount,{once:true});
+else enableMount();
 })();
