@@ -1,0 +1,56 @@
+/* Kibernetic BNB compact monitoring sphere, inside home header. */
+#kiberCompactDashboard .kbo-orb-button{
+  flex:0 0 54px;margin-left:auto;border:0;background:transparent;color:#c4eaff;
+  display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 3px;
+  cursor:pointer;min-height:53px;justify-content:center
+}
+#kiberCompactDashboard .kbo-orb-label{
+  font-size:9px;font-weight:780;letter-spacing:.5px;line-height:1
+}
+#kiberCompactDashboard .kbo-orb-sphere{
+  position:relative;display:block;width:35px;height:35px;flex:none;border-radius:50%;
+  background:radial-gradient(circle at 29% 22%,#d3faff 0%,#71c7fb 18%,#165e99 42%,#102d58 72%,#071327 100%);
+  border:1px solid #49bff6;
+  box-shadow:inset -5px -5px 12px #04182ed9,0 0 8px #2c95c36b
+}
+#kiberCompactDashboard .kbo-orb-sphere::before{
+  content:"";position:absolute;inset:-4px -6px;border:1.5px solid #80cffa94;
+  border-radius:50%;transform:rotate(-30deg) scaleY(.52)
+}
+#kiberCompactDashboard .kbo-orb-sphere::after{
+  content:"";position:absolute;right:5px;bottom:6px;width:5px;height:5px;
+  border-radius:50%;background:#d4ebf4;box-shadow:0 0 0 2px #ffffff19
+}
+#kiberCompactDashboard .kbo-orb-button[data-status="active"] .kbo-orb-sphere{
+  border-color:#6ef3db;box-shadow:inset -5px -5px 12px #04182ebd,0 0 0 2px #36cbbd4a,0 0 13px #40d3c579
+}
+#kiberCompactDashboard .kbo-orb-button[data-status="active"] .kbo-orb-sphere::after{background:#83ffcb;box-shadow:0 0 7px #a0ffe0}
+#kiberCompactDashboard .kbo-orb-button[data-status="stale"] .kbo-orb-sphere{
+  filter:saturate(.55);border-color:#d6a46c;box-shadow:0 0 0 2px #c68f4950
+}
+#kiberCompactDashboard .kbo-orb-button[data-status="stale"] .kbo-orb-sphere::after{background:#ffc577}
+#kiberCompactDashboard .kbo-orb-button[data-status="unavailable"] .kbo-orb-sphere{filter:grayscale(.85);box-shadow:none}
+#kiberCompactDashboard .kbo-panel[hidden]{display:none!important}
+#kiberCompactDashboard .kbo-panel{
+  padding:11px 13px;margin:0 0 12px;background:#0a2334;color:#dff6ff;
+  border:1px solid #2d667a;border-radius:13px;font-size:12px;line-height:1.5
+}
+#kiberCompactDashboard .kbo-panel-title{display:block;font-size:14px;margin-bottom:5px}
+#kiberCompactDashboard .kbo-line{margin:3px 0;color:#b1d1e0;overflow-wrap:anywhere}
+#kiberCompactDashboard #kboStatus{color:#e6faff;font-weight:750}
+#kiberCompactDashboard .kbo-changes{padding:8px;margin:8px 0;background:#103248;border-radius:8px}
+#kiberCompactDashboard .kbo-note{font-size:11px;color:#91b7c9;margin:9px 0}
+#kiberCompactDashboard .kbo-actions{display:flex;gap:8px;justify-content:flex-end}
+#kiberCompactDashboard .kbo-actions button{
+  border:1px solid #3c708c;border-radius:8px;background:#11354d;color:#d8f5ff;
+  padding:8px 10px;min-height:36px;font-size:12px
+}
+@media(max-width:390px){
+  #kiberCompactDashboard .kbo-orb-button{flex-basis:47px;padding:2px 0}
+  #kiberCompactDashboard .kbo-orb-sphere{width:31px;height:31px}
+  #kiberCompactDashboard .kbo-orb-label{font-size:8px}
+  #kiberCompactDashboard .kcd-header h1{font-size:20px}
+}
+@media(prefers-reduced-motion:reduce){
+  #kiberCompactDashboard .kbo-orb-sphere{animation:none!important}
+}

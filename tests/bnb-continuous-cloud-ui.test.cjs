@@ -13,7 +13,7 @@ test('mobile market scanner shows server-side minute scan without duplicating ch
   assert.match(panel,/monitoredAssets/);
   assert.ok(panel.includes('#v271TokenView .v271-main'));
   assert.match(boot,/'bnb-trading-panel.js'/);
-  assert.match(boot,/bnb-cloud-scanner/);
+  assert.match(boot,/bnb-cloud-orb/);
 });
 test('cloud status is fail-closed, never claims WebSocket or wallet trading',()=>{
   assert.match(panel,/cloudAge<=190/);
