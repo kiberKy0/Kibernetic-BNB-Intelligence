@@ -11,6 +11,10 @@
       "destination": "/api/coingecko?type=bnb-dex-live"
     },
     {
+      "source": "/api/bnb-pool-verify",
+      "destination": "/api/coingecko?type=bnb-pool-verify"
+    },
+    {
       "source": "/api/token-safety",
       "destination": "/api/token-search?mode=safety"
     },
