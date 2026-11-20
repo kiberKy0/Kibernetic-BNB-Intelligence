@@ -1,0 +1,333 @@
+/*
+ * Kibernetic BNB Intelligence · visual theme of Kiber IA Finance
+ * Source: Floot project "Kiber IA Finance", base.css and pages/_index.module.css (2026-11-20).
+ * Presentation-only skin. No new panels, text, elements, layout grids, API calls,
+ * wallet behavior, trading rules, event listeners, or reordering.
+ * Loaded LAST into the existing BNB iframe. XAU/USD remains an independent page.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --fia-night:#060c1c;
+  --fia-indigo:#101b44;
+  --fia-glass:#12223e;
+  --fia-deep:#0b1b36;
+  --fia-cyan:#42dbff;
+  --fia-bright:#86f2ff;
+  --fia-lavender:#b499ff;
+  --fia-gold:#ffce86;
+  --fia-white:#f2f8ff;
+  --fia-muted:#9fb8d3;
+  --fia-edge:rgba(86,185,249,.32);
+  --fia-outline:rgba(114,232,255,.62);
+  --fia-shadow:0 14px 38px rgba(1,4,23,.40);
+  --fia-display:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;
+  --fia-text:'DM Sans',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+
+/* Finance uses deep indigo glass. Keep all existing components and measurements. */
+body.theme-dark,
+body.theme-blue,
+body.theme-kiber {
+  --bg:#060c1c;
+  --panel:#101b34;
+  --panel2:#142440;
+  --text:#f0f7ff;
+  --muted:#9fb8d3;
+  --line:#304566;
+  --accent:#32baff;
+  --accent2:#42dbff;
+  --kiber-bg:#060c1c;
+  --kiber-panel:#0d1b34;
+  --kiber-panel-2:#12223e;
+  --kiber-blue:#42baff;
+  --kiber-cyan:#42dbff;
+  --kiber-white:#f0f7ff;
+  --kiber-muted:#9fb8d3;
+  --kiber-line:#304566;
+  background:
+    radial-gradient(ellipse 72% 44% at 50% -9%,rgba(84,92,228,.45) 0%,rgba(24,38,112,.29) 49%,transparent 100%),
+    radial-gradient(ellipse 50% 45% at 96% 45%,rgba(85,52,155,.12),transparent 82%),
+    #060c1c;
+  color:var(--fia-white);
+  font-family:var(--fia-text);
+  font-variant-numeric:tabular-nums;
+}
+body.theme-dark :is(h1,h2,h3,.brand-copy strong,.kcd-header h1,.kcd-card-head h2,.v271-top-title b),
+body.theme-blue :is(h1,h2,h3,.brand-copy strong,.kcd-header h1),
+body.theme-kiber :is(h1,h2,h3,.brand-copy strong,.kcd-header h1){
+  font-family:var(--fia-display);
+  letter-spacing:-.025em;
+}
+body :is(button,a,input,select,textarea):focus-visible {
+  outline:2px solid var(--fia-bright);
+  outline-offset:3px;
+}
+
+/* Top navigation: only glass surface, type, and glow. Its wallet/profile slots
+   retain their position and dimensions from v20-production.html. */
+header.top.kiber-wallet-top {
+  background:linear-gradient(107deg,rgba(8,17,44,.97),rgba(18,27,70,.91) 60%,rgba(10,23,53,.97));
+  border-bottom:1px solid rgba(91,215,255,.38);
+  box-shadow:0 9px 32px rgba(0,7,38,.25);
+  backdrop-filter:blur(16px);
+}
+header.top .brand-mark{
+  filter:drop-shadow(0 0 12px rgba(66,219,255,.37));
+}
+header.top .brand-copy strong{color:var(--fia-white)!important}
+header.top .brand-copy small{color:#b3cced}
+header.top :is(.icon-btn,.profile-btn,#kiberHeaderWalletBalance){
+  background:linear-gradient(130deg,rgba(21,43,90,.95),rgba(11,32,69,.91));
+  color:#e8f5ff;
+  border-color:rgba(94,180,243,.45);
+  box-shadow:inset 0 0 14px rgba(69,157,245,.08);
+}
+header.top #kiberHeaderGold{
+  background:linear-gradient(130deg,rgba(68,49,96,.94),rgba(38,29,78,.96));
+  border-color:rgba(238,186,121,.60);
+  color:#ffe1aa;
+}
+header.top :is(.icon-btn,.profile-btn,#kiberHeaderWalletBalance,#kiberHeaderGold):hover {
+  border-color:rgba(127,239,255,.9);
+  box-shadow:0 0 14px rgba(63,175,245,.18);
+}
+
+/* Shared surfaces used by the legacy sections. Do not change open/closed
+   states, display modes, grid-template columns, heights or fixed positioning. */
+body.theme-dark :is(.panel,.chart-card,.project-card,.news-item,.risk-card,.sector-card,.overview>div,.metrics>div){
+  background:linear-gradient(140deg,rgba(19,36,80,.88),rgba(9,24,56,.91));
+  border-color:var(--fia-edge);
+  box-shadow:inset 0 1px 0 rgba(190,229,255,.035),0 8px 24px rgba(0,4,30,.13);
+}
+body.theme-dark :is(.hub button,.v241-card,.v241-metric,.v241-brief,.v241-workbar){
+  background:linear-gradient(145deg,rgba(19,46,110,.75),rgba(11,26,62,.86));
+  border-color:rgba(81,168,243,.35);
+}
+body.theme-dark :is(.section-head,.v241-workbar,.v241-subnav) {color:var(--fia-white)}
+body.theme-dark :is(.primary,.v241-btn.primary){
+  background:linear-gradient(112deg,#157ecb,#42dbff);
+  color:#041b32;
+  border-color:rgba(154,244,255,.48);
+}
+body.theme-dark :is(.v241-subnav button.active,.tabs button.active){
+  background:linear-gradient(110deg,rgba(36,98,188,.76),rgba(23,110,166,.80));
+  color:#e9faff;
+  border-color:rgba(90,221,255,.72);
+}
+
+/* Primary compact home, identical controls and groups, IA Finance materials. */
+#kiberCompactDashboard {
+  position:relative;
+  isolation:isolate;
+  color:var(--fia-white);
+  background:
+    radial-gradient(ellipse 70% 35% at 93% 0%,rgba(80,57,166,.23),transparent 79%),
+    linear-gradient(150deg,rgba(17,29,73,.84),rgba(6,15,41,.75) 74%);
+  border:1px solid rgba(89,138,224,.29);
+  border-radius:24px;
+  box-shadow:var(--fia-shadow),inset 0 1px rgba(137,208,255,.07);
+}
+#kiberCompactDashboard .kcd-header {
+  position:relative;
+  border-radius:18px;
+  background:
+    radial-gradient(ellipse at 87% 12%,rgba(89,60,190,.18),transparent 55%),
+    linear-gradient(110deg,rgba(13,34,93,.80),rgba(11,27,70,.72));
+  border:1px solid rgba(69,194,248,.31);
+  box-shadow:inset 0 0 23px rgba(23,105,227,.12);
+}
+#kiberCompactDashboard .kcd-header h1{
+  font-family:var(--fia-display);
+  color:#f6fbff;
+  text-shadow:0 0 20px rgba(71,185,255,.2);
+}
+#kiberCompactDashboard .kcd-header p{color:#aecbea}
+#kiberCompactDashboard .kcd-icon-action{
+  background:linear-gradient(145deg,#123a7b,#0e2960);
+  color:#c6f9ff;
+  border-color:rgba(110,223,255,.65);
+  box-shadow:0 0 9px rgba(45,172,255,.20);
+}
+#kiberCompactDashboard .kcd-nav button{
+  background:linear-gradient(150deg,#153a82 0%,#101e57 80%);
+  border-color:rgba(92,192,255,.55);
+  border-radius:16px;
+  color:#f2faff;
+  box-shadow:inset 0 0 19px rgba(24,116,231,.15),0 3px 12px rgba(0,10,48,.17);
+}
+#kiberCompactDashboard .kcd-nav button:first-child{
+  background:linear-gradient(140deg,#145caa,#0b3476);
+  border-color:#75ecff;
+  box-shadow:0 0 13px rgba(56,207,255,.32),inset 0 0 16px rgba(75,176,239,.12);
+}
+#kiberCompactDashboard .kcd-nav button:hover{
+  border-color:#b4f9ff;
+  box-shadow:0 0 14px rgba(52,195,255,.28);
+}
+#kiberCompactDashboard .kcd-nav-icon{color:#92f1ff}
+#kiberCompactDashboard .kcd-leader{
+  background:linear-gradient(110deg,rgba(24,48,114,.85),rgba(29,26,98,.74));
+  border-color:rgba(100,157,239,.42);
+  box-shadow:inset 0 0 19px rgba(49,91,229,.10);
+}
+#kiberCompactDashboard .kcd-leader[data-tone="up"]{
+  background:linear-gradient(110deg,rgba(20,65,79,.85),rgba(13,42,69,.86));
+  border-color:rgba(88,222,178,.48);
+}
+#kiberCompactDashboard .kcd-leader[data-tone="down"]{
+  background:linear-gradient(110deg,rgba(78,37,72,.86),rgba(40,27,73,.89));
+  border-color:rgba(252,132,163,.48);
+}
+#kiberCompactDashboard .kcd-leader-main small{color:#b6d7ec}
+#kiberCompactDashboard .kcd-leader-info{color:#a7c5df}
+#kiberCompactDashboard .kcd-card{
+  background:linear-gradient(135deg,rgba(16,43,100,.93),rgba(8,28,74,.94));
+  border-color:rgba(78,199,255,.63);
+  border-radius:20px;
+  box-shadow:0 0 17px rgba(21,159,241,.16),inset 0 0 20px rgba(25,125,231,.1);
+}
+#kiberCompactDashboard .kcd-card-head h2{
+  font-family:var(--fia-display);
+  color:#f6f9ff;
+}
+#kiberCompactDashboard .kcd-card-head button{color:#a6f4ff}
+#kiberCompactDashboard .kcd-row {border-top-color:rgba(105,177,244,.22);color:#effaff}
+#kiberCompactDashboard .kcd-row:hover{background:rgba(46,118,218,.19)}
+#kiberCompactDashboard .kcd-row-sub{color:#b0c7e3}
+#kiberCompactDashboard .kcd-metrics{
+  background:linear-gradient(115deg,rgba(12,42,106,.94),rgba(19,37,101,.89));
+  border-color:rgba(83,198,252,.53);
+  border-radius:18px;
+  box-shadow:inset 0 0 19px rgba(33,126,222,.15);
+}
+#kiberCompactDashboard .kcd-metrics>div+div{border-left-color:rgba(99,183,238,.28)}
+#kiberCompactDashboard .kcd-metrics span{color:#acc9e6}
+#kiberCompactDashboard .kcd-metrics strong{color:#f6faff}
+#kiberCompactDashboard .kcd-footnote,
+#kiberCompactDashboard .kcd-sample-note{color:#a4bfdc}
+#kiberCompactDashboard .kcd-dock{
+  background:rgba(8,20,58,.94);
+  border-color:rgba(93,193,245,.54);
+  border-radius:18px;
+  box-shadow:0 0 18px rgba(54,153,230,.17),0 10px 32px rgba(0,5,26,.38);
+}
+#kiberCompactDashboard .kcd-dock button{color:#c4e0f7}
+#kiberCompactDashboard .kcd-dock button:first-child{
+  background:linear-gradient(128deg,#1764ac,#164d8f);
+  color:#f1fdff;
+  box-shadow:inset 0 0 11px rgba(91,213,255,.2);
+}
+#kiberCompactDashboard .kcd-external-source{
+  background:rgba(17,40,89,.76);
+  border-color:rgba(72,168,234,.41);
+  color:#b6cee8;
+}
+#kiberCompactDashboard .kcd-external-source a{color:#a5f1ff!important}
+
+/* Orb visual remains semantic: cyan=active, amber=stale, grey=unknown.
+   These overrides style its housing only; don't override status colours. */
+#kiberCompactDashboard .kbo-panel{
+  background:linear-gradient(132deg,#122958,#111d48 64%,#18205b);
+  border-color:rgba(109,213,255,.58);
+  box-shadow:inset 0 0 22px rgba(40,120,235,.11);
+  color:#f0f8ff;
+}
+#kiberCompactDashboard .kbo-line{color:#bfd6ef}
+#kiberCompactDashboard .kbo-changes{background:#10295a}
+#kiberCompactDashboard .kbo-actions button{
+  background:#123975;border-color:#5399d9;color:#e5fbff;
+}
+
+/* Existing token-scanner and comparison windows: same panels, same fields and
+   same collapse/expand controls. Only shared materials and accents change. */
+#v271TokenView .v271-shell,
+#v271TokenView .v271-main,
+#kcdCompare.kcd-compare{
+  background:linear-gradient(150deg,#0a163a,#0b1944 60%,#09152f);
+  color:#edf7ff;
+}
+#v271TokenView .v271-top{
+  background:linear-gradient(120deg,#102b67,#171e62);
+  border-bottom-color:rgba(90,202,255,.43);
+}
+#v271TokenView .v271-hero{
+  background:linear-gradient(135deg,rgba(24,53,126,.95),rgba(25,24,86,.96));
+  border-color:rgba(89,187,247,.46);
+}
+#v271TokenView :is(.v271-metrics>div,.v271-chart-stats>div,.v271-box,.v271-factor-grid>div,.v271-trade .kcd-trade-grid>div){
+  background:linear-gradient(145deg,rgba(15,40,91,.92),rgba(10,23,55,.96));
+  border-color:rgba(82,156,228,.28);
+}
+#v271TokenView .v271-box>summary{color:#eff8ff}
+#v271TokenView :is(.v271-inline-actions button,.v271-ai-actions button){
+  background:rgba(18,57,112,.83);
+  border-color:rgba(84,198,244,.48);
+  color:#d6faff;
+}
+#kcdCompare :is(.kcd-compare-item,.kcd-compare-chip){
+  background:linear-gradient(140deg,#142e67,#0d2350);
+  border-color:rgba(93,189,236,.37);
+}
+
+/* Kiber chat matches IA Finance without changing message handling, layout or
+   memory behavior. The user and assistant bubbles remain distinct. */
+.kiber-panel {
+  background:linear-gradient(156deg,#111b44,#0a1636 70%,#101834);
+  color:#eef7ff;
+  border-color:rgba(108,196,250,.64);
+  box-shadow:0 20px 65px rgba(0,3,27,.73),0 0 24px rgba(74,147,238,.17);
+  font-family:var(--fia-text);
+}
+.kiber-top{
+  background:linear-gradient(110deg,#142d69,#251f67 72%,#132351);
+  border-bottom-color:rgba(100,197,246,.39);
+}
+.kiber-top strong{font-family:var(--fia-display);color:#fff}
+.kiber-top small,.kiber-panel .kiber-note{color:#a9c9e8}
+.kiber-msg.assistant{
+  background:linear-gradient(125deg,#18284e,#192344);
+  color:#e3f3ff;
+  border:1px solid rgba(90,155,228,.24);
+}
+.kiber-msg.user{
+  background:linear-gradient(115deg,#3168da,#425bd7);
+  border:1px solid rgba(149,210,255,.32);
+  color:white;
+}
+.kiber-quick button{
+  background:rgba(12,38,89,.97);
+  color:#c6f4ff;
+  border-color:rgba(104,174,244,.50);
+}
+.kiber-compose input{
+  background:#081730;
+  color:#f5faff;
+  border-color:rgba(88,160,217,.5);
+}
+.kiber-compose input::placeholder{color:#93adc9}
+.kiber-compose button{
+  background:linear-gradient(120deg,#2c8cd8,#39cde8);
+  color:#041c33;
+  border:1px solid rgba(157,238,255,.46);
+}
+.kiber-top .kiber-memory-toggle{
+  background:#1b386c;
+  border-color:#6599dc;
+  color:#dbf4ff;
+}
+.kiber-top .kiber-memory-toggle[aria-pressed="true"]{
+  background:#125c5d;
+  border-color:#58d5b0;
+}
+
+/* Tiny devices: retain existing grids and click targets, avoid extra overflow. */
+@media(max-width:650px){
+  #kiberCompactDashboard{border-radius:20px}
+  #kiberCompactDashboard .kcd-header{border-radius:15px}
+  #kiberCompactDashboard .kcd-nav button{border-radius:13px}
+  #kiberCompactDashboard .kcd-card{border-radius:17px}
+}
+@media(prefers-reduced-motion:reduce){
+  #kiberCompactDashboard .kcd-nav button{transition:none}
+}
