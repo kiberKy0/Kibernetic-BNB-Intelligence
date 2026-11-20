@@ -88,6 +88,9 @@
       setText('xauGuideSummary', 'Impossibile validare il setup in sicurezza.');
       window.KiberXauContext = { state:'WAIT', mode:'validator-error' };
     }
+    // Update the separate price-action lab without changing the advanced safety gate.
+    try { window.KiberXauMethodsUI?.render(result, feedContext, source); }
+    catch (_) { /* The main Decoder remains independent if an optional lab breaks. */ }
   }
   function waiting(reason, source = 'Nessun feed affidabile') {
     render({ signal: 'WAIT', label: 'ATTESA', samples: 0, interval: $('interval').value,
