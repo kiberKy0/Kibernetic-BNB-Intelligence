@@ -88,3 +88,28 @@ test('BNB backend routes internal explanations and XAU independently',()=>{
  assert.doesNotThrow(()=>new Function(ui));
  assert.doesNotThrow(()=>new Function('require','process','module','exports',api));
 });
+
+test('40 current help topics including 11 XAU research methods and theoretical study levels',()=>{
+ assert.equal(K.CATALOG.length,40);
+ const a=K.match('Spiegami gli 11 metodi di XAU/USD',{area:'xau'});
+ assert.ok(a?.entries.some(x=>x.id==='xaumethods'));
+ assert.match(K.summaries(a),/Falsa rottura|Pullback EMA20/);
+ const b=K.match('Come funziona il retest del livello?',{area:'xau'});
+ assert.ok(b?.entries.some(x=>x.id==='xauresearch'));
+ const c=K.match('A cosa servono i livelli ipotetici TP1 TP2?',{area:'xau'});
+ assert.ok(c?.entries.some(x=>x.id==='xaulevels'));
+});
+test('status and market analysis must not be hijacked as documentation',()=>{
+ assert.equal(K.match('Ricerca cloud attiva?'),null);
+ assert.equal(K.match('Perché aumenta il prezzo BNB oggi?'),null);
+ assert.equal(K.match('Quanto costa CAKE adesso?'),null);
+});
+test('web research is explicit, not triggered by a feature named Ricerca',()=>{
+ assert.equal(K.wantsExternalGuideResearch('Come funziona la ricerca cloud?'),false);
+ assert.equal(K.wantsExternalGuideResearch('Spiegami la sfera ricerca'),false);
+ assert.equal(K.wantsExternalGuideResearch('Fai una ricerca su TVL e DeFi'),true);
+ assert.equal(K.wantsExternalGuideResearch('Cerca approfondimenti sul RSI, fonti esterne'),true);
+ assert.ok(K.match('Fai una ricerca su TVL e DeFi')?.entries.some(x=>x.id==='defi'));
+ const api=fs.readFileSync('api/kiber.js','utf8');
+ assert.match(api,/PlatformGuide\.wantsExternalGuideResearch\(question\)/);
+});
