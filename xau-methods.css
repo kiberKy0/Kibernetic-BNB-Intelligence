@@ -36,3 +36,17 @@
  .xau-method-card>summary strong,.xau-method-card>summary span{display:inline}
  .xau-method-card>summary span{margin-left:5px}
 }
+
+/* Research extension: only one extra collapsed section, no dashboard sprawl. */
+.xau-research-scenario{border:1px solid #365769;background:#0b1e2d;border-radius:9px;margin-top:9px;overflow:hidden}
+.xau-research-scenario>summary{cursor:pointer;color:#ecd49d;font-weight:740;font-size:12px;padding:11px}
+.xau-research-scenario[open]>summary{border-bottom:1px solid #2e4e60}
+.xau-research-scenario>p{font-size:11px;color:#bacfdd;margin:8px 10px;line-height:1.45}
+.xau-research-scenario .xau-research-status{font-size:10px;font-weight:760;letter-spacing:.02em;color:#e9c783}
+.xau-research-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:9px}
+.xau-research-levels>div{background:#101f30;border:1px solid #3c5565;border-radius:8px;min-width:0;padding:9px 6px}
+.xau-research-levels small{display:block;font-size:10px;color:#9fb9c8}
+.xau-research-levels strong{display:block;margin-top:5px;font-size:13px;color:#e3eff5;font-variant-numeric:tabular-nums}
+.xau-research-quality{font-size:10px!important;color:#adc1cf;margin:9px 0!important;line-height:1.5}
+.xau-research-quality strong{color:#d8e6ee}
+@media(max-width:470px){.xau-research-levels{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.xau-research-levels>div{padding:8px}.xau-research-levels strong{font-size:12px}}
