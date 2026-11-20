@@ -53,3 +53,15 @@ test('All key state colours and phone layouts are preserved',()=>{
  assert.match(css,/max-width:650px/);
  assert.match(css,/focus-visible/);
 });
+
+test('Parent wallet and XAU shell receive only colour skin, not layout or behavior changes',()=>{
+ const parent=fs.readFileSync('kiber-ia-finance-shell.css','utf8');
+ assert.match(html,/href="kiber-ia-finance-shell\.css\?v=314-20261120-ia-finance-skin"/);
+ assert.match(parent,/#walletMini/);
+ assert.match(parent,/#goldPanel/);
+ assert.match(parent,/#bootRetry/);
+ assert.doesNotMatch(parent,/\b(?:position\s*:\s*fixed|grid-template-columns|display\s*:\s*none|addEventListener|fetch\s*\(|requestAccounts)\b/i);
+ assert.match(html,/id="goldFrame"/);
+ assert.match(html,/id="walletConnect"/);
+ assert.match(html,/id="walletAddress"/);
+});
