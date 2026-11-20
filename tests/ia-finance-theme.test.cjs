@@ -21,10 +21,11 @@ test('Finance palette and glass UI are applied by a trailing presentation-only s
 });
 
 test('Original dashboard navigation, windows, token scan, wallet and chat remain intact',()=>{
- for(const a of ['bnb','new','defi','compare','search','watch','profile','gold']){
+ for(const a of ['bnb','new','defi','compare','search','watch','profile']){
   assert.ok(home.includes('data-kcd-action="'+a+'"') || home.includes("navigate('"+a+"')"),'Navigation action missing '+a);
  }
  assert.match(frame,/id="kiberHeaderGold"/);
+ assert.match(home,/if\(action==='gold'\)/);
  assert.match(frame,/id="kiberHeaderWalletBalance"/);
  assert.match(frame,/id="profileBtn"/);
  assert.match(html,/id="walletMini"/);
