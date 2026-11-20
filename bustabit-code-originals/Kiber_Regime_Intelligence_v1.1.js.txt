@@ -1,0 +1,1361 @@
+var config = {
+  title: {
+    type: 'noop',
+    label: 'KIBER REGIME INTELLIGENCE v1.1'
+  },
+  baseBet: {
+    value: 100,
+    type: 'balance',
+    label: 'Puntata base (1 bit)'
+  },
+  payout: {
+    value: 1.45,
+    type: 'multiplier',
+    label: 'Cash-out fisso'
+  },
+  attacksPer100: {
+    value: '45',
+    type: 'text',
+    label: 'Attacchi per 100 round idonei'
+  },
+  warmupRounds: {
+    value: '16',
+    type: 'text',
+    label: 'Round iniziali di sola analisi'
+  },
+  maxBetFactor: {
+    value: '5',
+    type: 'text',
+    label: 'Tetto recovery rispetto alla base'
+  },
+  maxBankrollPercent: {
+    value: '2',
+    type: 'text',
+    label: 'Massimo saldo esposto per colpo (%)'
+  },
+  specialTitle: {
+    type: 'noop',
+    label: 'COLPI SPECIALI ADATTIVI'
+  },
+  specialEnabled: {
+    value: true,
+    type: 'checkbox',
+    label: 'Abilita colpi speciali 5-20 bits'
+  },
+  specialMinBet: {
+    value: 500,
+    type: 'balance',
+    label: 'Minimo colpo speciale (5 bits)'
+  },
+  specialMaxBet: {
+    value: 2000,
+    type: 'balance',
+    label: 'Massimo colpo speciale (20 bits)'
+  },
+  specialMaxPer100: {
+    value: '6',
+    type: 'text',
+    label: 'Massimo colpi speciali ogni 100'
+  },
+  specialCooldown: {
+    value: '4',
+    type: 'text',
+    label: 'Round minimi tra colpi speciali'
+  },
+  specialMinScore: {
+    value: '72',
+    type: 'text',
+    label: 'Qualita minima colpo speciale (0-100)'
+  },
+  specialBankrollPercent: {
+    value: '2',
+    type: 'text',
+    label: 'Massimo saldo per colpo speciale (%)'
+  },
+  reportEvery: {
+    value: '25',
+    type: 'text',
+    label: 'Rapporto ogni N round'
+  },
+  verboseScans: {
+    value: false,
+    type: 'checkbox',
+    label: 'Mostra anche tutti gli skip'
+  }
+};
+
+/*
+ * KIBER REGIME INTELLIGENCE v1.1 - HOTFIX AVVIO
+ * Bustabit - analisi continua dei regimi con quota 45 attacchi normali
+ * e colpi speciali adattivi da 5 a 20 bits.
+ *
+ * La dichiarazione config deve restare la prima istruzione del file: in
+ * alcuni editor compatibili con Bustabit il parser non avvia lo script se
+ * trova testo o commenti prima della configurazione.
+ *
+ * Regimi studiati:
+ *   EXTREME_NEGATIVE, NEGATIVE, CHAOS, BREAK_UP, BREAK_DOWN,
+ *   POSITIVE, EXTREME_POSITIVE.
+ *
+ * Principi del motore:
+ * - usa finestre mobili di 8, 16 e 30 round;
+ * - misura distribuzione, mediana, media limitata, entropia, alternanza,
+ *   pendenza e rotture di catene da 2 a 5 round;
+ * - distribuisce esattamente 45 tentativi di puntata in ogni blocco completo
+ *   di 100 round idonei, salvo saldo insufficiente o rifiuto dell'API;
+ * - puo aggiungere fino a 6 colpi speciali per blocco, senza consumare la
+ *   quota dei 45 normali e solo quando capitale e spazio residuo lo consentono;
+ * - dimensiona i colpi speciali fra 5 e 20 bits usando capitale, regime,
+ *   rotture, volatilita, frequenza osservata e payout adattivo;
+ * - mantiene imprevedibile la posizione degli attacchi tramite casualita,
+ *   assegnando solo una priorita moderata ai regimi osservati;
+ * - applica una recovery a livelli graduali. Il debito e solo contabile:
+ *   non puo mai forzare direttamente una puntata alta;
+ * - non contiene target profit, stop-loss o arresto di sessione. Se il saldo
+ *   non consente la puntata minima, continua ad analizzare senza puntare.
+ *
+ * IMPORTANTE: i crash passati non predicono il prossimo crash. Questa logica
+ * organizza frequenza, lettura del ritmo e rischio; non garantisce profitto,
+ * recupero o protezione del saldo.
+ */
+
+var MIN_BET = 100; // Bustabit: 100 satoshi = 1 bit.
+var HISTORY_LIMIT = 120;
+var LONG_WINDOW = 30;
+var MID_WINDOW = 16;
+var SHORT_WINDOW = 8;
+var MAX_RECOVERY_LEVEL = 8;
+
+// Progressione dolce; dopo l'arrotondamento resta sempre entro 5x.
+var RECOVERY_FACTORS = [1.00, 1.35, 1.70, 2.05, 2.50, 3.00, 3.60, 4.30, 5.00];
+var REGIME_NAMES = [
+  'EXTREME_NEGATIVE',
+  'NEGATIVE',
+  'CHAOS',
+  'BREAK_UP',
+  'BREAK_DOWN',
+  'POSITIVE',
+  'EXTREME_POSITIVE'
+];
+
+var historyValues = [];
+var lastGameId = null;
+var pendingPlan = null;
+var roundDecisionLocked = false;
+var lowFundsWarningShown = false;
+var startBalance = userInfo.balance;
+
+var recovery = {
+  debt: 0,
+  level: 0,
+  ageRounds: 0,
+  winsWhileOpen: 0,
+  lossesWhileOpen: 0,
+  peakDebt: 0,
+  peakLevel: 0
+};
+
+var special = {
+  blockShots: 0,
+  cooldownRemaining: 0,
+  totalShots: 0,
+  wins: 0,
+  losses: 0,
+  consecutiveLosses: 0,
+  failedAttempts: 0,
+  totalWager: 0,
+  net: 0,
+  minBet: 0,
+  maxBet: 0,
+  lastScore: 0,
+  lastObservedRate: 0,
+  lastRequiredRate: 0,
+  lastPayout: 0
+};
+
+var quota = {
+  block: 1,
+  position: 0,
+  attacks: 0,
+  failedAttempts: 0
+};
+
+var counters = {
+  observed: 0,
+  eligible: 0,
+  submitted: 0,
+  normalSubmitted: 0,
+  specialSubmitted: 0,
+  settled: 0,
+  wins: 0,
+  losses: 0,
+  skipped: 0,
+  betErrors: 0,
+  totalWager: 0,
+  net: 0,
+  minBet: 0,
+  maxBet: 0,
+  completedBlocks: 0,
+  exactBlocks: 0,
+  breakUps: 0,
+  breakDowns: 0,
+  persistentChaos: 0
+};
+
+var regimeStats = createRegimeStats();
+
+function createRegimeStats() {
+  var result = {};
+  for (var i = 0; i < REGIME_NAMES.length; i += 1) {
+    result[REGIME_NAMES[i]] = {
+      slots: 0,
+      attacks: 0,
+      wins: 0,
+      losses: 0,
+      net: 0
+    };
+  }
+  return result;
+}
+
+function numberValue(value, fallback) {
+  var parsed = Number(value);
+  return isFinite(parsed) ? parsed : fallback;
+}
+
+function integerValue(value, fallback, minimum, maximum) {
+  var parsed = Math.floor(numberValue(value, fallback));
+  return Math.max(minimum, Math.min(maximum, parsed));
+}
+
+function clamp(value, minimum, maximum) {
+  return Math.max(minimum, Math.min(maximum, value));
+}
+
+function bits(satoshis) {
+  return (numberValue(satoshis, 0) / 100).toFixed(2);
+}
+
+function signedBits(satoshis) {
+  var value = numberValue(satoshis, 0);
+  return (value >= 0 ? '+' : '') + bits(value);
+}
+
+function percentage(part, total) {
+  return total > 0 ? part / total : 0;
+}
+
+function mean(values, cap) {
+  if (!values.length) return 0;
+  var total = 0;
+  for (var i = 0; i < values.length; i += 1) {
+    total += cap > 0 ? Math.min(values[i], cap) : values[i];
+  }
+  return total / values.length;
+}
+
+function median(values) {
+  if (!values.length) return 0;
+  var sorted = values.slice().sort(function (a, b) { return a - b; });
+  var middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2) return sorted[middle];
+  return (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+function standardDeviation(values, average, cap) {
+  if (values.length < 2) return 0;
+  var total = 0;
+  for (var i = 0; i < values.length; i += 1) {
+    var limited = cap > 0 ? Math.min(values[i], cap) : values[i];
+    var difference = limited - average;
+    total += difference * difference;
+  }
+  return Math.sqrt(total / values.length);
+}
+
+function linearSlope(values, cap) {
+  if (values.length < 2) return 0;
+  var n = values.length;
+  var sumX = 0;
+  var sumY = 0;
+  var sumXY = 0;
+  var sumXX = 0;
+
+  for (var i = 0; i < n; i += 1) {
+    var y = cap > 0 ? Math.min(values[i], cap) : values[i];
+    sumX += i;
+    sumY += y;
+    sumXY += i * y;
+    sumXX += i * i;
+  }
+
+  var denominator = n * sumXX - sumX * sumX;
+  if (denominator === 0) return 0;
+  return (n * sumXY - sumX * sumY) / denominator;
+}
+
+function bucket(value) {
+  if (value < config.payout.value) return 'S';
+  if (value < 2.00) return 'N';
+  if (value < 3.00) return 'P';
+  if (value < 10.00) return 'H';
+  return 'X';
+}
+
+function normalizedEntropy(counts, total) {
+  if (total <= 1) return 0;
+  var entropy = 0;
+  var types = ['S', 'N', 'P', 'H', 'X'];
+
+  for (var i = 0; i < types.length; i += 1) {
+    var count = counts[types[i]] || 0;
+    if (count <= 0) continue;
+    var probability = count / total;
+    entropy -= probability * Math.log(probability);
+  }
+
+  return entropy / Math.log(types.length);
+}
+
+function statsFor(values) {
+  var counts = { S: 0, N: 0, P: 0, H: 0, X: 0 };
+  var changes = 0;
+  var previous = null;
+  var currentStrictRun = 0;
+  var currentPositiveRun = 0;
+  var maxStrictRun = 0;
+  var maxPositiveRun = 0;
+
+  for (var i = 0; i < values.length; i += 1) {
+    var currentBucket = bucket(values[i]);
+    counts[currentBucket] += 1;
+
+    if (previous !== null && currentBucket !== previous) changes += 1;
+    previous = currentBucket;
+
+    if (values[i] < config.payout.value) {
+      currentStrictRun += 1;
+      maxStrictRun = Math.max(maxStrictRun, currentStrictRun);
+    } else {
+      currentStrictRun = 0;
+    }
+
+    if (values[i] >= 2.00) {
+      currentPositiveRun += 1;
+      maxPositiveRun = Math.max(maxPositiveRun, currentPositiveRun);
+    } else {
+      currentPositiveRun = 0;
+    }
+  }
+
+  var size = values.length;
+  var rhythmAverage = mean(values, 10);
+  var negative = counts.S + counts.N;
+  var positive = counts.P + counts.H + counts.X;
+  var hot = counts.H + counts.X;
+
+  return {
+    size: size,
+    average: mean(values, 0),
+    cappedAverage: mean(values, 20),
+    rhythmAverage: rhythmAverage,
+    median: median(values),
+    deviation: standardDeviation(values, rhythmAverage, 10),
+    slope: linearSlope(values, 10),
+    entropy: normalizedEntropy(counts, size),
+    changeRate: size > 1 ? changes / (size - 1) : 0,
+    strictNegative: counts.S,
+    negative: negative,
+    positive: positive,
+    hot: hot,
+    extreme: counts.X,
+    strictShare: percentage(counts.S, size),
+    negativeShare: percentage(negative, size),
+    positiveShare: percentage(positive, size),
+    hotShare: percentage(hot, size),
+    maxStrictRun: maxStrictRun,
+    maxPositiveRun: maxPositiveRun,
+    counts: counts
+  };
+}
+
+function trailingRun(predicate) {
+  var length = 0;
+  for (var i = historyValues.length - 1; i >= 0; i -= 1) {
+    if (!predicate(historyValues[i])) break;
+    length += 1;
+  }
+  return length;
+}
+
+function brokenRunBeforeLast(runPredicate, breakerPredicate) {
+  if (historyValues.length < 3) return 0;
+  var last = historyValues[historyValues.length - 1];
+  if (!breakerPredicate(last)) return 0;
+
+  var length = 0;
+  for (var i = historyValues.length - 2; i >= 0; i -= 1) {
+    if (!runPredicate(historyValues[i])) break;
+    length += 1;
+  }
+  return length;
+}
+
+function chaosSignature(stats) {
+  return stats.size >= SHORT_WINDOW &&
+    stats.entropy >= 0.67 &&
+    stats.changeRate >= 0.57 &&
+    stats.maxStrictRun <= 3 &&
+    stats.maxPositiveRun <= 3;
+}
+
+function analyzeRegime() {
+  var last30 = historyValues.slice(-LONG_WINDOW);
+  var last16 = historyValues.slice(-MID_WINDOW);
+  var last8 = historyValues.slice(-SHORT_WINDOW);
+  var previous8 = historyValues.slice(-MID_WINDOW, -SHORT_WINDOW);
+
+  var s30 = statsFor(last30);
+  var s16 = statsFor(last16);
+  var s8 = statsFor(last8);
+  var p8 = statsFor(previous8);
+
+  var strictRun = trailingRun(function (value) {
+    return value < config.payout.value;
+  });
+  var positiveRun = trailingRun(function (value) {
+    return value >= 2.00;
+  });
+  var negativeRun = trailingRun(function (value) {
+    return value < 2.00;
+  });
+
+  var strictBreak = brokenRunBeforeLast(
+    function (value) { return value < config.payout.value; },
+    function (value) { return value >= config.payout.value; }
+  );
+  var positiveBreak = brokenRunBeforeLast(
+    function (value) { return value >= 2.00; },
+    function (value) { return value < 2.00; }
+  );
+
+  var enoughComparison = p8.size === SHORT_WINDOW && s8.size === SHORT_WINDOW;
+  var negativeShareShift = enoughComparison
+    ? p8.negativeShare - s8.negativeShare
+    : 0;
+  var medianShift = enoughComparison ? s8.median - p8.median : 0;
+  var rhythmShift = enoughComparison
+    ? s8.rhythmAverage - p8.rhythmAverage
+    : 0;
+
+  var breakUpStrength = 0;
+  var breakDownStrength = 0;
+  var signals = [];
+
+  if (strictBreak >= 2 && strictBreak <= 5) {
+    breakUpStrength += 3 + (strictBreak - 2) * 0.35;
+    signals.push('ROTTURA_STRETTA_' + strictBreak);
+  }
+  if (enoughComparison && negativeShareShift >= 0.25) {
+    breakUpStrength += 2.0 + negativeShareShift;
+    signals.push('DIVARIO_SU');
+  }
+  if (enoughComparison && medianShift >= 0.35) {
+    breakUpStrength += 1.2;
+    signals.push('MEDIANA_SU');
+  }
+  if (s8.slope >= 0.16) {
+    breakUpStrength += 0.8;
+    signals.push('PENDENZA_SU');
+  }
+
+  if (positiveBreak >= 2 && positiveBreak <= 5) {
+    breakDownStrength += 3 + (positiveBreak - 2) * 0.35;
+    signals.push('ROTTURA_POS_' + positiveBreak);
+  }
+  if (enoughComparison && negativeShareShift <= -0.25) {
+    breakDownStrength += 2.0 + Math.abs(negativeShareShift);
+    signals.push('DIVARIO_GIU');
+  }
+  if (enoughComparison && medianShift <= -0.35) {
+    breakDownStrength += 1.2;
+    signals.push('MEDIANA_GIU');
+  }
+  if (s8.slope <= -0.16) {
+    breakDownStrength += 0.8;
+    signals.push('PENDENZA_GIU');
+  }
+
+  var currentChaos = chaosSignature(s8);
+  var previousChaos = chaosSignature(p8);
+  var persistentChaos = currentChaos && previousChaos;
+  var regime;
+
+  var extremeNegative =
+    strictRun >= 4 ||
+    (s8.negativeShare >= 0.75 && s8.strictShare >= 0.50 && s8.median < 1.55) ||
+    (s16.negativeShare >= 0.75 && s16.maxStrictRun >= 4);
+
+  var extremePositive =
+    (s8.positiveShare >= 0.75 && s8.hotShare >= 0.375 && s8.median >= 2.15) ||
+    (s16.positiveShare >= 0.69 && s16.hotShare >= 0.31 && s16.cappedAverage >= 3.80);
+
+  if (extremeNegative) {
+    regime = 'EXTREME_NEGATIVE';
+  } else if (extremePositive) {
+    regime = 'EXTREME_POSITIVE';
+  } else if (breakUpStrength >= 3.0 && breakUpStrength > breakDownStrength) {
+    regime = 'BREAK_UP';
+  } else if (breakDownStrength >= 3.0) {
+    regime = 'BREAK_DOWN';
+  } else if (currentChaos || (s16.entropy >= 0.70 && s16.changeRate >= 0.60)) {
+    regime = 'CHAOS';
+  } else if (
+    s8.positiveShare >= 0.56 ||
+    (s8.median >= 1.85 && s8.rhythmAverage >= s16.rhythmAverage)
+  ) {
+    regime = 'POSITIVE';
+  } else {
+    regime = 'NEGATIVE';
+  }
+
+  if (persistentChaos) signals.push('CAOS_PERSISTENTE');
+  if (strictRun >= 2 && strictRun <= 5) signals.push('CATENA_STRETTA_' + strictRun);
+  if (positiveRun >= 2 && positiveRun <= 5) signals.push('CATENA_POS_' + positiveRun);
+  if (negativeRun >= 2 && negativeRun <= 5) signals.push('CATENA_NEG_' + negativeRun);
+  if (!signals.length) signals.push('RITMO_ORDINARIO');
+
+  var separation = Math.abs(s8.positiveShare - s8.negativeShare);
+  var sampleConfidence = clamp(historyValues.length / LONG_WINDOW, 0, 1);
+  var regimeClarity = regime === 'CHAOS'
+    ? (s8.entropy + s8.changeRate) / 2
+    : clamp(0.45 + separation * 0.65, 0, 1);
+  var confidence = Math.round(100 * clamp(
+    sampleConfidence * 0.60 + regimeClarity * 0.40,
+    0,
+    1
+  ));
+
+  var qualityByRegime = {
+    EXTREME_NEGATIVE: 36,
+    NEGATIVE: 44,
+    CHAOS: persistentChaos ? 40 : 47,
+    BREAK_UP: 63,
+    BREAK_DOWN: 39,
+    POSITIVE: 56,
+    EXTREME_POSITIVE: 59
+  };
+
+  return {
+    regime: regime,
+    confidence: confidence,
+    timingQuality: qualityByRegime[regime],
+    persistentChaos: persistentChaos,
+    signals: signals,
+    strictRun: strictRun,
+    positiveRun: positiveRun,
+    negativeRun: negativeRun,
+    strictBreak: strictBreak,
+    positiveBreak: positiveBreak,
+    breakUpStrength: breakUpStrength,
+    breakDownStrength: breakDownStrength,
+    medianShift: medianShift,
+    rhythmShift: rhythmShift,
+    s8: s8,
+    s16: s16,
+    s30: s30
+  };
+}
+
+function targetAttacks() {
+  return integerValue(config.attacksPer100.value, 45, 1, 99);
+}
+
+function quotaDecision(analysis) {
+  var target = targetAttacks();
+  var remainingSlots = 100 - quota.position;
+  var needed = target - quota.attacks;
+
+  if (needed <= 0) {
+    return {
+      play: false,
+      probability: 0,
+      reason: 'QUOTA_COMPLETA'
+    };
+  }
+
+  if (needed >= remainingSlots) {
+    return {
+      play: true,
+      probability: 1,
+      reason: 'QUOTA_OBBLIGATA_' + needed + '/' + remainingSlots
+    };
+  }
+
+  // Probabilita adattiva: il rapporto necessario garantisce la convergenza
+  // della quota; regime e casualita cambiano solo la disposizione dei colpi.
+  var quotaProbability = needed / remainingSlots;
+  var regimeAdjustment = (analysis.timingQuality - 50) * 0.0045;
+  var randomJitter = (Math.random() - 0.5) * 0.12;
+  var probability = clamp(
+    quotaProbability + regimeAdjustment + randomJitter,
+    0.06,
+    0.94
+  );
+
+  return {
+    play: Math.random() < probability,
+    probability: probability,
+    reason: analysis.signals.slice(0, 3).join('+')
+  };
+}
+
+function hitRateFor(values, payout) {
+  if (!values.length) return 0;
+
+  var hits = 0;
+  for (var i = 0; i < values.length; i += 1) {
+    if (values[i] >= payout) hits += 1;
+  }
+
+  return hits / values.length;
+}
+
+function weightedObservedRate(payout) {
+  var windows = [
+    { values: historyValues.slice(-SHORT_WINDOW), weight: 0.50 },
+    { values: historyValues.slice(-MID_WINDOW), weight: 0.30 },
+    { values: historyValues.slice(-LONG_WINDOW), weight: 0.20 }
+  ];
+
+  var weightedTotal = 0;
+  var availableWeight = 0;
+
+  for (var i = 0; i < windows.length; i += 1) {
+    if (!windows[i].values.length) continue;
+    weightedTotal += hitRateFor(windows[i].values, payout) * windows[i].weight;
+    availableWeight += windows[i].weight;
+  }
+
+  return availableWeight > 0 ? weightedTotal / availableWeight : 0;
+}
+
+function initialSpecialPayout(analysis) {
+  if (analysis.regime === 'BREAK_UP') return 1.55;
+  if (analysis.regime === 'EXTREME_POSITIVE') return 1.50;
+  if (analysis.regime === 'POSITIVE') return 1.45;
+  return 1.35;
+}
+
+function amountAdjustedPayout(initialPayout, amount) {
+  if (amount >= 1500) return Math.min(initialPayout, 1.35);
+  if (amount >= 1000) return Math.min(initialPayout, 1.45);
+  return initialPayout;
+}
+
+function specialEvidence(analysis, payout) {
+  var baseScores = {
+    EXTREME_NEGATIVE: 24,
+    NEGATIVE: 39,
+    CHAOS: 54,
+    BREAK_UP: 78,
+    BREAK_DOWN: 31,
+    POSITIVE: 68,
+    EXTREME_POSITIVE: 76
+  };
+
+  var observedRate = weightedObservedRate(payout);
+  var requiredRate = 1 / payout;
+  var margin = observedRate - requiredRate;
+  var score = baseScores[analysis.regime];
+
+  score += (analysis.confidence - 50) * 0.14;
+  score += Math.min(8, analysis.breakUpStrength * 1.35);
+  score -= Math.min(8, analysis.breakDownStrength * 1.20);
+  score += clamp(analysis.s8.slope * 5, -4, 4);
+  score += clamp(margin * 30, -6, 6);
+
+  if (analysis.persistentChaos) score -= 9;
+  if (analysis.s8.deviation >= 3.50) score -= 2;
+  if (recovery.level > 0) score -= recovery.level * 2;
+  if (special.consecutiveLosses > 0) {
+    score -= Math.min(12, special.consecutiveLosses * 5);
+  }
+
+  var capitalRatio = startBalance > 0 ? userInfo.balance / startBalance : 1;
+  if (capitalRatio < 0.85) score -= 8;
+  else if (capitalRatio < 0.95) score -= 4;
+  else if (capitalRatio > 1.05) score += 2;
+
+  return {
+    score: clamp(score, 0, 100),
+    observedRate: observedRate,
+    requiredRate: requiredRate,
+    margin: margin
+  };
+}
+
+function specialBetLimits() {
+  var minimum = wholeBitNearest(Math.max(
+    500,
+    numberValue(config.specialMinBet.value, 500)
+  ));
+
+  var configuredMaximum = wholeBitFloor(Math.min(
+    2000,
+    Math.max(minimum, numberValue(config.specialMaxBet.value, 2000))
+  ));
+
+  var bankrollPercent = clamp(
+    numberValue(config.specialBankrollPercent.value, 2) / 100,
+    0.002,
+    0.05
+  );
+
+  var bankrollMaximum = wholeBitFloor(userInfo.balance * bankrollPercent);
+  var balanceMaximum = wholeBitFloor(userInfo.balance);
+
+  return {
+    minimum: minimum,
+    maximum: Math.min(configuredMaximum, bankrollMaximum, balanceMaximum)
+  };
+}
+
+function specialRegimeAllowed(analysis) {
+  if (analysis.regime === 'BREAK_UP') return true;
+  if (analysis.regime === 'POSITIVE') return true;
+  if (analysis.regime === 'EXTREME_POSITIVE') return true;
+
+  return analysis.regime === 'CHAOS' &&
+    !analysis.persistentChaos &&
+    analysis.breakUpStrength >= 2.20 &&
+    analysis.s8.slope > 0;
+}
+
+function specialSpaceAvailable() {
+  var remainingSlots = 100 - quota.position;
+  var normalNeeded = targetAttacks() - quota.attacks;
+
+  // Il round speciale non conta fra i 45: deve restare almeno un round per
+  // ogni attacco normale ancora necessario.
+  return remainingSlots - 1 >= normalNeeded;
+}
+
+function buildSpecialCandidate(analysis) {
+  var unavailable = {
+    eligible: false,
+    reason: 'NON_IDONEO',
+    score: 0,
+    probability: 0
+  };
+
+  if (!config.specialEnabled.value) {
+    unavailable.reason = 'SPECIALI_DISATTIVATI';
+    return unavailable;
+  }
+
+  if (!specialRegimeAllowed(analysis)) {
+    unavailable.reason = 'REGIME_NON_IDONEO';
+    return unavailable;
+  }
+
+  if (!specialSpaceAvailable()) {
+    unavailable.reason = 'PRIORITA_QUOTA_45';
+    return unavailable;
+  }
+
+  var maxPerBlock = integerValue(config.specialMaxPer100.value, 6, 0, 20);
+  if (special.blockShots >= maxPerBlock) {
+    unavailable.reason = 'LIMITE_SPECIALI_BLOCCO';
+    return unavailable;
+  }
+
+  if (special.cooldownRemaining > 0) {
+    unavailable.reason = 'PAUSA_SPECIALE_' + special.cooldownRemaining;
+    return unavailable;
+  }
+
+  // Una recovery gia alta ha priorita: non sovrapponiamo un colpo grande.
+  if (recovery.level > 3) {
+    unavailable.reason = 'RECOVERY_TROPPO_ALTA';
+    return unavailable;
+  }
+
+  var limits = specialBetLimits();
+  if (limits.maximum < limits.minimum) {
+    unavailable.reason = 'CAPITALE_NON_SUFFICIENTE_PER_5_BITS';
+    return unavailable;
+  }
+
+  var payout = initialSpecialPayout(analysis);
+  var evidence = specialEvidence(analysis, payout);
+  var threshold = integerValue(config.specialMinScore.value, 72, 55, 95);
+
+  var firstScale = clamp(
+    (evidence.score - threshold) / Math.max(1, 100 - threshold),
+    0,
+    1
+  );
+  var amount = wholeBitNearest(
+    limits.minimum + (limits.maximum - limits.minimum) * firstScale
+  );
+  amount = Math.min(limits.maximum, Math.max(limits.minimum, amount));
+
+  payout = amountAdjustedPayout(payout, amount);
+  evidence = specialEvidence(analysis, payout);
+
+  var finalScale = clamp(
+    (evidence.score - threshold) / Math.max(1, 100 - threshold),
+    0,
+    1
+  );
+  amount = wholeBitNearest(
+    limits.minimum + (limits.maximum - limits.minimum) * finalScale
+  );
+  amount = Math.min(limits.maximum, Math.max(limits.minimum, amount));
+  payout = amountAdjustedPayout(initialSpecialPayout(analysis), amount);
+  evidence = specialEvidence(analysis, payout);
+
+  if (evidence.score < threshold) {
+    unavailable.reason = 'SCORE_BASSO_' + evidence.score.toFixed(1);
+    unavailable.score = evidence.score;
+    return unavailable;
+  }
+
+  var selectionProbability = clamp(
+    0.05 + (evidence.score - threshold) * 0.009,
+    0.05,
+    0.25
+  );
+
+  if (recovery.debt > 0) selectionProbability *= 0.70;
+  if (special.consecutiveLosses > 0) selectionProbability *= 0.60;
+
+  return {
+    eligible: true,
+    reason: analysis.signals.slice(0, 3).join('+'),
+    score: evidence.score,
+    probability: clamp(selectionProbability, 0.02, 0.25),
+    amount: amount,
+    payout: payout,
+    observedRate: evidence.observedRate,
+    requiredRate: evidence.requiredRate,
+    margin: evidence.margin
+  };
+}
+
+function specialDecision(analysis) {
+  var candidate = buildSpecialCandidate(analysis);
+  candidate.play = candidate.eligible && Math.random() < candidate.probability;
+  return candidate;
+}
+
+function wholeBitNearest(amount) {
+  return Math.max(MIN_BET, Math.round(amount / MIN_BET) * MIN_BET);
+}
+
+function wholeBitFloor(amount) {
+  return Math.floor(amount / MIN_BET) * MIN_BET;
+}
+
+function baseBetAmount() {
+  return wholeBitNearest(Math.max(MIN_BET, numberValue(config.baseBet.value, MIN_BET)));
+}
+
+function effectiveRecoveryLevel(analysis) {
+  var level = recovery.level;
+
+  // Nelle fasi peggiori la recovery rallenta di un livello. Non accelera mai
+  // oltre il livello reale: in questo modo il regime non crea una martingala.
+  if (
+    analysis.regime === 'EXTREME_NEGATIVE' ||
+    analysis.regime === 'BREAK_DOWN' ||
+    analysis.persistentChaos
+  ) {
+    level = Math.max(0, level - 1);
+  }
+
+  return level;
+}
+
+function calculateBet(analysis) {
+  var base = baseBetAmount();
+  var configuredFactor = clamp(numberValue(config.maxBetFactor.value, 5), 1, 5);
+  var maxLevel = Math.min(MAX_RECOVERY_LEVEL, RECOVERY_FACTORS.length - 1);
+  var level = Math.min(effectiveRecoveryLevel(analysis), maxLevel);
+  var factor = Math.min(RECOVERY_FACTORS[level], configuredFactor);
+  var wanted = wholeBitNearest(base * factor);
+
+  var factorCap = wholeBitFloor(base * configuredFactor);
+  var bankrollPercent = clamp(
+    numberValue(config.maxBankrollPercent.value, 2) / 100,
+    0.005,
+    0.20
+  );
+  var bankrollCap = wholeBitFloor(userInfo.balance * bankrollPercent);
+  var balanceCap = wholeBitFloor(userInfo.balance);
+  var maximum = Math.min(factorCap, bankrollCap, balanceCap);
+
+  if (maximum < MIN_BET) return 0;
+  return Math.max(MIN_BET, Math.min(wanted, maximum));
+}
+
+function placeAttack(analysis, decision) {
+  if (pendingPlan) {
+    counters.skipped += 1;
+    quota.failedAttempts += 1;
+    log('SKIP SICUREZZA | esito della puntata precedente non ancora registrato');
+    return false;
+  }
+
+  var amount = calculateBet(analysis);
+  if (amount < MIN_BET) {
+    counters.skipped += 1;
+    quota.failedAttempts += 1;
+    if (!lowFundsWarningShown) {
+      lowFundsWarningShown = true;
+      log(
+        'SOLO ANALISI | saldo insufficiente per la puntata minima o per il tetto di rischio; ' +
+        'lo script resta attivo'
+      );
+    }
+    return false;
+  }
+
+  lowFundsWarningShown = false;
+  var plan = {
+    attackType: 'NORMAL',
+    amount: amount,
+    payout: config.payout.value,
+    regime: analysis.regime,
+    confidence: analysis.confidence,
+    reason: decision.reason,
+    level: recovery.level,
+    effectiveLevel: effectiveRecoveryLevel(analysis),
+    block: quota.block,
+    slot: quota.position + 1
+  };
+
+  try {
+    engine.bet(amount, config.payout.value);
+    pendingPlan = plan;
+    quota.attacks += 1;
+    counters.submitted += 1;
+    counters.normalSubmitted += 1;
+    regimeStats[analysis.regime].attacks += 1;
+
+    log(
+      'ATTACCO ' + quota.attacks + '/' + targetAttacks() +
+      ' | blocco ' + quota.block + ' slot ' + (quota.position + 1) + '/100' +
+      ' | ' + bits(amount) + 'b @ ' + config.payout.value.toFixed(2) + 'x' +
+      ' | ' + analysis.regime + ' ' + analysis.confidence + '%' +
+      ' | livello ' + recovery.level + ' (eff. ' + plan.effectiveLevel + ')' +
+      ' | ' + plan.reason
+    );
+    return true;
+  } catch (error) {
+    pendingPlan = null;
+    counters.betErrors += 1;
+    counters.skipped += 1;
+    quota.failedAttempts += 1;
+    log('ERRORE PUNTATA | continuo in analisi | ' + String(error));
+    return false;
+  }
+}
+
+function placeSpecialAttack(analysis, candidate) {
+  if (pendingPlan) return false;
+
+  var plan = {
+    attackType: 'SPECIAL',
+    amount: candidate.amount,
+    payout: candidate.payout,
+    regime: analysis.regime,
+    confidence: analysis.confidence,
+    reason: candidate.reason,
+    level: recovery.level,
+    effectiveLevel: recovery.level,
+    score: candidate.score,
+    observedRate: candidate.observedRate,
+    requiredRate: candidate.requiredRate,
+    selectionProbability: candidate.probability,
+    block: quota.block,
+    slot: quota.position + 1
+  };
+
+  try {
+    engine.bet(candidate.amount, candidate.payout);
+    pendingPlan = plan;
+
+    counters.submitted += 1;
+    counters.specialSubmitted += 1;
+    special.blockShots += 1;
+    special.totalShots += 1;
+    special.lastScore = candidate.score;
+    special.lastObservedRate = candidate.observedRate;
+    special.lastRequiredRate = candidate.requiredRate;
+    special.lastPayout = candidate.payout;
+    special.cooldownRemaining = integerValue(
+      config.specialCooldown.value,
+      4,
+      1,
+      30
+    );
+    regimeStats[analysis.regime].attacks += 1;
+
+    log(
+      'COLPO SPECIALE ' + special.blockShots + '/' +
+      integerValue(config.specialMaxPer100.value, 6, 0, 20) +
+      ' | blocco ' + quota.block + ' slot ' + (quota.position + 1) + '/100' +
+      ' | ' + bits(candidate.amount) + 'b @ ' + candidate.payout.toFixed(2) + 'x' +
+      ' | ' + analysis.regime + ' | score ' + candidate.score.toFixed(1) +
+      ' | frequenza osservata ' + (candidate.observedRate * 100).toFixed(1) + '%' +
+      ' | pareggio matematico ' + (candidate.requiredRate * 100).toFixed(1) + '%' +
+      ' | selezione ' + (candidate.probability * 100).toFixed(1) + '%'
+    );
+    return true;
+  } catch (error) {
+    pendingPlan = null;
+    counters.betErrors += 1;
+    special.failedAttempts += 1;
+    log('ERRORE COLPO SPECIALE | provo la logica normale | ' + String(error));
+    return false;
+  }
+}
+
+function closeQuotaBlockIfNeeded() {
+  if (quota.position < 100) return;
+
+  counters.completedBlocks += 1;
+  if (quota.attacks === targetAttacks()) counters.exactBlocks += 1;
+
+  log('');
+  log(
+    'BLOCCO ' + quota.block + ' COMPLETO | normali ' + quota.attacks +
+    '/100 (obiettivo ' + targetAttacks() + ') | speciali aggiuntivi ' +
+    special.blockShots +
+    (quota.failedAttempts > 0
+      ? ' | tentativi non eseguiti ' + quota.failedAttempts
+      : ' | quota esatta')
+  );
+  log('');
+
+  quota.block += 1;
+  quota.position = 0;
+  quota.attacks = 0;
+  quota.failedAttempts = 0;
+  special.blockShots = 0;
+}
+
+function decideNextRound() {
+  var warmup = integerValue(config.warmupRounds.value, 16, MID_WINDOW, 60);
+  if (historyValues.length < warmup) {
+    log('ANALISI INIZIALE | ' + historyValues.length + '/' + warmup + ' round raccolti');
+    return;
+  }
+
+  var analysis = analyzeRegime();
+  var played = false;
+
+  if (special.cooldownRemaining > 0) {
+    special.cooldownRemaining -= 1;
+  }
+
+  counters.eligible += 1;
+  regimeStats[analysis.regime].slots += 1;
+  if (analysis.regime === 'BREAK_UP') counters.breakUps += 1;
+  if (analysis.regime === 'BREAK_DOWN') counters.breakDowns += 1;
+  if (analysis.persistentChaos) counters.persistentChaos += 1;
+
+  var specialChoice = specialDecision(analysis);
+  if (specialChoice.play) {
+    played = placeSpecialAttack(analysis, specialChoice);
+  }
+
+  if (!played) {
+    var decision = quotaDecision(analysis);
+    if (decision.play) {
+      played = placeAttack(analysis, decision);
+    } else {
+      counters.skipped += 1;
+    }
+  }
+
+  if (!played && config.verboseScans.value) {
+    log(
+      'SCAN | skip | blocco ' + quota.block + ' slot ' + (quota.position + 1) +
+      ' | ' + analysis.regime + ' ' + analysis.confidence + '%' +
+      ' | quota normale ' + quota.attacks + '/' + targetAttacks() +
+      ' | speciale ' + specialChoice.reason +
+      ' | N/P/H 8R ' + analysis.s8.negative + '/' +
+      (analysis.s8.counts.P || 0) + '/' + analysis.s8.hot
+    );
+  }
+
+  quota.position += 1;
+  closeQuotaBlockIfNeeded();
+}
+
+function settlePendingBet(game) {
+  if (!pendingPlan) return;
+
+  if (!game || typeof game.wager !== 'number' || game.wager <= 0) {
+    log('AVVISO ESITO | puntata inviata ma wager non presente nello storico');
+    pendingPlan = null;
+    return;
+  }
+
+  var wager = game.wager;
+  var won = typeof game.cashedAt === 'number' && game.cashedAt > 0;
+  var net;
+  var stats = regimeStats[pendingPlan.regime];
+  var isSpecial = pendingPlan.attackType === 'SPECIAL';
+
+  counters.settled += 1;
+  counters.totalWager += wager;
+  counters.minBet = counters.minBet === 0 ? wager : Math.min(counters.minBet, wager);
+  counters.maxBet = Math.max(counters.maxBet, wager);
+
+  if (isSpecial) {
+    special.totalWager += wager;
+    special.minBet = special.minBet === 0 ? wager : Math.min(special.minBet, wager);
+    special.maxBet = Math.max(special.maxBet, wager);
+  }
+
+  if (won) {
+    net = Math.round(wager * (game.cashedAt - 1));
+    counters.wins += 1;
+    stats.wins += 1;
+    if (isSpecial) {
+      special.wins += 1;
+      special.consecutiveLosses = 0;
+    }
+    recovery.debt = Math.max(0, recovery.debt - net);
+    recovery.winsWhileOpen += recovery.debt > 0 ? 1 : 0;
+
+    if (recovery.debt <= 0) {
+      recovery.debt = 0;
+      recovery.level = 0;
+      recovery.ageRounds = 0;
+      recovery.winsWhileOpen = 0;
+      recovery.lossesWhileOpen = 0;
+    } else {
+      // Due livelli evitano che l'arrotondamento a bit interi lasci la
+      // puntata ferma dopo una vittoria, ma la discesa resta graduale.
+      recovery.level = Math.max(0, recovery.level - 2);
+    }
+  } else {
+    net = -wager;
+    counters.losses += 1;
+    stats.losses += 1;
+    if (isSpecial) {
+      special.losses += 1;
+      special.consecutiveLosses += 1;
+      special.cooldownRemaining = Math.max(
+        special.cooldownRemaining,
+        integerValue(config.specialCooldown.value, 4, 1, 30) +
+          Math.min(6, special.consecutiveLosses * 2)
+      );
+    }
+    recovery.debt += wager;
+    recovery.level = Math.min(MAX_RECOVERY_LEVEL, recovery.level + 1);
+    recovery.lossesWhileOpen += 1;
+  }
+
+  counters.net += net;
+  stats.net += net;
+  if (isSpecial) special.net += net;
+  recovery.peakDebt = Math.max(recovery.peakDebt, recovery.debt);
+  recovery.peakLevel = Math.max(recovery.peakLevel, recovery.level);
+
+  log(
+    'ESITO ' + (isSpecial ? 'SPECIALE' : 'NORMALE') + ' | ' +
+    (won ? 'WIN ' : 'LOSS ') + signedBits(net) + 'b' +
+    ' | sessione ' + signedBits(counters.net) + 'b' +
+    ' | recovery livello ' + recovery.level + '/' + MAX_RECOVERY_LEVEL +
+    ' | debito contabile ' + bits(recovery.debt) + 'b'
+  );
+
+  pendingPlan = null;
+}
+
+function report(analysis) {
+  var attackRate = counters.eligible > 0
+    ? counters.submitted / counters.eligible * 100
+    : 0;
+  var winRate = counters.settled > 0
+    ? counters.wins / counters.settled * 100
+    : 0;
+
+  log('');
+  log('RAPPORTO | ' + counters.observed + ' round osservati');
+  log(
+    'Attacchi totali ' + counters.submitted + '/' + counters.eligible +
+    ' = ' + attackRate.toFixed(1) + '% | normali ' + counters.normalSubmitted +
+    ' | speciali ' + counters.specialSubmitted
+  );
+  log(
+    'Blocco ' + quota.block + ' posizione ' + quota.position + '/100' +
+    ' | quota normale ' + quota.attacks + '/' + targetAttacks() +
+    ' | speciali blocco ' + special.blockShots + '/' +
+    integerValue(config.specialMaxPer100.value, 6, 0, 20)
+  );
+  log(
+    'W/L ' + counters.wins + '/' + counters.losses +
+    ' | win rate ' + winRate.toFixed(1) + '%' +
+    ' | netto ' + signedBits(counters.net) + 'b' +
+    ' | saldo da avvio ' + signedBits(userInfo.balance - startBalance) + 'b'
+  );
+  log(
+    'Recovery livello ' + recovery.level + '/' + MAX_RECOVERY_LEVEL +
+    ' | debito ' + bits(recovery.debt) + 'b' +
+    ' | picco debito ' + bits(recovery.peakDebt) + 'b' +
+    ' | puntata min/max ' + bits(counters.minBet) + '/' + bits(counters.maxBet) + 'b'
+  );
+  log(
+    'Speciali W/L ' + special.wins + '/' + special.losses +
+    ' | netto ' + signedBits(special.net) + 'b' +
+    ' | min/max ' + bits(special.minBet) + '/' + bits(special.maxBet) + 'b' +
+    ' | pausa ' + special.cooldownRemaining
+  );
+  if (special.lastPayout > 0) {
+    log(
+      'Ultimo speciale | score ' + special.lastScore.toFixed(1) +
+      ' | payout ' + special.lastPayout.toFixed(2) + 'x' +
+      ' | osservato/pareggio ' + (special.lastObservedRate * 100).toFixed(1) +
+      '/' + (special.lastRequiredRate * 100).toFixed(1) + '%'
+    );
+  }
+  log(
+    'Regime ' + analysis.regime + ' ' + analysis.confidence + '%' +
+    (analysis.persistentChaos ? ' | CAOS PERSISTENTE' : '') +
+    ' | segnali ' + analysis.signals.slice(0, 4).join('+')
+  );
+  log(
+    '8R  media/mediana ' + analysis.s8.average.toFixed(2) + '/' +
+    analysis.s8.median.toFixed(2) + 'x | N/P/H ' + analysis.s8.negative + '/' +
+    (analysis.s8.counts.P || 0) + '/' + analysis.s8.hot +
+    ' | entropia ' + analysis.s8.entropy.toFixed(2)
+  );
+  log(
+    '16R media/mediana ' + analysis.s16.average.toFixed(2) + '/' +
+    analysis.s16.median.toFixed(2) + 'x | 30R media/mediana ' +
+    analysis.s30.average.toFixed(2) + '/' + analysis.s30.median.toFixed(2) + 'x'
+  );
+  log(
+    'Rotture su/giu ' + counters.breakUps + '/' + counters.breakDowns +
+    ' | caos persistente ' + counters.persistentChaos +
+    ' | blocchi esatti ' + counters.exactBlocks + '/' + counters.completedBlocks
+  );
+  log('');
+}
+
+function registerGame(game) {
+  if (!game || typeof game.bust !== 'number' || game.bust < 1) return;
+  if (game.id !== undefined && game.id !== null && game.id === lastGameId) return;
+  if (game.id !== undefined && game.id !== null) lastGameId = game.id;
+
+  settlePendingBet(game);
+
+  historyValues.push(game.bust);
+  if (historyValues.length > HISTORY_LIMIT) historyValues.shift();
+  counters.observed += 1;
+
+  if (recovery.debt > 0) recovery.ageRounds += 1;
+
+  var analysis = analyzeRegime();
+  var reportEvery = integerValue(config.reportEvery.value, 25, 5, 10000);
+  if (counters.observed % reportEvery === 0) report(analysis);
+}
+
+function preloadSettledHistory() {
+  if (!engine.history || typeof engine.history.toArray !== 'function') return 0;
+
+  var games;
+  try {
+    games = engine.history.toArray();
+  } catch (error) {
+    log('AVVISO STORICO | impossibile leggere i round precedenti: ' + String(error));
+    return 0;
+  }
+
+  if (!games || typeof games.length !== 'number' || games.length === 0) return 0;
+
+  var settled = [];
+  var allIdsNumeric = true;
+  for (var i = 0; i < games.length; i += 1) {
+    var game = games[i];
+    if (!game || typeof game.bust !== 'number' || game.bust < 1) continue;
+    if (typeof game.id !== 'number') allIdsNumeric = false;
+    settled.push(game);
+  }
+
+  if (allIdsNumeric) {
+    settled.sort(function (a, b) { return a.id - b.id; });
+  } else {
+    // Normalmente history.toArray() restituisce dal piu recente al piu
+    // vecchio; senza id numerici lo rimettiamo in ordine cronologico.
+    settled.reverse();
+  }
+
+  var first = Math.max(0, settled.length - HISTORY_LIMIT);
+  for (var j = first; j < settled.length; j += 1) {
+    historyValues.push(settled[j].bust);
+  }
+
+  if (settled.length > 0) {
+    var newest = settled[settled.length - 1];
+    if (newest.id !== undefined && newest.id !== null) lastGameId = newest.id;
+  }
+
+  return historyValues.length;
+}
+
+var preloadedRounds = preloadSettledHistory();
+
+engine.on('GAME_STARTING', function () {
+  if (roundDecisionLocked) return;
+  roundDecisionLocked = true;
+  decideNextRound();
+});
+
+engine.on('GAME_ENDED', function () {
+  registerGame(engine.history.first());
+  roundDecisionLocked = false;
+});
+
+log('KIBER REGIME INTELLIGENCE v1.1 AVVIATA');
+log(
+  'STORICO INIZIALE | ' + preloadedRounds +
+  ' round validi precaricati' +
+  (preloadedRounds >= integerValue(config.warmupRounds.value, 16, MID_WINDOW, 60)
+    ? ' | analisi pronta dal prossimo round'
+    : ' | completo il warm-up con i prossimi round')
+);
+log(
+  'Continuo | warm-up ' + integerValue(config.warmupRounds.value, 16, MID_WINDOW, 60) +
+  ' round | obiettivo ' + targetAttacks() + '/100 round idonei'
+);
+log(
+  'Finestre 8/16/30 | 7 regimi | base ' + bits(baseBetAmount()) +
+  'b | cash-out ' + config.payout.value.toFixed(2) + 'x | recovery massima 5x'
+);
+log(
+  'Sicurezza | tetto singolo colpo ' +
+  numberValue(config.maxBankrollPercent.value, 2).toFixed(2) +
+  '% del saldo | nessun arresto automatico'
+);
+log(
+  'Speciali | ' + bits(Math.max(500, config.specialMinBet.value)) + '-' +
+  bits(Math.min(2000, config.specialMaxBet.value)) + 'b | massimo ' +
+  integerValue(config.specialMaxPer100.value, 6, 0, 20) +
+  ' aggiuntivi/100 | tetto capitale ' +
+  numberValue(config.specialBankrollPercent.value, 2).toFixed(2) + '%'
+);
+
+if (config.payout.value <= 1) {
+  log('CONFIG ERRORE | cash-out non valido: deve essere superiore a 1.00x');
+}
+if (numberValue(config.baseBet.value, MIN_BET) < MIN_BET) {
+  log('CONFIG AVVISO | base inferiore a 1 bit: verra usato il minimo di 1 bit');
+}

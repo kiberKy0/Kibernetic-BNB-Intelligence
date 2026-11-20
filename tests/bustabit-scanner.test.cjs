@@ -63,13 +63,15 @@ test('holdout target is selected only from first 70% of data',()=>{
   assert.equal(r1.holdout.chosenTarget,r2.holdout.chosenTarget);
   assert.notEqual(r1.holdout.test.roi,r2.holdout.test.roi);
 });
-test('lab page registers the local scanner and keeps wager execution outside',()=>{
+test('the old scanner library is still testable, but the active Bustabit sector only archives bot originals',()=>{
  const h=fs.readFileSync(path.join(__dirname,'../bustabit-lab.html'),'utf8');
  const shell=fs.readFileSync(path.join(__dirname,'../bustabit-shell.js'),'utf8');
  const index=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
- const s=fs.readFileSync(path.join(__dirname,'../bustabit-scanner.js'),'utf8');
- assert.match(h,/bustabit-scanner\.js/);assert.match(h,/bustabit-lab-ui\.js/);
- assert.match(index,/bustabit-shell\.js/);assert.match(shell,/kiberBustabitTab/);
- assert.doesNotMatch(s,/engine\.bet\(|window\.fetch\(|fetch\(/);
- assert.match(h,/ANALISI, non LIVE/);
+ const scanner=fs.readFileSync(path.join(__dirname,'../bustabit-scanner.js'),'utf8');
+ assert.match(index,/bustabit-shell\.js/);
+ assert.match(shell,/kiberBustabitTab/);
+ assert.match(h,/bustabit-vault\.js/);
+ assert.match(h,/bvaBotList/);
+ assert.doesNotMatch(h,/bustabit-scanner\.js|kbtAnalyze|kbtRaw/);
+ assert.doesNotMatch(scanner,/engine\.bet\(|window\.fetch\(|fetch\(/);
 });

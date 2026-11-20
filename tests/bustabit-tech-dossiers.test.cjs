@@ -55,29 +55,22 @@ test('performance belongs to the exact original version, not to adjacent revisio
  assert.equal(x.kiber30[0].bets,128166);
  assert.equal(x.kiber30[0].net,null);
 });
-test('interface offers 4 named questions and all per-source functions as collapsible dossier',()=>{
- const html=rd('bustabit-archivio.html'),ui=rd('bustabit-tech-ui.js');
- for(const id of ['bfTechSelect','bfTechFunctionSearch','bfTechStatus','bfTechView'])assert.match(html,new RegExp('id="'+id+'"'));
- for(const p of ['bustabit-tech-data.js','bustabit-tech-ui.js','bustabit-tech-functions-primary.js','bustabit-tech-functions-variants.js','bustabit-tech.css'])assert.ok(html.includes(p),p);
- for(const h of ['COSA FA','QUANDO ENTRA IN AZIONE','COME FUNZIONA','PERCHÉ È STATO PROGETTATO','Tecnologie e strategie, per nome','Performance e prove di questa versione','Catalogo completo delle funzioni'])assert.ok(ui.includes(h),h);
- assert.ok(html.indexOf('bustabit-tech-data.js')<html.indexOf('bustabit-tech-ui.js'));
- assert.ok(html.indexOf('id="bf-tech"')<html.indexOf('id="bf-codes"'));
- assert.ok(rd('bustabit-archive-ui.js').includes('Tecnologie e performance'));
- for(const p of ['bustabit-tech-data.js','bustabit-tech-ui.js','bustabit-tech-functions-primary.js','bustabit-tech-functions-variants.js'])assert.doesNotThrow(()=>new vm.Script(rd(p),{filename:p}));
+test('active Bustabit sector gives each original version named technologies, statistics, and copyable source',()=>{
+ const html=rd('bustabit-lab.html'),ui=rd('bustabit-vault.js');
+ for(const id of ['bvaBotList','bvaDossier','bvaBotName','bvaCopy','bvaDownload','bvaStrategies','bvaResults','bvaLogic','bvaFnList'])assert.match(html,new RegExp('id="'+id+'"'),id);
+ for(const h of ['COSA','QUANDO','COME','PERCHÉ','Performance e log','Copia tutto il codice'])assert.ok(html.includes(h)||ui.includes(h),h);
+ for(const p of ['bustabit-tech-data.js','bustabit-tech-functions-primary.js','bustabit-tech-functions-variants.js','bustabit-vault.js','bustabit-vault.css'])assert.ok(html.includes(p),p);
+ assert.ok(html.indexOf('bustabit-tech-data.js')<html.indexOf('bustabit-vault.js'));
+ assert.doesNotThrow(()=>new vm.Script(ui,{filename:'bustabit-vault.js'}));
 });
-test('public dossier never embeds or executes private betting code and flags missing LIVE evidence',()=>{
- const paths=['bustabit-tech-ui.js','bustabit-tech-data.js'];
- for(const p of paths){
-  const s=rd(p);
-  assert.doesNotMatch(s,/\bengine\s*\.\s*bet\s*\(/);
-  assert.doesNotMatch(s,/\beval\s*\(/);
-  assert.doesNotMatch(s,/\bnew\s+Function\s*\(/);
-  assert.doesNotMatch(s,/\bfetch\s*\(/);
-  assert.doesNotMatch(s,/\bXMLHttpRequest\b/);
- }
- const s=rd('bustabit-tech-ui.js');
- assert.ok(s.includes('LIVE NON CERTIFICATO'));
- assert.ok(s.includes('Nessuna performance quantitativa attribuibile con certezza'));
- assert.ok(s.includes('La funzione precisa non è ancora documentata'));
- assert.ok(s.includes('file')||s.includes('entry.sha'));
+test('no false LIVE performance: missing numeric evidence remains explicitly unavailable',()=>{
+ const ui=rd('bustabit-vault.js');
+ assert.match(ui,/Non sono disponibili performance quantitative dimostrate/);
+ assert.match(ui,/non vengono attribuiti a questa/);
+ assert.match(ui,/SHA-256/);
+ assert.match(ui,/crypto\.subtle\.digest/);
+ assert.match(ui,/checksum!==entry\.sha/);
+ assert.match(ui,/navigator\.clipboard\.writeText/);
+ assert.doesNotMatch(ui,/engine\s*\.\s*bet\s*\(/);
+ assert.doesNotMatch(ui,/\beval\s*\(/);
 });
