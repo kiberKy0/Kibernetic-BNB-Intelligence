@@ -73,4 +73,34 @@ $('kbtAnalyze').onclick=()=>{
   set('kbtStatus','Scansione completata: '+r.rounds+' round. Origine: '+r.source+'. Solo dati locali, nessuna puntata.');
  }catch(error){set('kbtStatus','Errore scanner: '+error.message)}
 };
+const codeFile=$('kbtCodeFile');
+codeFile?.addEventListener('change',async event=>{
+ const file=event.target.files?.[0];if(!file)return;
+ const result=$('kbtCodeSummary');result.replaceChildren();
+ if(file.size>2*1024*1024){set('kbtCodeStatus','Codice troppo grande (max 2 MB).');return}
+ try{
+  const code=await file.text();
+  const details=[
+   ['Config interfaccia',/\bvar\s+config\s*=\s*[{]/.test(code)||/\blet\s+config\s*=\s*[{]/.test(code)],
+   ['Evento GAME_STARTING',/engine\.on\s*\(\s*['"]GAME_STARTING['"]/.test(code)],
+   ['Evento GAME_STARTED',/engine\.on\s*\(\s*['"]GAME_STARTED['"]/.test(code)],
+   ['Evento GAME_ENDED',/engine\.on\s*\(\s*['"]GAME_ENDED['"]/.test(code)],
+   ['API invio puntata (rilevata, non eseguita)',/engine\.bet\s*\(/.test(code)],
+   ['Lettura history',/engine\.history|history\.toArray/.test(code)],
+   ['Eventi legacy (verificare compatibilità)',/engine\.on\s*\(\s*['"](?:game_started|game_crash)['"]/.test(code)],
+   ['Riferimenti ML/Pattern',/\b(?:ML|PATTERN|BAYES|ADAPTIVE)\b/i.test(code)],
+   ['Controlli rischio',/\b(?:maxLoss|stopLoss|maxBet|drawdown|riskManager)\b/i.test(code)],
+   ['Memoria o storage',/\b(?:localStorage|sessionStorage|storage|persist)\b/i.test(code)]
+  ];
+  details.forEach(([label,found])=>{
+   const cell=document.createElement('div');cell.className='kbt-cell';
+   const name=document.createElement('small');name.textContent=label;
+   const state=document.createElement('b');state.textContent=found?'Riferimento trovato':'Non individuato';
+   state.className=found?'kbt-ok':'kbt-muted';cell.append(name,state);result.append(cell);
+  });
+  const modern=details.slice(1,4).some(x=>x[1]),legacy=details[6][1];
+  set('kbtCodeStatus','Audit statico locale: '+file.name+' ('+code.split(/\r?\n/).length+' righe). '+(modern?'Eventi moderni presenti. ':legacy?'Rilevati eventi legacy da verificare. ':'Eventi del game non rilevati. ')+'Nessuna esecuzione, nessun upload, nessuna certificazione LIVE.');
+ }catch(e){set('kbtCodeStatus','Errore lettura codice: '+e.message)}
+});
+
 })();
