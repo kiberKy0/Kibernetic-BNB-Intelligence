@@ -89,8 +89,11 @@
       window.KiberXauContext = { state:'WAIT', mode:'validator-error' };
     }
     // Update the separate price-action lab without changing the advanced safety gate.
-    try { window.KiberXauMethodsUI?.render(result, feedContext, source); }
+    let methodReport=null;
+    try { methodReport=window.KiberXauMethodsUI?.render(result, feedContext, source); }
     catch (_) { /* The main Decoder remains independent if an optional lab breaks. */ }
+    try { window.KiberXauResearchUI?.render(feedContext, methodReport, source); }
+    catch (_) { /* New research methods are isolated from the safety validator. */ }
   }
   function waiting(reason, source = 'Nessun feed affidabile') {
     render({ signal: 'WAIT', label: 'ATTESA', samples: 0, interval: $('interval').value,
