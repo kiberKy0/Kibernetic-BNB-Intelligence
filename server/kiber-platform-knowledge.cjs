@@ -345,12 +345,18 @@ const FOCUS=Object.freeze({
  'ai:token360':'kiberai','ai:scenario':'forecast','ai:risk':'risk','ai:newsimpact':'factors'
 });
 const INDEX=new Map(CATALOG.map(x=>[x.id,x]));
-const GUIDE_PATTERNS=/(?:\b(?:cosa|cos|che|chi|come|dove|quali|qual|perche|spieg\w*|descriv\w*|a cosa|a che|funzion\w*|utilizz\w*|istruzion\w*|guida|aiut\w*|non capisco|signific\w*|serve|trovo|usare|mostr\w*|riassum\w*|sezioni|settori|pulsant\w*|riquadr\w*|strument\w*|differenza|compos\w*|sai fare|insegn\w*|cerca|ricerc\w*|approfond\w*)\b)/;
+const GUIDE_PATTERNS=/(?:\b(?:cosa|cos|che|chi|come|dove|quali|qual|perche|spieg\w*|descriv\w*|a cosa|a che|funzion\w*|utilizz\w*|istruzion\w*|guida|aiut\w*|non capisco|signific\w*|serve|trovo|usare|mostr\w*|riassum\w*|sezioni|settori|pulsant\w*|riquadr\w*|strument\w*|differenza|compos\w*|sai fare|insegn\w*|cerca|approfond\w*)\b)/;
 const DEICTIC=/(?:\b(?:questo|questa|quel|quella|pulsante|riquadro|sezione|qui|dove sono|cosa sto vedendo)\b)/;
 const OVERVIEW=/(?:tutt[ieo]|ogni (?:sezione|strumento|settore|funzione|dettaglio)|panoramica|cosa sai fare|cos e kibernetic|come funziona (?:il sito|la piattaforma)|che cosa (?:fa|contiene) la piattaforma|quali (?:funzioni|sezioni|strumenti)|guida completa)/;
+function wantsExternalGuideResearch(question){
+ const q=NORMALIZE(question).slice(0,350);
+ return /^(?:cerca|fai(?:mi)? una ricerca|ricerca sul web|approfondisci sul web|verifica su internet)\b/.test(q)||
+  /\b(?:e cerca (?:fonti|informazioni|approfondimenti)|consulta (?:fonti|il web)|cerca (?:sul web|su internet|fonti online)|approfondisci (?:sul web|con fonti esterne))\b/.test(q);
+}
 function match(question,{focus='',area='bnb'}={}){
  const q=NORMALIZE(question).slice(0,600);
- if(/\b(?:perche|come)\b.*\b(?:salendo|sale|salgono|scendendo|scende|ribasso|rialzo|profitto|guadagnare|prezzi oggi|andamento oggi)\b/.test(q)&&!/\b(?:come funziona|a cosa serve|cosa significa|spiegami la voce|spiegami il pulsante)\b/.test(q))return null;
+ if(/\b(?:perche|come)\b.*\b(?:salendo|sale|salgono|scendendo|scende|aumenta|diminuisce|ribasso|rialzo|profitto|guadagnare|prezzi oggi|andamento oggi)\b/.test(q)&&!/\b(?:come funziona|a cosa serve|cosa significa|spiegami la voce|spiegami il pulsante)\b/.test(q))return null;
+ if(/\b(?:attivo|attiva|online|adesso|in questo momento|ultimi minuti|cosa hai rilevato|quanti token|quanti asset|quale token sale)\b/.test(q)&&!/\b(?:a cosa serve|come funziona|spiegami|cosa significa|che cos)\b/.test(q))return null;
  const explicitFocus=FOCUS[String(focus||'').slice(0,95)]||'';
  if(!q)return null;
  const guideIntent=GUIDE_PATTERNS.test(q)||OVERVIEW.test(q);
@@ -412,4 +418,4 @@ function relevantForModel(m){if(!m)return null;return {
  derivedFrom:'Moduli e documentazione del repository Kibernetic (non verifica live di ogni pulsante)',
  caveat:'Queste istruzioni descrivono UI e funzioni documentate. Non sono una certificazione di disponibilità, né dati di mercato live.'
 }}
-module.exports={REVISION,CATALOG,FOCUS,NORMALIZE,match,isGuideQuestion,summaries,relevantForModel};
+module.exports={REVISION,CATALOG,FOCUS,NORMALIZE,match,isGuideQuestion,wantsExternalGuideResearch,summaries,relevantForModel};
