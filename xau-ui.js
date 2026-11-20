@@ -94,6 +94,8 @@
     catch (_) { /* The main Decoder remains independent if an optional lab breaks. */ }
     try { window.KiberXauResearchUI?.render(feedContext, methodReport, source); }
     catch (_) { /* New research methods are isolated from the safety validator. */ }
+    try { window.KiberXauLearningUI?.render(feedContext, source); }
+    catch (_) { /* Optional education never alters decoder signals or the safety gate. */ }
   }
   function waiting(reason, source = 'Nessun feed affidabile') {
     render({ signal: 'WAIT', label: 'ATTESA', samples: 0, interval: $('interval').value,
