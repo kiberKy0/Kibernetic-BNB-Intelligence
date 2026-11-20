@@ -329,11 +329,12 @@ const FOCUS=Object.freeze({
  'ai:token360':'kiberai','ai:scenario':'forecast','ai:risk':'risk','ai:newsimpact':'factors'
 });
 const INDEX=new Map(CATALOG.map(x=>[x.id,x]));
-const GUIDE_PATTERNS=/(?:\b(?:cosa|cos|che|chi|come|dove|quali|qual|perche|spieg\w*|descriv\w*|a cosa|a che|funzion\w*|utilizz\w*|istruzion\w*|guida|aiut\w*|non capisco|signific\w*|serve|trovo|usare|mostr\w*|riassum\w*|sezioni|settori|pulsant\w*|riquadr\w*|strument\w*|differenza|compos\w*|sai fare|insegn\w*|cerca informazioni|approfondisc\w*)\b)/;
+const GUIDE_PATTERNS=/(?:\b(?:cosa|cos|che|chi|come|dove|quali|qual|perche|spieg\w*|descriv\w*|a cosa|a che|funzion\w*|utilizz\w*|istruzion\w*|guida|aiut\w*|non capisco|signific\w*|serve|trovo|usare|mostr\w*|riassum\w*|sezioni|settori|pulsant\w*|riquadr\w*|strument\w*|differenza|compos\w*|sai fare|insegn\w*|cerca|ricerc\w*|approfond\w*)\b)/;
 const DEICTIC=/(?:\b(?:questo|questa|quel|quella|pulsante|riquadro|sezione|qui|dove sono|cosa sto vedendo)\b)/;
 const OVERVIEW=/(?:tutt[ieo]|ogni |panoramica|cosa sai fare|cos e kibernetic|come funziona (?:il sito|la piattaforma)|che cosa (?:fa|contiene) la piattaforma|quali (?:funzioni|sezioni|strumenti)|guida completa)/;
 function match(question,{focus='',area='bnb'}={}){
  const q=NORMALIZE(question).slice(0,600);
+ if(/\b(?:perche|come)\b.*\b(?:salendo|sale|salgono|scendendo|scende|ribasso|rialzo|profitto|guadagnare|prezzi oggi|andamento oggi)\b/.test(q)&&!/\b(?:come funziona|a cosa serve|cosa significa|spiegami la voce|spiegami il pulsante)\b/.test(q))return null;
  const explicitFocus=FOCUS[String(focus||'').slice(0,95)]||'';
  if(!q)return null;
  const guideIntent=GUIDE_PATTERNS.test(q)||OVERVIEW.test(q);
