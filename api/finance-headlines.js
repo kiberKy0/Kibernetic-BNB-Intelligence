@@ -9,17 +9,17 @@ const TOPICS = [
   {
     id:'macro', label:'Macroeconomia',
     query:'(BCE OR Federal Reserve OR inflazione OR tassi OR PIL) economia',
-    terms:/\b(BCE|Fed|Federal Reserve|inflazion|tassi|PIL|economia|recession|occupazion|bank)\b/i
+    terms:/\b(?:BCE|Fed|Federal Reserve|inflazion\w*|tassi|PIL|economi\w*|recession\w*|occupazion\w*|banc\w*)\b/i
   },
   {
     id:'markets',label:'Mercati',
     query:'(Wall Street OR Nasdaq OR S&P 500 OR FTSE MIB OR borse europee) mercati azionari',
-    terms:/\b(Wall Street|Nasdaq|S&P|FTSE|borsa|borse|azion|mercat|Dow Jones|Stoxx)\b/i
+    terms:/\b(?:Wall Street|Nasdaq|S&P|FTSE|borsa|borse|azion\w*|mercat\w*|Dow Jones|Stoxx)\b/i
   },
   {
     id:'crypto',label:'Criptovalute',
     query:'(bitcoin OR ethereum OR criptovalute OR crypto ETF) mercato',
-    terms:/\b(bitcoin|BTC|ethereum|ETH|criptovalut|crypto|stablecoin|blockchain|ETF)\b/i
+    terms:/\b(?:bitcoin|BTC|ethereum|ETH|criptovalut\w*|crypto|stablecoin|blockchain|ETF)\b/i
   }
 ];
 function decodeEntities(value) {
@@ -47,6 +47,7 @@ function extractItems(xml,topic,now){
     if(hours < -0.5 || hours > 48)continue;
     const sameDay=todayRome(publishedMs)===todayRome(now);
     const relevance=topic.terms.test(title)?1:0;
+    if(!relevance)continue;
     const importance=/\b(annunc|decision|record|croll|crisi|approv|tagli|rialz|inflazion|tassi|ETF|Fed|BCE)\b/i.test(title)?1:0;
     // Prefer today's reporting; older stories only appear if nothing new is found.
     const score=(sameDay?100:0)+(relevance*18)+(importance*5)-hours;
