@@ -1,0 +1,35 @@
+/* Bustabit intelligence: separate bounded panel, no impact on BNB/XAU styles */
+#kiberBustabitNav{border-color:#5e548e;background:#201d37;color:#e6ddff}
+#kiberBustabitNav b{color:#e6ddff}
+#section-bustabit{scroll-margin-top:18px}
+#section-bustabit .kbt-intro{font-size:13px;line-height:1.55;color:#aebfdb}
+#section-bustabit .kbt-warning{padding:10px 12px;border:1px solid #736046;border-radius:12px;background:#292315;color:#ffdfa9;font-size:12px;line-height:1.5}
+#section-bustabit .kbt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:9px;margin:12px 0}
+#section-bustabit .kbt-cell{min-width:0;display:grid;gap:5px;border:1px solid #31445e;background:#102034;padding:11px;border-radius:12px}
+#section-bustabit .kbt-cell b{font-size:15px;overflow-wrap:anywhere}
+#section-bustabit .kbt-cell small{font-size:11px;color:#b3c8d9}
+#section-bustabit .kbt-details{border:1px solid #344962;border-radius:13px;margin:10px 0;background:#0a1b2c}
+#section-bustabit .kbt-details>summary{cursor:pointer;padding:13px;color:#d7e8ff;font-weight:700;font-size:14px}
+#section-bustabit .kbt-details>.kbt-inside{border-top:1px solid #2b4156;padding:12px}
+#section-bustabit .kbt-inside p,#section-bustabit .kbt-inside li{font-size:12px;line-height:1.6;color:#b5c7d7}
+#section-bustabit .kbt-controls{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;align-items:center}
+#section-bustabit .kbt-controls button,#section-bustabit .kbt-controls select,#section-bustabit input[type=file]{border-radius:9px;padding:10px;background:#14344c;border:1px solid #4980a1;color:#e2f4ff;min-height:42px;font-size:12px}
+#section-bustabit .kbt-controls button{font-weight:750;cursor:pointer}
+#section-bustabit .kbt-controls button:hover{background:#1c4e6f}
+#section-bustabit .kbt-controls label{font-size:12px;color:#b5c8d7}
+#section-bustabit textarea{width:100%;box-sizing:border-box;background:#071929;border:1px solid #34546b;color:#d8eeff;border-radius:9px;min-height:114px;resize:vertical;padding:10px;font:12px/1.55 monospace}
+#section-bustabit .kbt-table{width:100%;border-collapse:collapse;font-size:12px}
+#section-bustabit .kbt-table td,#section-bustabit .kbt-table th{padding:8px 5px;border-bottom:1px solid #2f4259;text-align:left;vertical-align:top}
+#section-bustabit .kbt-table td:last-child{text-align:right}
+#section-bustabit .kbt-scroll{overflow-x:auto}
+#section-bustabit .kbt-pattern-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px}
+#section-bustabit .kbt-pattern{border:1px solid #344760;border-radius:9px;padding:8px;display:grid;gap:5px}
+#section-bustabit .kbt-pattern strong{font-size:12px;color:#d4e7ff}
+#section-bustabit .kbt-pattern small{color:#8fa5bc;font-size:11px}
+#section-bustabit .kbt-active{border-color:#8275b5;background:#1f2043}
+#section-bustabit .kbt-fail{color:#ffb6b6}
+#section-bustabit .kbt-ok{color:#a5e9c7}
+#section-bustabit #kbtStatus{font-size:12px;line-height:1.55;margin:8px 0}
+#section-bustabit .kbt-muted{font-size:11px;color:#a3b8c9}
+#section-bustabit a{color:#8ed9ff;overflow-wrap:anywhere}
+@media(max-width:420px){#section-bustabit .kbt-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#section-bustabit .kbt-controls>*{max-width:100%}#section-bustabit .kbt-details>summary{font-size:13px}}
