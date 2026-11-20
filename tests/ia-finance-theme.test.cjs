@@ -10,6 +10,7 @@ test('Finance palette and glass UI are applied by a trailing presentation-only s
  assert.match(css,/#42dbff/);
  assert.match(css,/#101b44/);
  assert.match(css,/Bricolage Grotesque/);
+ assert.doesNotMatch(css,/^\s*@import\s+url\(/m);
  assert.match(css,/DM Sans/);
  assert.match(css,/linear-gradient/);
  assert.match(css,/#kiberCompactDashboard/);
@@ -17,7 +18,7 @@ test('Finance palette and glass UI are applied by a trailing presentation-only s
  assert.match(css,/#v271TokenView/);
  assert.match(css,/\.kbo-panel/);
  assert.match(html,/'bnb-cloud-orb\.css','kiber-ia-finance-theme\.css']/);
- assert.match(html,/V='314-20261120-ia-finance-skin'/);
+ assert.match(html,/V='314-20261120-ia-finance-v2'/);
 });
 
 test('Original dashboard navigation, windows, token scan, wallet and chat remain intact',()=>{
@@ -57,7 +58,7 @@ test('All key state colours and phone layouts are preserved',()=>{
 
 test('Parent wallet and XAU shell receive only colour skin, not layout or behavior changes',()=>{
  const parent=fs.readFileSync('kiber-ia-finance-shell.css','utf8');
- assert.match(html,/href="kiber-ia-finance-shell\.css\?v=314-20261120-ia-finance-skin"/);
+ assert.match(html,/href="kiber-ia-finance-shell\.css\?v=314-20261120-ia-finance-v2"/);
  assert.match(parent,/#walletMini/);
  assert.match(parent,/#goldPanel/);
  assert.match(parent,/#bootRetry/);
