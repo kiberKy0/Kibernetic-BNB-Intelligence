@@ -9,7 +9,7 @@
   const txt=(id,value)=>{const e=$(id);if(e)e.textContent=String(value??'—');};
   const price=n=>Number.isFinite(n)?n.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
   function render(feed,base,source){
-    const panel=$('xauResearchSupplement');
+    const panel=$('xauMethodLab');
     if(!panel)return null;
     let data;
     try{
