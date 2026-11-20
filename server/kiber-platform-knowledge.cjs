@@ -49,7 +49,7 @@ e('search','Cerca monete e contratti',
  'Controlla sempre l’indirizzo; nome e simbolo non identificano in modo univoco il token.',
  'v27-2-oracle.js; dashboard-compact.js','read_only'),
 e('token','Scheda del token e Token Scanner',
- ['scheda token','scheda della moneta','token scanner','dettagli moneta','dossier','aprire token','analisi della moneta','pulsante analizza'],
+ ['scheda token','scheda della moneta','token scanner','scanner dei token','dettagli moneta','dossier','aprire token','analisi della moneta','pulsante analizza'],
  'Mercato/Cerca/Nuovi token → seleziona una moneta',
  'Riunisce prezzo, percentuali, storico, fattori, rischi e approfondimenti della moneta selezionata.',
  'Apri una moneta. Usa le linguette 24H, 7G, 30G, 90G, 1A o 3A per il grafico; espandi Previsione, Grafico, Cosa la impatta e Kiber AI. Usa ↻ per aggiornare, × o Indietro per chiudere.',
@@ -331,7 +331,7 @@ const FOCUS=Object.freeze({
 const INDEX=new Map(CATALOG.map(x=>[x.id,x]));
 const GUIDE_PATTERNS=/(?:\b(?:cosa|cos|che|chi|come|dove|quali|qual|perche|spieg\w*|descriv\w*|a cosa|a che|funzion\w*|utilizz\w*|istruzion\w*|guida|aiut\w*|non capisco|signific\w*|serve|trovo|usare|mostr\w*|riassum\w*|sezioni|settori|pulsant\w*|riquadr\w*|strument\w*|differenza|compos\w*|sai fare|insegn\w*|cerca|ricerc\w*|approfond\w*)\b)/;
 const DEICTIC=/(?:\b(?:questo|questa|quel|quella|pulsante|riquadro|sezione|qui|dove sono|cosa sto vedendo)\b)/;
-const OVERVIEW=/(?:tutt[ieo]|ogni |panoramica|cosa sai fare|cos e kibernetic|come funziona (?:il sito|la piattaforma)|che cosa (?:fa|contiene) la piattaforma|quali (?:funzioni|sezioni|strumenti)|guida completa)/;
+const OVERVIEW=/(?:tutt[ieo]|ogni (?:sezione|strumento|settore|funzione|dettaglio)|panoramica|cosa sai fare|cos e kibernetic|come funziona (?:il sito|la piattaforma)|che cosa (?:fa|contiene) la piattaforma|quali (?:funzioni|sezioni|strumenti)|guida completa)/;
 function match(question,{focus='',area='bnb'}={}){
  const q=NORMALIZE(question).slice(0,600);
  if(/\b(?:perche|come)\b.*\b(?:salendo|sale|salgono|scendendo|scende|ribasso|rialzo|profitto|guadagnare|prezzi oggi|andamento oggi)\b/.test(q)&&!/\b(?:come funziona|a cosa serve|cosa significa|spiegami la voce|spiegami il pulsante)\b/.test(q))return null;
@@ -347,6 +347,7 @@ function match(question,{focus='',area='bnb'}={}){
      if(pos>=0){const score=2+Math.min(7,Math.ceil(term.length/5));if(score>strength)strength=score;matched.push(a)}
    }
    if((DEICTIC.test(q)||q==='qui')&&explicitFocus===x.id)strength+=17;
+   if(x.id==='aiweb'&&/(?:\b(?:cerca|ricerc\w*|approfond\w*)\b)/.test(q)&&!/\b(?:come|cosa|significa|funziona|a cosa serve)\b/.test(q))strength-=10;
    if(x.id==='overview'&&OVERVIEW.test(q))strength+=15;
    if(x.id.startsWith('xau')&&area==='xau'&&/^(?:questo|questa|qui|come funziona)$/.test(q))strength+=9;
    return {entry:x,score:strength,matched};
