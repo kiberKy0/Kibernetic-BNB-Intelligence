@@ -1,0 +1,45 @@
+/* Bot technical dossiers: compact finance-style modules, all text read-only. */
+.bf-tech-toolbar{display:grid;grid-template-columns:minmax(200px,1fr) minmax(180px,1fr);gap:10px;margin:12px 0}
+.bf-tech-toolbar label{display:grid;gap:5px;font-size:12px;color:#cce5fa;font-weight:700}
+.bf-tech-toolbar select,.bf-tech-toolbar input{background:#071632;border:1px solid #4374ad;border-radius:12px;color:#f1faff;padding:10px 12px;font-size:13px;max-width:100%;min-height:44px}
+.bf-tech-attr{padding:12px;border:1px solid rgba(86,165,218,.32);border-radius:13px;background:rgba(12,33,78,.66);min-width:0}
+.bf-tech-attr small{font-size:10px;font-weight:900;letter-spacing:.055em;color:#80d7ff}
+.bf-tech-attr p{font-size:12px;line-height:1.55;color:#d8e8fc;margin:7px 0 0;overflow-wrap:anywhere}
+.bf-tech-dossier-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between;margin-bottom:12px}
+.bf-tech-dossier-head h3{font-size:17px;margin:0;color:#fff}
+.bf-tech-quadrant{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.bf-tech-measures,.bf-tech-performance-numbers{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.bf-tech-number{flex:1 1 130px;min-width:0;padding:10px 12px;border:1px solid #315681;border-radius:12px;background:rgba(11,36,79,.78);display:grid;gap:5px}
+.bf-tech-number small{font-size:10px;color:#a8cfeb}
+.bf-tech-number strong{font-size:16px;color:#f4f9ff;font-variant-numeric:tabular-nums}
+.bf-tech-source{font-size:10px;color:#86bce3;line-height:1.6;overflow-wrap:anywhere}
+.bf-tech-sub{margin-top:18px}
+.bf-tech-sub h4{font-size:15px;color:#c9f5ff;margin:0 0 9px}
+.bf-tech-module,.bf-tech-function{border:1px solid #355a88;border-radius:12px;background:#11244b;margin:7px 0;overflow:hidden}
+.bf-tech-module>summary,.bf-tech-function>summary{list-style:none;cursor:pointer;padding:12px;color:#e8f9ff;font-size:12px;font-weight:800}
+.bf-tech-module>summary::-webkit-details-marker,.bf-tech-function>summary::-webkit-details-marker{display:none}
+.bf-tech-module>summary::before,.bf-tech-function>summary::before{content:'+';display:inline-block;width:18px;color:#79ddff}
+.bf-tech-module[open]>summary::before,.bf-tech-function[open]>summary::before{content:'−'}
+.bf-tech-module-body{border-top:1px solid #294c77;padding:9px;display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.bf-tech-function-names{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 2px}
+.bf-tech-function-names code{font-size:10px;color:#d7f6ff;background:#152d5b;border-radius:7px;border:1px solid #3b6b9f;padding:5px 7px}
+.bf-tech-performance{padding:12px;margin:9px 0;background:linear-gradient(130deg,#153565,#0b2046);border:1px solid #3973b8;border-radius:15px}
+.bf-tech-performance>p{font-size:12px;line-height:1.6;color:#d3e9ff}
+.bf-tech-performance .bf-code-title{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.bf-tech-performance-numbers .bf-tech-number{flex:1 1 125px}
+.bf-tech-no-evidence{padding:13px;border:1px dashed #6780a4;border-radius:14px;background:#132643}
+.bf-tech-no-evidence strong{font-size:12px;color:#f7f9ff}
+.bf-tech-no-evidence p,.bf-tech-empty{font-size:12px;color:#bcd5ea;line-height:1.55}
+.bf-tech-functions-details>summary{font-weight:800}
+.bf-tech-function-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.bf-tech-function{margin:0}
+.bf-tech-function>summary{word-break:break-word;display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.bf-tech-function>summary::before{flex:0 0 15px}
+.bf-tech-function-tag{background:#214270;border-radius:9px;padding:3px 5px;font-size:9px;color:#b4e2ff}
+.bf-tech-function-content{border-top:1px solid #355a88;padding:8px;display:grid;gap:7px}
+.bf-tech-function-content .bf-tech-attr{padding:7px 8px}
+.bf-tech-function-content .bf-tech-attr p{font-size:11px}
+.bf-tech-uncertain{font-size:10px;color:#f0bf93;line-height:1.6}
+.bf-tech-info,.bf-tech-counter{font-size:11px;color:#adcbe4;line-height:1.6}
+.bf-tech-card-action{background:#16416d!important;border-color:#65adf5!important}
+@media(max-width:690px){.bf-tech-toolbar{grid-template-columns:1fr}.bf-tech-quadrant,.bf-tech-module-body,.bf-tech-function-list{grid-template-columns:1fr}.bf-tech-number{flex:1 1 115px}.bf-tech-dossier-head h3{font-size:15px}.bf-tech-performance .bf-code-title{flex-direction:column;align-items:flex-start}}

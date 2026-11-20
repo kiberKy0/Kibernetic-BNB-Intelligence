@@ -7,10 +7,15 @@
 <link rel="stylesheet" href="/bustabit-lab.css?v=3">
 <link rel="stylesheet" href="/bustabit-finance.css?v=3">
 <link rel="stylesheet" href="/bustabit-legacy.css?v=3">
+<link rel="stylesheet" href="/bustabit-tech.css?v=1">
 <script defer src="/bustabit-archive-data.js?v=2"></script>
 <script defer src="/bustabit-legacy-data.js?v=3"></script>
-<script defer src="/bustabit-archive-ui.js?v=3"></script>
+<script defer src="/bustabit-tech-functions-primary.js?v=1"></script>
+<script defer src="/bustabit-tech-functions-variants.js?v=1"></script>
+<script defer src="/bustabit-tech-data.js?v=1"></script>
+<script defer src="/bustabit-archive-ui.js?v=4"></script>
 <script defer src="/bustabit-legacy-ui.js?v=3"></script>
+<script defer src="/bustabit-tech-ui.js?v=1"></script>
 </head><body class="bf-page"><main>
 <header class="bf-head">
  <div class="bf-brand"><img src="/assets/kiber-logo.svg" alt="Kiber"><div><h1>Archivio storico Bustabit</h1><small>Kiber IA Finance · I codici originali</small></div></div>
@@ -22,7 +27,7 @@
  <div class="bf-ai"><img src="/assets/kiber-logo.svg" alt="Assistente Kiber"><div><b>Archivio Kiber</b><small>Versioni reali recuperate dalla Libreria. I log di simulazione restano distinti dalle scommesse LIVE certificate.</small></div></div>
 </section>
 <nav class="bf-navigation" aria-label="Navigazione Bustabit">
- <a href="#bf-codes">⌘ Codici</a><a href="#bf-intelligence">✧ Kiber</a><a href="#bf-bands">◈ Fasce</a><a href="#bf-evidence">▦ Log</a><a href="/bustabit-lab.html">◎ Decoder</a>
+ <a href="#bf-tech">◈ Analisi bot</a><a href="#bf-codes">⌘ Codici</a><a href="#bf-intelligence">✧ Kiber</a><a href="#bf-bands">◈ Fasce</a><a href="#bf-evidence">▦ Log</a><a href="/bustabit-lab.html">◎ Decoder</a>
 </nav>
 <div class="bf-metrics" aria-label="Dimensione dell'archivio storico">
  <div class="bf-stat"><small>Famiglie principali</small><strong>5</strong><em>Kiber / Negative / Trident / Cyber / V3</em></div>
@@ -30,6 +35,21 @@
  <div class="bf-stat"><small>Fasce del game</small><strong>8</strong><em>Catalogo Pattern V1.3</em></div>
  <div class="bf-stat"><small>Audit Cyber V3</small><strong>94 + 95</strong><em>Due esiti discordanti, entrambi conservati</em></div>
 </div>
+<section id="bf-tech" class="bf-section" aria-label="Tecnologie e performance di ogni bot">
+ <div class="bf-section-head"><div><h2>🧠 Tecnologia, strategie e performance per bot</h2>
+ <p>Seleziona una versione precisa. Kiber spiega ogni tecnologia e funzione per nome: <strong>cosa fa, quando, come e perché</strong>, con le prove dei log riferite soltanto a quel codice.</p></div><span class="bf-pill">21 versioni separate</span></div>
+ <div class="bf-tech-toolbar">
+  <label for="bfTechSelect">Seleziona il codice originale
+   <select id="bfTechSelect" aria-label="Scegli il bot storico da analizzare"></select>
+  </label>
+  <label for="bfTechFunctionSearch">Cerca una funzione o una tecnologia
+   <input id="bfTechFunctionSearch" type="search" placeholder="Es. Recovery, Moonshot, Governor, evaluateEntry" autocomplete="off">
+  </label>
+ </div>
+ <output id="bfTechStatus" class="bf-proof-footer" role="status" aria-live="polite">Seleziona un bot per aprire la sua scheda tecnica.</output>
+ <div id="bfTechView" class="bf-tech-dossier" aria-live="off"></div>
+ <p class="bf-note blue">Legenda prove: file identico (SHA-256) ≠ test funzionale ≠ replay simulato ≠ scommessa LIVE riconciliata. Le denominazioni dei moduli descrivono la logica del sorgente, non garantiscono vantaggi predittivi.</p>
+</section>
 <section id="bf-codes" class="bf-section">
  <div class="bf-section-head"><div><h2>🗂 Codici storici originali</h2><p>Prima le cinque versioni principali. Le altre revisioni restano disponibili senza riempire la schermata.</p></div><span class="bf-pill">SHA-256</span></div>
  <div class="bf-note blue">Per consultare il codice <b>tale e quale</b>, carica i file JavaScript originali sul tuo dispositivo. Il browser verifica ogni SHA-256, salva i byte localmente e non esegue né pubblica il bot. <strong>LIVE NON CERTIFICATO:</strong> anche i file chiamati LIVE richiedono la conferma dei log dell'account.</div>
