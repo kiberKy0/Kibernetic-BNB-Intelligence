@@ -1,7 +1,7 @@
 # Guida interna Kiber: conoscenza della piattaforma (20 novembre 2026)
 
 ## Obiettivo
-Kiber non deve soltanto descrivere il mercato. Deve poter spiegare le funzioni, la loro posizione, le differenze fra gli strumenti e i limiti operativi, a partire **dalle funzioni documentate nel repository**, senza inventare capacità. Questa prima versione ha un catalogo curato di 38 argomenti in `server/kiber-platform-knowledge.cjs`.
+Kiber non deve soltanto descrivere il mercato. Deve poter spiegare le funzioni, la loro posizione, le differenze fra gli strumenti e i limiti operativi, a partire **dalle funzioni documentate nel repository**, senza inventare capacità. Questa prima versione ha un catalogo curato di 40 argomenti in `server/kiber-platform-knowledge.cjs`.
 
 ## Comportamento
 - Domande come «Cos'è Kibernetic?», «Spiegami tutti i settori», «A cosa serve la campanella?», «Come funziona l'indicatore RSI?», «Perché la memoria è OFF?» cercano la voce corrispondente. Una risposta di guida identifica **dove**, **che cosa fa**, **come usarla**, **come funziona**, **limiti** e codice di riferimento.
@@ -13,7 +13,7 @@ Kiber non deve soltanto descrivere il mercato. Deve poter spiegare le funzioni, 
 - Quando vengono introdotti nuovi moduli, aggiornare la voce corrispondente (data, file sorgente, status) e aggiungere test di domanda/risposta.
 
 ## Moduli del repository esaminati
-`dashboard-compact.js`, `v27-1.js`, `v27-2-oracle.js`, `v27-3-forensics.js`, `v27-4-oracle.js`, `bnb-trading-panel.js`, `bnb-cloud-orb.js`, `profile-planets.js`, `kiber-dialog-memory.js`, `kiber-assistant.js`, `api/kiber.js`, `api/chain.js`, `xau-usd.html`, `xau-ui.js`, `xau-methods.js`, `xau-methods-ui.js` e mappa storica `docs/mappa-piattaforma-2026-10-12.md`. L'ultimo file è una mappa storica: dove le funzioni cambiano, ha priorità il codice attivo.
+`dashboard-compact.js`, `v27-1.js`, `v27-2-oracle.js`, `v27-3-forensics.js`, `v27-4-oracle.js`, `bnb-trading-panel.js`, `bnb-cloud-orb.js`, `profile-planets.js`, `kiber-dialog-memory.js`, `kiber-assistant.js`, `api/kiber.js`, `api/chain.js`, `xau-usd.html`, `xau-ui.js`, `xau-methods.js`, `xau-methods-ui.js`, `xau-strategy-research.js`, `xau-research-ui.js` e mappa storica `docs/mappa-piattaforma-2026-10-12.md`. L'ultimo file è una mappa storica: dove le funzioni cambiano, ha priorità il codice attivo.
 
 ## Vincoli
 1. **Documentato non significa funzionante**: una voce mostra ciò che il codice e le verifiche supportano, distinguendo funzioni presenti, limitate e pianificate.
