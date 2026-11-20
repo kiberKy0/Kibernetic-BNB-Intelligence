@@ -25,28 +25,25 @@ test('BNB shell bridges the real Saldo button without duplicating buttons over t
   assert.match(index,/id="walletMini"/);
 });
 
-test('XAU/USD has one visible Portafoglio button while broker remains unconnected',()=>{
+test('XAU/USD offers separate Broker and MT5 information, not a connected account',()=>{
   assert.match(gold,/<header class="xau-topbar">/);
-  assert.match(gold,/<nav class="xau-finance"[^>]*>[\s\S]*?id="xauWalletAccountBtn"[\s\S]*?id="xauWalletBalanceBtn"[\s\S]*?<\/nav>/);
-  assert.match(gold,/id="xauWalletBalanceBtn"[^>]*hidden/);
-  assert.match(gold, /class="xau-wallet-round"[^>]*id="xauWalletAccountBtn"/);
-  assert.match(gold,/Portafoglio<\/span>/);
-  assert.match(gold,/Broker non collegato/);
-  assert.match(gold,/Nessun movimento automatico è attivo/);
+  assert.match(gold,/<nav class="xau-finance xau-platform-nav"[^>]*>[\s\S]*?id="xauBrokerOpen"[\s\S]*?id="xauMt5Open"[\s\S]*?<\/nav>/);
+  assert.match(gold,/#xauWalletBalanceBtn\[hidden\]\{display:none!important\}/);
+  assert.match(gold,/id="xauBrokerInfo"/);
+  assert.match(gold,/Nessuna operazione/);
   assert.doesNotMatch(gold,/id="xauWalletAccountBtn"[^>]*MetaMask/);
 });
-
-test('Kiber profile is editable and shared across BNB and gold without changing other settings',()=>{
+test('BNB legacy profile data remain stored, while XAU has no editable profile interface',()=>{
   for(const id of ['profileName','profileTagline','profileBio','avatarSelect','profileSubtitleTop','profileBioPreview'])assert.match(bnb,new RegExp('id="'+id+'"'));
-  for(const id of ['xauProfileBtn','xauProfileDrawer','xauProfileForm','xauProfileEditName','xauProfileEditAvatar','xauProfileEditTagline','xauProfileEditBio'])assert.match(gold,new RegExp('id="'+id+'"'));
   assert.match(profile,/tagline:\(\$\('profileTagline'\)/);
   assert.match(profile,/bio:\(\$\('profileBio'\)/);
-  assert.match(gold,/kiber_v17_profile/);
   assert.match(profile,/kiber_v17_profile/);
+  assert.match(gold,/id="xauProfileName"|xauProfileName/);
+  assert.doesNotMatch(gold,/id="xauProfileBtn"/);
+  assert.doesNotMatch(gold,/id="xauProfileDrawer"/);
 });
-
 test('Gold standalone document remains independently accessible with its technical engine',()=>{
-  assert.match(gold, /<h1>Decoder <span class="gold">XAU\/USD<\/span><\/h1>/);
+  assert.match(gold, /<h1>(?:Kiber|Decoder) <span class="gold">XAU\/USD<\/span><\/h1>/);
   assert.match(gold, /id="decoder"/);
   assert.match(gold, /xau-analysis\.js/);
   assert.match(gold, /xau-ui\.js/);

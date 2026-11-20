@@ -53,6 +53,6 @@ test('read-only UI change keeps scanner, Kiber chat, wallet and XAU logic',()=>{
  assert.match(index,/walletBalanceToggle'\)\?\.click\(\)/);
  assert.match(index,/id="walletMini"/);
  assert.match(index,/id="goldPanel"/);
- assert.match(index,/V='314-20261120-header-shortcuts'/);
+ assert.match(index,/V='314-20261120-speculative-layout'/);
  assert.doesNotThrow(()=>new Function(busta));
 });

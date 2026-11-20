@@ -33,9 +33,11 @@ test('Gold decoder contains independent analysis and TradingView chart',()=>{
   assert.match(gold,/xau-analysis\.js/);
 });
 
-test('Gold mobile profile no longer exposes the robot avatar and the notice is compact',()=>{
-  assert.match(gold, /#xauProfileAvatar\{display:none!important\}/);
-  assert.match(gold, /id="xauProfileName">Profilo<\/span>/);
-  assert.match(gold, /<details class="banner xau-disclosure">/);
-  assert.doesNotMatch(html, /class="gold-panel-head"/);
+test('Gold mobile has no profile customizer or avatar control, notice remains compact',()=>{
+  assert.doesNotMatch(gold,/id="xauProfileBtn"/);
+  assert.doesNotMatch(gold,/id="xauProfileDrawer"/);
+  assert.match(gold,/id="xauBackToBnb"/);
+  assert.match(gold,/<details class="banner xau-disclosure">/);
+  assert.doesNotMatch(html,/class="gold-panel-head"/);
 });
+
