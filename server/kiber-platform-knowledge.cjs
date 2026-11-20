@@ -348,6 +348,12 @@ function match(question,{focus='',area='bnb'}={}){
    }
    if((DEICTIC.test(q)||q==='qui')&&explicitFocus===x.id)strength+=17;
    if(x.id==='aiweb'&&/(?:\b(?:cerca|ricerc\w*|approfond\w*)\b)/.test(q)&&!/\b(?:come|cosa|significa|funziona|a cosa serve)\b/.test(q))strength-=10;
+   // «Cerca approfondimenti su RSI» is about RSI, not the search button or source menu.
+   const researchVerb=/^(?:cerca|ricerca|approfondisci)\b/.test(q);
+   if(researchVerb&&!/\b(?:come|cosa|significa|funziona|a cosa serve)\b/.test(q)){
+     if(['search','sources','aiweb'].includes(x.id))strength-=8;
+     else if(matched.length)strength+=5;
+   }
    if(x.id==='overview'&&OVERVIEW.test(q))strength+=15;
    if(x.id.startsWith('xau')&&area==='xau'&&/^(?:questo|questa|qui|come funziona)$/.test(q))strength+=9;
    return {entry:x,score:strength,matched};
