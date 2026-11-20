@@ -87,6 +87,9 @@ function renderCodes(){
   const down=make('button','bf-action secondary','Scarica .js');down.disabled=!saved;
   down.addEventListener('click',()=>download(entry));
   actions.append(preview,down);
+  const technical=make('button','bf-action bf-tech-card-action','Tecnologie e performance');
+  technical.addEventListener('click',()=>window.KiberBustabitTechUI?.open(entry.id));
+  actions.prepend(technical);
   if(saved){
    const del=make('button','bf-action danger','Rimuovi locale');
    del.addEventListener('click',()=>forget(entry));actions.append(del);
