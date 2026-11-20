@@ -19,11 +19,13 @@ function parse(input){
     rows=o.map(v=>typeof v==='object'&&v!==null?(v.multiplier??v.bust??v.crash??v.payout):v);
   }else{
     const lines=s.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    if(lines[0]&&/[a-z]/i.test(lines[0].replace(/[\dx.,;|\s]/gi,''))){
-      const cols=lines[0].split(/[,;\t|]/).map(x=>x.trim().toLowerCase());
+    if(lines.every(x=>/^\d+,\d+x?$/i.test(x))){rows=lines.map(x=>x.replace(',','.'));}
+    else if(lines[0]&&/[a-z]/i.test(lines[0].replace(/[\dx.,;|\s]/gi,''))){
+      const sep=lines[0].includes(';')?';':lines[0].includes('\t')?'\t':lines[0].includes('|')?'|':',';
+      const cols=lines[0].split(sep).map(x=>x.trim().toLowerCase());
       const index=cols.findIndex(x=>/^(bust|crash|multiplier|payout|crashpoint|crash_point)$/.test(x));
       if(index<0)throw Error('CSV: manca colonna bust, crash o multiplier.');
-      rows=lines.slice(1).map(x=>x.split(/[,;\t|]/)[index]);
+      rows=lines.slice(1).map(x=>x.split(sep)[index]);
     }else rows=s.split(/[\s;|]+/).flatMap(t=>t.split(/,(?=\s*\d+(?:[.,]\d+)?x?(?:,|$))/i));
   }
   if(rows.length>MAX_ROUNDS)throw Error('Limite '+MAX_ROUNDS.toLocaleString('it-IT')+' round per scansione.');
