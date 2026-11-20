@@ -35,7 +35,7 @@ test('finance landing links to three independent sectors and loads its data prov
 });
 test('finance headlines return one dated real link per category',async()=>{
   const orig=global.fetch;
-  global.fetch=async()=>({ok:true,text:async()=>rss(Date.now()-30000)});
+  global.fetch=async url=>{const q=decodeURIComponent(String(url));const title=q.includes('Wall Street')?'Wall Street e Nasdaq chiudono la seduta':q.includes('bitcoin')?'Bitcoin e Ethereum sul mercato crypto':'BCE annuncia decisione sui tassi';return {ok:true,text:async()=>rss(Date.now()-30000,title)};};
   try{
     const res=fakeResponse();
     await handler({method:'GET'},res);
@@ -62,4 +62,14 @@ test('Bustabit scanner is local and does not claim guaranteed prediction',()=>{
   assert.match(page,/non permettono di prevedere/);
   assert.ok(page.includes('split(/[\\s;]+/)'));
   assert.doesNotThrow(()=>new vm.Script(page.match(/<script>([\s\S]*?)<\/script>/i)[1]));
+});
+
+test('a macro headline cannot be incorrectly reused as the crypto headline',async()=>{
+  const orig=global.fetch;
+  global.fetch=async()=>({ok:true,text:async()=>rss(Date.now()-30000,'BCE annuncia decisione sui tassi')});
+  try{
+    const res=fakeResponse();await handler({method:'GET'},res);
+    assert.equal(res.body.items.find(x=>x.category==='macro').status,'available');
+    assert.equal(res.body.items.find(x=>x.category==='crypto').status,'unavailable');
+  }finally{global.fetch=orig}
 });
