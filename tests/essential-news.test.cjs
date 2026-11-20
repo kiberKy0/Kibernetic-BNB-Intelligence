@@ -13,12 +13,13 @@ test('active BNB news rendering prioritizes max 3 fresh impact >=70 while keepin
  assert.match(h,/data-news="token">Token/);
  assert.match(h,/id="newsList"/);
 });
-test('historical source archive leads with older families and links decoder without betting',()=>{
- const html=read('bustabit-archivio.html'),js=read('bustabit-legacy-ui.js');
- assert.match(html,/Kiber Strike 1\.4/);
- assert.match(html,/Negative Breaker/);
- assert.match(html,/Trident/);
- assert.match(html,/LIVE NON CERTIFICATO/);
- assert.ok(html.includes('href="/bustabit-lab.html"'));
- assert.doesNotMatch(js,/engine\.bet\s*\(/);
+test('Bustabit sector is an original code archive, not an extra news or scanner dashboard',()=>{
+ const h=read('bustabit-lab.html');
+ assert.match(h,/Kiber Strike 1\.4/);
+ assert.match(h,/Negative Breaker/);
+ assert.match(h,/Trident/);
+ assert.match(h,/LIVE/);
+ assert.match(h,/bustabit-vault\.js/);
+ assert.match(h,/https:\/\/bustabit\.com/);
+ assert.doesNotMatch(h,/bustabit-scanner\.js|id="newsList"|id="kbtAnalyze"/);
 });

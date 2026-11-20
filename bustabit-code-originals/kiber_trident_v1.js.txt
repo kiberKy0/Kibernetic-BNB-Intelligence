@@ -1,0 +1,743 @@
+/*
+ * KIBER TRIDENT V1
+ * Three-mode adaptive Bustabit bot
+ * Modes:
+ *   PRUDENT  -> target profit 1-2 bits, variable payout
+ *   OFFENSIVE -> target profit 3-5 bits, variable payout
+ *   EXTREME -> 10-30 bit stake micro-session after strong positive/negative extremes
+ *
+ * Design principles:
+ * - Variable payout + variable stake
+ * - Strategy performance affects FREQUENCY first
+ * - Weak strategy: less frequent, compensation stake may rise only gradually and under strong signal
+ * - Strong strategy: stake contained, allowed more often
+ * - Block/sequence change detector on short/medium/long windows
+ * - Capital protection, profit lock, fortress pause, extreme-session cooldown
+ * - Live wager grid = 100 satoshis (1 bit) to avoid Bustabit integer-grid errors seen live
+ */
+
+var config = {
+  minBet: { value: 100, type: 'balance', label: 'Min bet (1 bit)' },
+  maxBet: { value: 5000, type: 'balance', label: 'Hard max bet (50 bits)' },
+
+  warmupRounds: { value: '20', type: 'text', label: 'Warm-up rounds' },
+  stopLossPct: { value: '8', type: 'text', label: 'Session stop loss %' },
+  profitTargetPct: { value: '5', type: 'text', label: 'Session profit target %' },
+  hardRiskCapPct: { value: '4.5', type: 'text', label: 'Absolute max single-bet risk %' },
+
+  prudentMinProfitBits: { value: '1', type: 'text', label: 'Prudent min target profit bits' },
+  prudentMaxProfitBits: { value: '2', type: 'text', label: 'Prudent max target profit bits' },
+  offensiveMinProfitBits: { value: '3', type: 'text', label: 'Offensive min target profit bits' },
+  offensiveMaxProfitBits: { value: '5', type: 'text', label: 'Offensive max target profit bits' },
+
+  extremeMinBits: { value: '10', type: 'text', label: 'Extreme min stake bits' },
+  extremeMaxBits: { value: '30', type: 'text', label: 'Extreme max stake bits' },
+  extremeMaxBets: { value: '3', type: 'text', label: 'Extreme micro-session max bets' },
+  extremeCooldown: { value: '15', type: 'text', label: 'Extreme cooldown rounds' },
+
+  perfWindow: { value: '24', type: 'text', label: 'Strategy performance window' },
+  perfMinSample: { value: '6', type: 'text', label: 'Min sample before adaptation' },
+  fortressRounds: { value: '4', type: 'text', label: 'Fortress rounds after 3 losses' },
+
+  verbose: { value: true, type: 'checkbox', label: 'Verbose logs' }
+};
+
+function num(v, fallback) {
+  var n = Number(v);
+  return isFinite(n) ? n : fallback;
+}
+
+function intNum(v, fallback) {
+  var n = Math.floor(num(v, fallback));
+  return isFinite(n) ? n : fallback;
+}
+
+function clamp(v, lo, hi) {
+  return Math.max(lo, Math.min(hi, v));
+}
+
+function sat(v) {
+  var n = Math.floor(num(v, 0));
+  return (!isFinite(n) || n < 0) ? 0 : n;
+}
+
+function bitsToSat(bits) {
+  return sat(num(bits, 0) * 100);
+}
+
+function bits(sats) {
+  return (num(sats, 0) / 100).toFixed(2);
+}
+
+function pct(v) {
+  return num(v, 0).toFixed(2) + '%';
+}
+
+function pushLimited(arr, value, maxLen) {
+  arr.push(value);
+  while (arr.length > maxLen) arr.shift();
+}
+
+function tail(arr, n) {
+  return arr.slice(Math.max(0, arr.length - n));
+}
+
+function mean(arr) {
+  if (!arr.length) return 0;
+  var s = 0;
+  for (var i = 0; i < arr.length; i++) s += arr[i];
+  return s / arr.length;
+}
+
+function variance(arr) {
+  if (arr.length < 2) return 0;
+  var m = mean(arr);
+  var s = 0;
+  for (var i = 0; i < arr.length; i++) {
+    var d = arr[i] - m;
+    s += d * d;
+  }
+  return s / arr.length;
+}
+
+function rate(arr, test) {
+  if (!arr.length) return 0;
+  var c = 0;
+  for (var i = 0; i < arr.length; i++) if (test(arr[i])) c++;
+  return c / arr.length;
+}
+
+function trailingBelow(x) {
+  var c = 0;
+  for (var i = state.history.length - 1; i >= 0; i--) {
+    if (state.history[i] < x) c++;
+    else break;
+  }
+  return c;
+}
+
+function safeLog(msg) {
+  if (P.verbose && typeof log === 'function') log(msg);
+}
+
+var P = {
+  minBet: sat(config.minBet.value),
+  maxBet: sat(config.maxBet.value),
+  warmupRounds: intNum(config.warmupRounds.value, 20),
+  stopLossPct: num(config.stopLossPct.value, 8),
+  profitTargetPct: num(config.profitTargetPct.value, 5),
+  hardRiskCapPct: num(config.hardRiskCapPct.value, 4.5),
+
+  prudentMinProfit: bitsToSat(config.prudentMinProfitBits.value),
+  prudentMaxProfit: bitsToSat(config.prudentMaxProfitBits.value),
+  offensiveMinProfit: bitsToSat(config.offensiveMinProfitBits.value),
+  offensiveMaxProfit: bitsToSat(config.offensiveMaxProfitBits.value),
+
+  extremeMin: bitsToSat(config.extremeMinBits.value),
+  extremeMax: bitsToSat(config.extremeMaxBits.value),
+  extremeMaxBets: intNum(config.extremeMaxBets.value, 3),
+  extremeCooldown: intNum(config.extremeCooldown.value, 15),
+
+  perfWindow: intNum(config.perfWindow.value, 24),
+  perfMinSample: intNum(config.perfMinSample.value, 6),
+  fortressRounds: intNum(config.fortressRounds.value, 4),
+  verbose: !!config.verbose.value
+};
+
+P.minBet = Math.max(100, P.minBet);
+P.maxBet = Math.max(P.minBet, P.maxBet);
+P.prudentMaxProfit = Math.max(P.prudentMinProfit, P.prudentMaxProfit);
+P.offensiveMaxProfit = Math.max(P.offensiveMinProfit, P.offensiveMaxProfit);
+P.extremeMax = Math.max(P.extremeMin, P.extremeMax);
+P.perfWindow = Math.max(10, P.perfWindow);
+P.perfMinSample = Math.max(4, P.perfMinSample);
+P.extremeMaxBets = Math.max(1, P.extremeMaxBets);
+P.extremeCooldown = Math.max(0, P.extremeCooldown);
+P.fortressRounds = Math.max(0, P.fortressRounds);
+
+var startBalance = sat(userInfo.balance);
+
+var state = {
+  history: [],
+  round: 0,
+  sessionNet: 0,
+  peakNet: 0,
+  lockedProfit: 0,
+  winStreak: 0,
+  lossStreak: 0,
+  fortressLeft: 0,
+  stopped: false,
+  pending: null,
+  lastMode: 'WARMUP',
+  lastPlayedRound: {
+    PRUDENT: -9999,
+    OFFENSIVE: -9999,
+    EXTREME: -9999
+  },
+  perf: {
+    PRUDENT: [],
+    OFFENSIVE: [],
+    EXTREME: []
+  },
+  extreme: {
+    active: false,
+    type: null,
+    strength: 0,
+    betsUsed: 0,
+    cooldownUntil: 0
+  }
+};
+
+function validate() {
+  if (startBalance <= 0) throw new Error('Invalid starting balance');
+  if (P.stopLossPct <= 0 || P.stopLossPct >= 100) throw new Error('Invalid stop loss');
+  if (P.profitTargetPct <= 0) throw new Error('Invalid profit target');
+  if (P.hardRiskCapPct <= 0 || P.hardRiskCapPct > 10) throw new Error('Invalid hard risk cap');
+  if (P.prudentMinProfit <= 0 || P.offensiveMinProfit <= 0) throw new Error('Invalid profit targets');
+}
+
+function sessionLossPct() {
+  if (state.sessionNet >= 0) return 0;
+  return (-state.sessionNet / startBalance) * 100;
+}
+
+function profitLockFloor() {
+  if (state.lockedProfit <= 0) return Math.floor(startBalance * (1 - P.stopLossPct / 100));
+  return Math.max(
+    Math.floor(startBalance * (1 - P.stopLossPct / 100)),
+    startBalance + state.lockedProfit
+  );
+}
+
+function availableCapital() {
+  return Math.max(0, sat(userInfo.balance) - profitLockFloor());
+}
+
+function updateProfitLock() {
+  if (state.sessionNet <= 0) return;
+  var p = (state.sessionNet / startBalance) * 100;
+  var share = 0;
+  if (p >= 4) share = 0.75;
+  else if (p >= 3) share = 0.60;
+  else if (p >= 2) share = 0.40;
+  else if (p >= 1) share = 0.25;
+  if (share > 0) {
+    var candidate = sat(state.sessionNet * share);
+    if (candidate > state.lockedProfit) state.lockedProfit = candidate;
+  }
+}
+
+function stopNow(reason) {
+  if (state.stopped) return true;
+  state.stopped = true;
+  safeLog('[STOP] ' + reason);
+  if (typeof engine.stop === 'function') engine.stop();
+  else if (typeof stop === 'function') stop(reason);
+  return true;
+}
+
+function shouldStop() {
+  var bal = sat(userInfo.balance);
+  if (bal <= Math.floor(startBalance * (1 - P.stopLossPct / 100))) {
+    return stopNow('Hard stop loss reached');
+  }
+  if (state.sessionNet <= -startBalance * (P.stopLossPct / 100)) {
+    return stopNow('Session stop loss reached: ' + bits(state.sessionNet) + 'b');
+  }
+  if (state.sessionNet >= startBalance * (P.profitTargetPct / 100)) {
+    return stopNow('Profit target reached: +' + bits(state.sessionNet) + 'b');
+  }
+  if (availableCapital() < P.minBet) {
+    return stopNow('Protected capital floor reached');
+  }
+  return false;
+}
+
+function blockStats(arr) {
+  return {
+    n: arr.length,
+    avg: mean(arr),
+    variance: variance(arr),
+    low: rate(arr, function (x) { return x < 1.35; }),
+    flow: rate(arr, function (x) { return x >= 1.50; }),
+    high: rate(arr, function (x) { return x >= 2.00; }),
+    veryHigh: rate(arr, function (x) { return x >= 5.00; })
+  };
+}
+
+function classifyBlock(s) {
+  if (s.n < 3) return 'UNKNOWN';
+  if (s.low >= 0.60 && s.high <= 0.20) return 'NEGATIVE';
+  if (s.flow >= 0.70 && s.high >= 0.35) return 'POSITIVE';
+  if (s.variance >= 10) return 'VOLATILE';
+  return 'MIXED';
+}
+
+function analyzeBlocks() {
+  var h = state.history;
+  var shortArr = tail(h, 5);
+  var mediumArr = tail(h, 12);
+  var longArr = tail(h, 24);
+
+  var s = blockStats(shortArr);
+  var m = blockStats(mediumArr);
+  var l = blockStats(longArr);
+
+  var shortType = classifyBlock(s);
+  var mediumType = classifyBlock(m);
+  var longType = classifyBlock(l);
+
+  var prevShort = blockStats(h.slice(Math.max(0, h.length - 10), Math.max(0, h.length - 5)));
+  var prevType = classifyBlock(prevShort);
+
+  var change = 'NONE';
+  if (prevType !== 'UNKNOWN' && shortType !== 'UNKNOWN' && prevType !== shortType) {
+    change = prevType + '_TO_' + shortType;
+  }
+
+  var negScore = 0;
+  var posScore = 0;
+  var lowTrail = trailingBelow(1.35);
+
+  negScore += clamp(lowTrail / 6, 0, 1) * 35;
+  negScore += clamp((m.low - 0.45) / 0.35, 0, 1) * 35;
+  negScore += clamp((0.30 - m.high) / 0.30, 0, 1) * 20;
+  if (change === 'POSITIVE_TO_NEGATIVE' || change === 'MIXED_TO_NEGATIVE') negScore += 10;
+
+  posScore += clamp((m.flow - 0.55) / 0.35, 0, 1) * 30;
+  posScore += clamp((m.high - 0.30) / 0.40, 0, 1) * 35;
+  posScore += clamp((m.avg - 1.80) / 2.20, 0, 1) * 20;
+  posScore += clamp(m.veryHigh / 0.20, 0, 1) * 5;
+  if (change === 'NEGATIVE_TO_POSITIVE' || change === 'MIXED_TO_POSITIVE') posScore += 10;
+
+  return {
+    short: s,
+    medium: m,
+    long: l,
+    shortType: shortType,
+    mediumType: mediumType,
+    longType: longType,
+    previousShortType: prevType,
+    change: change,
+    lowTrail: lowTrail,
+    negativeExtreme: clamp(Math.round(negScore), 0, 100),
+    positiveExtreme: clamp(Math.round(posScore), 0, 100)
+  };
+}
+
+function recordPerf(mode, won, pnl, wager) {
+  if (!state.perf[mode]) return;
+  pushLimited(state.perf[mode], {
+    win: won ? 1 : 0,
+    pnl: pnl,
+    wager: Math.max(1, wager)
+  }, Math.max(50, P.perfWindow));
+}
+
+function perfStats(mode) {
+  var arr = tail(state.perf[mode] || [], P.perfWindow);
+  var wins = 0;
+  var pnl = 0;
+  var wager = 0;
+  for (var i = 0; i < arr.length; i++) {
+    wins += arr[i].win;
+    pnl += arr[i].pnl;
+    wager += arr[i].wager;
+  }
+  return {
+    n: arr.length,
+    winRate: arr.length ? wins / arr.length : 0,
+    pnl: pnl,
+    roi: wager > 0 ? pnl / wager : 0
+  };
+}
+
+function strategyProfile(mode) {
+  var s = perfStats(mode);
+  if (s.n < P.perfMinSample) {
+    return { grade: 'NEW', frequencyGap: 1, stakeFactor: 1.00 };
+  }
+
+  if (s.pnl > 0 && s.roi > 0.05) {
+    return { grade: 'HOT', frequencyGap: 0, stakeFactor: 0.98 };
+  }
+
+  if (s.pnl > 0) {
+    return { grade: 'GOOD', frequencyGap: 1, stakeFactor: 1.00 };
+  }
+
+  if (s.roi > -0.08) {
+    return { grade: 'WEAK', frequencyGap: 2, stakeFactor: 1.08 };
+  }
+
+  return { grade: 'COLD', frequencyGap: 4, stakeFactor: 1.16 };
+}
+
+function strategyEligible(mode, signalScore) {
+  var p = strategyProfile(mode);
+  var since = state.round - state.lastPlayedRound[mode];
+  var requiredGap = p.frequencyGap;
+
+  // Weak strategies can still act, but only under stronger signal.
+  if (p.grade === 'WEAK' && signalScore < 58) return false;
+  if (p.grade === 'COLD' && signalScore < 72) return false;
+
+  return since > requiredGap;
+}
+
+function prudentSignal(a) {
+  var score = 50;
+  if (a.shortType === 'POSITIVE') score += 12;
+  if (a.shortType === 'MIXED') score += 5;
+  if (a.shortType === 'NEGATIVE') score -= 8;
+  if (a.change === 'NEGATIVE_TO_POSITIVE') score += 12;
+  if (a.medium.flow >= 0.55) score += 8;
+  if (a.lowTrail >= 3) score -= 10;
+  return clamp(Math.round(score), 0, 100);
+}
+
+function offensiveSignal(a) {
+  var score = 40;
+  if (a.shortType === 'POSITIVE') score += 18;
+  if (a.mediumType === 'POSITIVE') score += 12;
+  if (a.change === 'NEGATIVE_TO_POSITIVE') score += 15;
+  if (a.medium.high >= 0.40) score += 10;
+  if (a.shortType === 'NEGATIVE') score -= 18;
+  if (a.lowTrail >= 3) score -= 12;
+  return clamp(Math.round(score), 0, 100);
+}
+
+function maybeStartExtreme(a) {
+  if (state.extreme.active) return;
+  if (state.round < state.extreme.cooldownUntil) return;
+
+  var type = null;
+  var strength = 0;
+
+  if (a.negativeExtreme >= 78 && a.negativeExtreme >= a.positiveExtreme + 8) {
+    type = 'NEGATIVE';
+    strength = a.negativeExtreme;
+  } else if (a.positiveExtreme >= 78 && a.positiveExtreme >= a.negativeExtreme + 8) {
+    type = 'POSITIVE';
+    strength = a.positiveExtreme;
+  }
+
+  if (!type) return;
+
+  state.extreme.active = true;
+  state.extreme.type = type;
+  state.extreme.strength = strength;
+  state.extreme.betsUsed = 0;
+
+  safeLog('[EXTREME START] type=' + type + ' strength=' + strength + '/100');
+}
+
+function chooseMode(a) {
+  maybeStartExtreme(a);
+
+  if (state.extreme.active && state.extreme.betsUsed < P.extremeMaxBets) {
+    if (strategyEligible('EXTREME', state.extreme.strength)) return 'EXTREME';
+  }
+
+  var off = offensiveSignal(a);
+  if (off >= 66 && strategyEligible('OFFENSIVE', off)) return 'OFFENSIVE';
+
+  var pru = prudentSignal(a);
+  if (pru >= 46 && strategyEligible('PRUDENT', pru)) return 'PRUDENT';
+
+  return 'WAIT';
+}
+
+function targetProfitForMode(mode, signal) {
+  var t = clamp(signal / 100, 0, 1);
+  if (mode === 'PRUDENT') {
+    return sat(P.prudentMinProfit + (P.prudentMaxProfit - P.prudentMinProfit) * t);
+  }
+  if (mode === 'OFFENSIVE') {
+    return sat(P.offensiveMinProfit + (P.offensiveMaxProfit - P.offensiveMinProfit) * t);
+  }
+  return 0;
+}
+
+function variablePayout(mode, a, signal) {
+  if (mode === 'PRUDENT') {
+    if (a.shortType === 'NEGATIVE') return 1.30;
+    if (a.change === 'NEGATIVE_TO_POSITIVE') return 1.55;
+    if (signal >= 70) return 1.60;
+    if (signal >= 58) return 1.45;
+    return 1.35;
+  }
+
+  if (mode === 'OFFENSIVE') {
+    if (a.change === 'NEGATIVE_TO_POSITIVE' && a.medium.high >= 0.35) return 1.90;
+    if (signal >= 82) return 2.00;
+    if (signal >= 72) return 1.75;
+    if (a.shortType === 'NEGATIVE') return 1.45;
+    return 1.60;
+  }
+
+  if (mode === 'EXTREME') {
+    if (state.extreme.type === 'NEGATIVE') {
+      if (state.extreme.strength >= 90) return 1.35;
+      return 1.45;
+    }
+    if (state.extreme.strength >= 90) return 2.10;
+    return 1.80;
+  }
+
+  return 1.50;
+}
+
+function signalForMode(mode, a) {
+  if (mode === 'PRUDENT') return prudentSignal(a);
+  if (mode === 'OFFENSIVE') return offensiveSignal(a);
+  if (mode === 'EXTREME') return state.extreme.strength;
+  return 0;
+}
+
+function stakeFromTargetProfit(targetProfit, payout) {
+  if (payout <= 1) return 0;
+  return Math.ceil(targetProfit / (payout - 1));
+}
+
+function extremeStake(signal) {
+  var t = clamp((signal - 78) / 22, 0, 1);
+  return sat(P.extremeMin + (P.extremeMax - P.extremeMin) * t);
+}
+
+function modeRiskCap(mode, balance) {
+  if (mode === 'PRUDENT') return sat(balance * 0.0125);   // 1.25%
+  if (mode === 'OFFENSIVE') return sat(balance * 0.0250); // 2.50%
+  if (mode === 'EXTREME') return sat(balance * (P.hardRiskCapPct / 100));
+  return 0;
+}
+
+function governorFactor() {
+  var loss = sessionLossPct();
+  if (loss < 1.5) return 1.00;
+  if (loss < 3.0) return 0.88;
+  if (loss < 5.0) return 0.72;
+  return 0.55;
+}
+
+function buildBet(mode, a) {
+  var signal = signalForMode(mode, a);
+  var payout = variablePayout(mode, a, signal);
+  var profile = strategyProfile(mode);
+  var balance = sat(userInfo.balance);
+  var raw;
+
+  if (mode === 'EXTREME') {
+    raw = extremeStake(signal);
+  } else {
+    var target = targetProfitForMode(mode, signal);
+    raw = stakeFromTargetProfit(target, payout);
+  }
+
+  // Chimera-inspired behavior:
+  // positive strategy -> more frequent but stake contained
+  // weak strategy -> less frequent, gradual compensation stake increase only under strong signal
+  raw *= profile.stakeFactor;
+  raw *= governorFactor();
+
+  var cap = Math.min(
+    P.maxBet,
+    sat(balance * (P.hardRiskCapPct / 100)),
+    modeRiskCap(mode, balance),
+    availableCapital(),
+    balance
+  );
+
+  raw = Math.min(raw, cap);
+
+  // Live safety grid: 1 bit increments (100 sats), always round DOWN.
+  raw = Math.floor(raw / 100) * 100;
+
+  if (raw < P.minBet) return null;
+
+  if (mode === 'EXTREME' && raw < P.extremeMin) return null;
+
+  // If the safety caps shrink the wager too far, do not pretend the original
+  // profit target is still achievable. Skip instead of taking an undersized bet.
+  var projectedProfit = sat(raw * (payout - 1));
+  if (mode === 'PRUDENT' && projectedProfit < P.prudentMinProfit) return null;
+  if (mode === 'OFFENSIVE' && projectedProfit < P.offensiveMinProfit) return null;
+
+  return {
+    mode: mode,
+    signal: signal,
+    payout: Number(payout.toFixed(2)),
+    wager: sat(raw),
+    profile: profile.grade,
+    projectedProfit: projectedProfit,
+    targetProfit: mode === 'EXTREME' ? 0 : targetProfitForMode(mode, signal)
+  };
+}
+
+function endExtremeSession(reason) {
+  if (!state.extreme.active) return;
+  safeLog('[EXTREME END] ' + reason + ' | bets=' + state.extreme.betsUsed);
+  state.extreme.active = false;
+  state.extreme.type = null;
+  state.extreme.strength = 0;
+  state.extreme.betsUsed = 0;
+  state.extreme.cooldownUntil = state.round + P.extremeCooldown;
+}
+
+validate();
+
+safeLog('=== KIBER TRIDENT V1 ===');
+safeLog('Modes: PRUDENT 1-2b target | OFFENSIVE 3-5b target | EXTREME 10-30b stake');
+safeLog('Start balance: ' + bits(startBalance) + 'b | stop=' + pct(P.stopLossPct) + ' | target=' + pct(P.profitTargetPct));
+safeLog('Live wager grid: 1.00 bit increments');
+
+engine.on('GAME_STARTING', function () {
+  if (state.stopped) return;
+  if (shouldStop()) return;
+
+  if (state.round < P.warmupRounds) {
+    state.lastMode = 'WARMUP';
+    state.pending = { played: false, mode: 'WARMUP', shadowPayout: 1.50, warmup: true };
+    safeLog('[WARMUP] ' + state.round + '/' + P.warmupRounds);
+    return;
+  }
+
+  if (state.fortressLeft > 0) {
+    state.fortressLeft--;
+    state.lastMode = 'FORTRESS';
+    state.pending = { played: false, mode: 'FORTRESS', shadowPayout: 1.50, warmup: false };
+    safeLog('[FORTRESS] wait | left=' + state.fortressLeft);
+    return;
+  }
+
+  var a = analyzeBlocks();
+  var mode = chooseMode(a);
+  state.lastMode = mode;
+
+  if (mode === 'WAIT') {
+    state.pending = { played: false, mode: 'WAIT', shadowPayout: 1.50, warmup: false };
+    safeLog('[TRIDENT] WAIT | block=' + a.shortType + ' change=' + a.change + ' ext-=' + a.negativeExtreme + ' ext+=' + a.positiveExtreme);
+    return;
+  }
+
+  var plan = buildBet(mode, a);
+  if (!plan) {
+    state.pending = { played: false, mode: 'WAIT', shadowPayout: 1.50, warmup: false };
+    safeLog('[TRIDENT] WAIT | ' + mode + ' blocked by capital/risk floor');
+    if (mode === 'EXTREME') endExtremeSession('capital/risk floor');
+    return;
+  }
+
+  if (plan.wager !== Math.floor(plan.wager) || plan.wager % 100 !== 0) {
+    stopNow('Internal wager grid validation failed: ' + plan.wager);
+    return;
+  }
+
+  if (!isFinite(plan.payout) || plan.payout <= 1) {
+    stopNow('Invalid payout: ' + plan.payout);
+    return;
+  }
+
+  safeLog(
+    '[BETCHECK] mode=' + plan.mode +
+    ' signal=' + plan.signal + '/100' +
+    ' profile=' + plan.profile +
+    ' wager=' + bits(plan.wager) + 'b' +
+    ' sats=' + plan.wager +
+    ' payout=' + plan.payout.toFixed(2) + 'x' +
+    (plan.targetProfit > 0 ? ' target=' + bits(plan.targetProfit) + 'b' : '') +
+    ' block=' + a.shortType +
+    ' change=' + a.change
+  );
+
+  try {
+    engine.bet(plan.wager, plan.payout);
+  } catch (e) {
+    stopNow('engine.bet error: ' + (e && e.message ? e.message : e) + ' | sats=' + plan.wager + ' payout=' + plan.payout);
+    return;
+  }
+
+  state.lastPlayedRound[mode] = state.round;
+  if (mode === 'EXTREME') state.extreme.betsUsed++;
+
+  state.pending = {
+    played: true,
+    mode: mode,
+    wager: plan.wager,
+    payout: plan.payout,
+    signal: plan.signal,
+    profile: plan.profile,
+    extremeType: mode === 'EXTREME' ? state.extreme.type : null,
+    warmup: false
+  };
+});
+
+engine.on('GAME_ENDED', function () {
+  if (state.stopped) return;
+
+  var game = engine.history.first();
+  if (!game || !isFinite(Number(game.bust))) {
+    stopNow('Invalid game history');
+    return;
+  }
+
+  var bust = Number(game.bust);
+  pushLimited(state.history, bust, 60);
+  state.round++;
+
+  if (state.pending && state.pending.played) {
+    var wager = sat(state.pending.wager);
+    var cash = Number(game.cashedAt);
+    var won = (
+      game.cashedAt !== null &&
+      game.cashedAt !== undefined &&
+      game.cashedAt !== false &&
+      isFinite(cash) &&
+      cash > 1
+    );
+
+    var realized = won ? Math.round(wager * (cash - 1)) : -wager;
+
+    state.sessionNet += realized;
+    if (state.sessionNet > state.peakNet) state.peakNet = state.sessionNet;
+
+    if (won) {
+      state.winStreak++;
+      state.lossStreak = 0;
+    } else {
+      state.lossStreak++;
+      state.winStreak = 0;
+    }
+
+    updateProfitLock();
+    recordPerf(state.pending.mode, won, realized, wager);
+
+    safeLog(
+      '[RESULT] ' + (won ? 'WIN' : 'LOSS') +
+      ' | mode=' + state.pending.mode +
+      ' | crash=' + bust.toFixed(2) + 'x' +
+      ' | cash=' + (won ? cash.toFixed(2) + 'x' : '-') +
+      ' | result=' + (realized >= 0 ? '+' : '') + bits(realized) + 'b' +
+      ' | session=' + (state.sessionNet >= 0 ? '+' : '') + bits(state.sessionNet) + 'b' +
+      ' | profile=' + strategyProfile(state.pending.mode).grade
+    );
+
+    if (state.pending.mode === 'EXTREME') {
+      if (won) {
+        endExtremeSession('extreme win');
+      } else if (state.extreme.betsUsed >= P.extremeMaxBets) {
+        endExtremeSession('max extreme bets used');
+      }
+    }
+
+    if (state.lossStreak >= 3) {
+      state.lossStreak = 0;
+      state.fortressLeft = P.fortressRounds;
+      safeLog('[FORTRESS] 3 consecutive losses | pause=' + P.fortressRounds);
+      if (state.extreme.active) endExtremeSession('fortress triggered');
+    }
+  }
+
+  state.pending = null;
+  shouldStop();
+});

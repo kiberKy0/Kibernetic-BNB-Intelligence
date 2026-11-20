@@ -1,0 +1,1027 @@
+var config = {
+    baseBet: { value: 100, type: "balance", label: "Unità minima (100 sats = 1 bit)" },
+    coreTarget: { value: 50, type: "multiplier", label: "Core max / 100 round" },
+    extraTarget: { value: 15, type: "multiplier", label: "Extra max / 100 round" },
+    memory: { value: 50, type: "multiplier", label: "Memoria strutturale principale" },
+    recoverySoftDD: { value: 2.5, type: "multiplier", label: "Recovery soft drawdown %" },
+    recoveryHardDD: { value: 4.0, type: "multiplier", label: "Recovery hard drawdown %" },
+    highHuntMinProfit: { value: 2.0, type: "multiplier", label: "Profitto minimo % per High Hunt" }
+};
+
+/* ==========================================================
+   CYBER STRIKER 3.0
+
+   IDEA:
+   - Observer 5 / 14 / 30 / 50
+   - 4 livelli di attacco
+       L1 PROBE       -> target profit < 1 bit
+       L2 BREAK       -> target profit ~ 1.5 bit, blocco riconosciuto
+       L3 STRIKE      -> target profit ~ 5 bit, mediana/struttura forti
+       L4 DEEP STRIKE -> recovery persistente, graduale, selettiva
+   - CORE fino a 50 ingressi / 100 round
+   - EXTRA fino a 15 ingressi / 100 round
+       * L4 Recovery
+       * High Multiplier Hunt 50x -> 500x quando in profitto
+   - Median Pattern Escalator: se il gioco continua a ritornare nello
+     stesso livello strutturale, il livello può salire di uno.
+   - Capital Adaptive: size rapportata al saldo corrente.
+   - Sessione continua: nessun limite round.
+
+   NOTA STATISTICA:
+   il riconoscimento di blocchi, intervalli o mediane non rende prevedibile
+   un crash indipendente. Questi segnali servono a disciplinare esposizione,
+   selettività e ritmo, non a garantire il prossimo moltiplicatore.
+   ========================================================== */
+
+var UNIT = roundSats(Number(config.baseBet.value) || 100);
+var CORE_CAP = Number(config.coreTarget.value) || 50;
+var EXTRA_CAP = Number(config.extraTarget.value) || 15;
+var MEMORY_MAX = Math.max(50, Number(config.memory.value) || 50);
+var WARMUP = 14;
+
+var startBalance = userInfo.balance;
+var bestBalance = startBalance;
+var bestProfitPct = 0;
+
+var history = [];
+var coreWindow = [];
+var extraWindow = [];
+var outcomeMemory = [];
+var medianBandHistory = [];
+
+var totalRounds = 0;
+var totalBets = 0;
+var wins = 0;
+var losses = 0;
+
+var levelBets = { L1: 0, L2: 0, L3: 0, L4: 0, HUNT: 0 };
+var levelPnl = { L1: 0, L2: 0, L3: 0, L4: 0, HUNT: 0 };
+
+var playedThisRound = false;
+var playedCoreThisRound = false;
+var playedExtraThisRound = false;
+var trackingThisRound = false;
+var roundsSinceBet = 99;
+
+var lastMode = "SKIP";
+var lastLevel = "L1";
+var lastAmount = 0;
+var lastPayout = 1.40;
+var lastContextScore = 0;
+var lastBlockScore = 0;
+var lastMedianRepeat = 0;
+
+var currentPhase = "POSITIVE";
+var previousPhase = "POSITIVE";
+var phaseAge = 0;
+
+var consecutiveLosses = 0;
+var cooldown = 0;
+
+var recoveryActive = false;
+var recoveryTargetBalance = startBalance;
+var recoveryStartRound = 0;
+var recoveryActivations = 0;
+var recoveryRecovered = 0;
+var recoveryBets = 0;
+var recoveryPnl = 0;
+
+var HIGH_EVENT_THRESHOLD = 50.0;
+var highEvents = [];
+var lastHighContext = {
+    events: 0,
+    gap: 0,
+    medianInterval: 0,
+    timing: 50,
+    structure: 50,
+    coherence: 50
+};
+
+var stopped = false;
+
+log("========================================");
+log("CYBER STRIKER 3.0");
+log("Core:", CORE_CAP + "/100", "| Extra:", EXTRA_CAP + "/100");
+log("Levels: L1 PROBE | L2 BREAK | L3 STRIKE | L4 DEEP STRIKE");
+log("Observer: 5/14/30/50 | Median Escalator: ON");
+log("Recovery: persistent, gradual, selective | no round cap");
+log("High Hunt: 50x -> 500x only with profit buffer and historical context");
+log("Start:", bits(startBalance), "bits");
+log("========================================");
+
+engine.on("GAME_STARTING", function () {
+    if (stopped) return;
+
+    playedThisRound = false;
+    playedCoreThisRound = false;
+    playedExtraThisRound = false;
+    trackingThisRound = history.length >= WARMUP;
+    lastMode = "SKIP";
+
+    updateBestBalance(userInfo.balance);
+    updateRecoveryState(userInfo.balance);
+
+    if (history.length < WARMUP) {
+        log("[WARMUP]", history.length + "/" + WARMUP);
+        return;
+    }
+
+    var s = buildSnapshot();
+    previousPhase = currentPhase;
+    currentPhase = detectPhase(s);
+    if (currentPhase === previousPhase) phaseAge++;
+    else {
+        phaseAge = 1;
+        log("[PHASE]", previousPhase, "->", currentPhase);
+    }
+
+    rememberMedianBand(s.m14.median);
+
+    var volatility = volatilityPenalty(s);
+    var confidence = confidenceScore(s, volatility);
+    var block = recognizeBlocks(s);
+    var medianRepeat = medianPatternScore(s);
+    var context = contextScore(s, confidence, block.score, medianRepeat, volatility);
+    var selfPenalty = recentPerformancePenalty();
+
+    lastContextScore = context;
+    lastBlockScore = block.score;
+    lastMedianRepeat = medianRepeat;
+
+    if (cooldown > 0) {
+        cooldown--;
+        logDecision("COOLDOWN", s, confidence, block.score, medianRepeat, context, "left=" + cooldown);
+        return;
+    }
+
+    /* EXTRA has priority only for a validated Recovery L4.
+       High Hunt is evaluated after Recovery but before ordinary CORE. */
+    if (recoveryActive) {
+        var r4 = evaluateLevel4(s, confidence, block, medianRepeat, context, volatility, selfPenalty);
+        if (r4.enter) {
+            if (extraCount() < EXTRA_CAP && canBet(r4.amount)) {
+                placeCyberBet(r4.amount, r4.payout, "L4", "RECOVERY", true, s, context, block.score, medianRepeat);
+                return;
+            }
+        }
+    }
+
+    if (!recoveryActive) {
+        var hunt = evaluateHighHunt(s, confidence, block, context, volatility);
+        if (hunt.enter) {
+            if (extraCount() < EXTRA_CAP && canBet(hunt.amount)) {
+                placeCyberBet(hunt.amount, hunt.payout, "HUNT", "HIGH_HUNT", true, s, context, block.score, medianRepeat);
+                return;
+            }
+        }
+    }
+
+    /* CORE 50/100. This is a cap/target, not an obligation to manufacture bets. */
+    if (coreCount() >= CORE_CAP) {
+        logDecision("CORE LOCK", s, confidence, block.score, medianRepeat, context, coreCount() + "/100");
+        return;
+    }
+
+    var level = selectAttackLevel(s, confidence, block, medianRepeat, context, volatility, selfPenalty);
+    var spacing = chooseSpacing(level, context, confidence);
+
+    if (roundsSinceBet < spacing) {
+        logDecision("SPACING", s, confidence, block.score, medianRepeat, context, roundsSinceBet + "/" + spacing);
+        return;
+    }
+
+    var entry = buildCoreEntry(level, s, confidence, block, medianRepeat, context, volatility, selfPenalty);
+
+    if (!entry.enter) {
+        logDecision("SKIP", s, confidence, block.score, medianRepeat, context, entry.reason);
+        return;
+    }
+
+    if (!canBet(entry.amount)) return;
+
+    placeCyberBet(entry.amount, entry.payout, level, "CORE", false, s, context, block.score, medianRepeat);
+});
+
+engine.on("GAME_ENDED", function () {
+    if (stopped) return;
+
+    var game = engine.history.first();
+    if (!game || typeof game.bust !== "number") return;
+
+    totalRounds++;
+
+    history.push(game.bust);
+    if (history.length > MEMORY_MAX) history.shift();
+
+    updateHighEventMemory(game.bust);
+
+    if (trackingThisRound) {
+        coreWindow.push(playedCoreThisRound ? 1 : 0);
+        extraWindow.push(playedExtraThisRound ? 1 : 0);
+        if (coreWindow.length > 100) coreWindow.shift();
+        if (extraWindow.length > 100) extraWindow.shift();
+    }
+
+    if (!playedThisRound || !game.wager) {
+        roundsSinceBet++;
+        if (totalRounds % 50 === 0) printStats();
+        return;
+    }
+
+    roundsSinceBet = 0;
+    totalBets++;
+
+    var won = !!game.cashedAt;
+    var wager = game.wager;
+    var pnl = won ? wager * (game.cashedAt - 1) : -wager;
+
+    if (won) {
+        wins++;
+        consecutiveLosses = 0;
+    } else {
+        losses++;
+        consecutiveLosses++;
+    }
+
+    if (levelPnl[lastLevel] === undefined) levelPnl[lastLevel] = 0;
+    levelPnl[lastLevel] += pnl;
+
+    if (lastLevel === "L4") {
+        recoveryBets++;
+        recoveryPnl += pnl;
+    }
+
+    rememberOutcome(won, pnl, lastLevel, lastPayout, lastContextScore, lastBlockScore);
+
+    log(
+        won ? "[WIN]" : "[LOSS]",
+        lastLevel,
+        "| Bust", game.bust + "x",
+        "|", bits(lastAmount), "bits @", lastPayout.toFixed(2) + "x",
+        "| P/L", signedBits(pnl),
+        "| Bal", bits(userInfo.balance)
+    );
+
+    /* Loss response: do not blindly martingale. The next round is re-evaluated.
+       A short cooldown appears only after repeated losses outside deep Recovery. */
+    if (!recoveryActive && consecutiveLosses >= 3) {
+        cooldown = Math.max(cooldown, 2);
+    }
+
+    updateBestBalance(userInfo.balance);
+    updateRecoveryState(userInfo.balance);
+
+    if (totalRounds % 50 === 0) printStats();
+});
+
+/* ==========================================================
+   OBSERVER
+   ========================================================== */
+function buildSnapshot() {
+    return {
+        m5: metrics(5),
+        m14: metrics(14),
+        m30: metrics(30),
+        m50: metrics(50),
+        lowStreak: currentLowStreak(),
+        highStreak: currentHighStreak(),
+        slope5_14: metrics(5).cappedAvg - metrics(14).cappedAvg,
+        slope14_50: metrics(14).cappedAvg - metrics(50).cappedAvg,
+        alternation14: extremeAlternation(14)
+    };
+}
+
+function metrics(windowSize) {
+    var n = Math.min(windowSize, history.length);
+    if (!n) return emptyMetrics();
+
+    var arr = history.slice(history.length - n);
+    var sorted = arr.slice().sort(function (a, b) { return a - b; });
+    var sum = 0;
+    var capped = 0;
+    var ge140 = 0;
+    var ge200 = 0;
+    var ge300 = 0;
+    var ge500 = 0;
+    var ge1000 = 0;
+    var max = 0;
+
+    for (var i = 0; i < arr.length; i++) {
+        var v = arr[i];
+        sum += v;
+        capped += Math.min(v, 10);
+        if (v >= 1.40) ge140++;
+        if (v >= 2.00) ge200++;
+        if (v >= 3.00) ge300++;
+        if (v >= 5.00) ge500++;
+        if (v >= 10.00) ge1000++;
+        if (v > max) max = v;
+    }
+
+    var med;
+    if (n % 2) med = sorted[(n - 1) / 2];
+    else med = (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+
+    return {
+        n: n,
+        avg: sum / n,
+        cappedAvg: capped / n,
+        median: med,
+        p140: ge140 / n,
+        p200: ge200 / n,
+        p300: ge300 / n,
+        p500: ge500 / n,
+        p1000: ge1000 / n,
+        max: max
+    };
+}
+
+function emptyMetrics() {
+    return { n: 0, avg: 0, cappedAvg: 0, median: 0, p140: 0, p200: 0, p300: 0, p500: 0, p1000: 0, max: 0 };
+}
+
+function detectPhase(s) {
+    if (s.m14.cappedAvg < 1.85 || s.m14.median < 1.35) return "NEGATIVE";
+    if (s.m14.cappedAvg >= 3.20 && s.m14.median >= 1.75 && s.m14.p200 >= 0.35) return "HOT";
+    return "POSITIVE";
+}
+
+function volatilityPenalty(s) {
+    var p = 0;
+    if (s.m14.cappedAvg > Math.max(1.01, s.m14.median) * 1.9) p += 10;
+    if (s.m14.max >= 20 && s.m14.p300 < 0.20) p += 10;
+    if (s.alternation14 >= 0.50) p += 12;
+    if (s.m5.max >= 15 && s.m5.p200 < 0.40) p += 8;
+    return clamp(p, 0, 40);
+}
+
+function confidenceScore(s, volatility) {
+    var c = 45;
+    c += clamp((phaseAge - 1) * 3, 0, 15);
+
+    if (currentPhase === "POSITIVE") {
+        if (s.m14.median >= 1.55) c += 8;
+        if (s.m14.p200 >= 0.30) c += 7;
+        if (s.m5.p140 >= 0.60) c += 5;
+    }
+
+    if (currentPhase === "HOT") {
+        if (s.m14.median >= 1.90) c += 10;
+        if (s.m30.median >= 1.65) c += 7;
+        if (s.m14.p300 >= 0.20) c += 8;
+    }
+
+    if (currentPhase === "NEGATIVE") {
+        if (s.lowStreak >= 3) c += 4;
+        if (s.slope5_14 > 0.20) c += 5;
+        else c -= 8;
+    }
+
+    c -= volatility;
+    c -= recentPerformancePenalty();
+    return clamp(c, 0, 100);
+}
+
+/* ==========================================================
+   BLOCK RECOGNITION - last 50
+   ========================================================== */
+function recognizeBlocks(s) {
+    var score = 0;
+    var type = "MIXED";
+
+    if (s.m50.n >= 30) score += 10;
+
+    /* Compression / low block */
+    if (s.m14.median < 1.45 && s.m14.p140 < 0.50) {
+        score += 22;
+        type = "LOW_BLOCK";
+    }
+
+    /* Positive cluster */
+    if (s.m14.median >= 1.60 && s.m14.p200 >= 0.32) {
+        score += 24;
+        type = "POS_BLOCK";
+    }
+
+    /* Strong positive block */
+    if (s.m30.median >= 1.65 && s.m30.p200 >= 0.34 && s.m14.p300 >= 0.18) {
+        score += 22;
+        type = "STRONG_POS_BLOCK";
+    }
+
+    /* Structure is more valuable when 14 and 50 windows are not fighting each other. */
+    if (Math.abs(s.m14.median - s.m50.median) <= 0.30) score += 12;
+    if (Math.abs(s.m14.p200 - s.m50.p200) <= 0.12) score += 8;
+
+    /* Directional change after a low block */
+    if (s.lowStreak >= 3 && s.slope5_14 > 0.35) {
+        score += 18;
+        type = "BREAK_UP";
+    }
+
+    /* Instability reduces block confidence. */
+    if (s.alternation14 >= 0.55) score -= 15;
+    if (s.m14.cappedAvg > Math.max(1.01, s.m14.median) * 2.2) score -= 10;
+
+    return { score: clamp(score, 0, 100), type: type };
+}
+
+/* ==========================================================
+   MEDIAN PATTERN ESCALATOR
+   ========================================================== */
+function medianBand(v) {
+    if (v < 1.30) return 0;
+    if (v < 1.55) return 1;
+    if (v < 1.85) return 2;
+    if (v < 2.30) return 3;
+    if (v < 3.00) return 4;
+    return 5;
+}
+
+function rememberMedianBand(v) {
+    medianBandHistory.push(medianBand(v));
+    if (medianBandHistory.length > 50) medianBandHistory.shift();
+}
+
+function medianPatternScore(s) {
+    if (medianBandHistory.length < 8) return 0;
+
+    var currentBand = medianBand(s.m14.median);
+    var recent = medianBandHistory.slice(Math.max(0, medianBandHistory.length - 12));
+    var same = 0;
+    var i;
+
+    for (i = 0; i < recent.length; i++) {
+        if (recent[i] === currentBand) same++;
+    }
+
+    var score = (same / recent.length) * 65;
+
+    if (Math.abs(s.m5.median - s.m14.median) <= 0.18) score += 12;
+    if (Math.abs(s.m14.median - s.m30.median) <= 0.22) score += 12;
+    if (Math.abs(s.m30.median - s.m50.median) <= 0.28) score += 11;
+
+    return clamp(score, 0, 100);
+}
+
+function contextScore(s, confidence, blockScore, medianRepeat, volatility) {
+    var c = confidence * 0.40 + blockScore * 0.30 + medianRepeat * 0.20 + 10;
+    if (currentPhase === "HOT") c += 6;
+    if (currentPhase === "NEGATIVE") c -= 7;
+    if (s.slope5_14 > 0.25) c += 5;
+    if (s.slope5_14 < -0.25) c -= 5;
+    c -= volatility * 0.30;
+    return clamp(c, 0, 100);
+}
+
+/* ==========================================================
+   ATTACK LEVEL SELECTOR
+   ========================================================== */
+function selectAttackLevel(s, confidence, block, medianRepeat, context, volatility, selfPenalty) {
+    var level = 1;
+
+    /* L2: recognized block / Spezza Guardia */
+    if (block.score >= 58 && confidence >= 55 && context >= 55) level = 2;
+
+    /* L3: high median + strong structure */
+    if (
+        block.score >= 70 &&
+        confidence >= 66 &&
+        context >= 68 &&
+        s.m14.median >= 1.70 &&
+        s.m30.median >= 1.55
+    ) {
+        level = 3;
+    }
+
+    /* Median Escalator can move one level upward, never directly into L4. */
+    if (medianRepeat >= 74 && context >= 62 && volatility <= 24 && level < 3) level++;
+
+    if (selfPenalty >= 12 && level > 1) level--;
+
+    if (level <= 1) return "L1";
+    if (level === 2) return "L2";
+    return "L3";
+}
+
+function chooseSpacing(level, context, confidence) {
+    if (level === "L3" && context >= 78 && confidence >= 74) return 0;
+    if (level === "L2") return 1;
+    return 2;
+}
+
+function buildCoreEntry(level, s, confidence, block, medianRepeat, context, volatility, selfPenalty) {
+    var threshold;
+
+    if (level === "L1") threshold = 48;
+    else if (level === "L2") threshold = 59;
+    else threshold = 70;
+
+    /* If CORE is running far below its 50/100 target, become a little less rigid,
+       but never remove structural requirements. */
+    var count = coreCount();
+    if (coreWindow.length >= 60 && count < 26) threshold -= 4;
+    else if (coreWindow.length >= 80 && count < 36) threshold -= 2;
+
+    threshold += selfPenalty * 0.20;
+    threshold += volatility * 0.12;
+
+    if (context < threshold) {
+        return { enter: false, reason: "CTX " + context.toFixed(0) + " < " + threshold.toFixed(0) };
+    }
+
+    if (level === "L2" && block.score < 58) {
+        return { enter: false, reason: "L2 block weak" };
+    }
+
+    if (level === "L3" && (block.score < 70 || s.m14.median < 1.70)) {
+        return { enter: false, reason: "L3 structure incomplete" };
+    }
+
+    var targetProfitBits = targetProfitForLevel(level, confidence, block.score, medianRepeat, context);
+    var built = constructBet(level, targetProfitBits, confidence, block.score, context, volatility, false);
+
+    return { enter: true, amount: built.amount, payout: built.payout, reason: "OK" };
+}
+
+function targetProfitForLevel(level, confidence, blockScore, medianRepeat, context) {
+    var q = (confidence + blockScore + medianRepeat + context) / 4;
+
+    if (level === "L1") {
+        return clamp(0.35 + q / 100 * 0.55, 0.35, 0.95);
+    }
+
+    if (level === "L2") {
+        return clamp(1.10 + q / 100 * 0.85, 1.10, 1.95);
+    }
+
+    return clamp(3.50 + q / 100 * 3.00, 3.50, 6.50);
+}
+
+/* ==========================================================
+   BET CONSTRUCTION
+   Converts a desired PROFIT into variable bits + multiplier.
+   ========================================================== */
+function constructBet(level, targetProfitBits, confidence, blockScore, context, volatility, isRecovery) {
+    var balBits = balanceBits(userInfo.balance);
+    var quality = (confidence * 0.40 + blockScore * 0.30 + context * 0.30);
+    var riskPct;
+
+    if (level === "L1") riskPct = 0.0018;
+    else if (level === "L2") riskPct = 0.0035;
+    else if (level === "L3") riskPct = 0.0065;
+    else riskPct = 0.0080;
+
+    if (quality >= 80) riskPct *= 1.15;
+    if (quality < 60) riskPct *= 0.75;
+    if (volatility >= 24) riskPct *= 0.70;
+    if (consecutiveLosses >= 2) riskPct *= 0.78;
+
+    if (isRecovery) {
+        riskPct *= 0.90;
+        if (drawdownPct(userInfo.balance) >= 8) riskPct *= 0.75;
+        if (drawdownPct(userInfo.balance) >= 15) riskPct *= 0.70;
+    }
+
+    /* Capital adaptation: small bankrolls are not treated like 4000+ bits. */
+    var capitalScale = clamp(balBits / 1000, 0.55, 1.00);
+    riskPct *= capitalScale;
+
+    var maxRiskPct = balBits < 500 ? 0.012 : (balBits < 1000 ? 0.018 : 0.025);
+    if (isRecovery) maxRiskPct = balBits < 1000 ? 0.018 : 0.024;
+    riskPct = clamp(riskPct, 0.0012, maxRiskPct);
+
+    var betBits = Math.max(1, Math.floor(balBits * riskPct));
+
+    var minPayout;
+    var maxPayout;
+    if (level === "L1") { minPayout = 1.15; maxPayout = 2.20; }
+    else if (level === "L2") { minPayout = 1.20; maxPayout = 2.80; }
+    else if (level === "L3") { minPayout = 1.30; maxPayout = 4.50; }
+    else { minPayout = 1.25; maxPayout = 5.50; }
+
+    var payout = 1 + targetProfitBits / Math.max(1, betBits);
+    payout = clamp(payout, minPayout, maxPayout);
+
+    /* Recalculate an approximate amount if payout clamping would miss target badly. */
+    var neededBits = targetProfitBits / Math.max(0.05, payout - 1);
+    betBits = Math.max(1, Math.ceil(neededBits));
+
+    var maxBetBits = Math.max(1, Math.floor(balBits * maxRiskPct));
+    betBits = Math.min(betBits, maxBetBits);
+
+    return {
+        amount: roundSats(betBits * 100),
+        payout: roundMultiplier(payout)
+    };
+}
+
+/* ==========================================================
+   LEVEL 4 - DEEP STRIKE / RECOVERY
+   ========================================================== */
+function updateRecoveryState(balance) {
+    var dd = drawdownPct(balance);
+
+    if (!recoveryActive) {
+        if (history.length < WARMUP) return;
+
+        var s = buildSnapshot();
+        var block = recognizeBlocks(s);
+        var soft = Number(config.recoverySoftDD.value) || 2.5;
+        var hard = Number(config.recoveryHardDD.value) || 4.0;
+
+        /* Soft entry needs recognizable 50-round structure.
+           Hard entry can activate at deeper loss, but wagers remain selective. */
+        if ((dd >= soft && block.score >= 62) || dd >= hard) {
+            recoveryActive = true;
+            recoveryTargetBalance = startBalance;
+            recoveryStartRound = totalRounds;
+            recoveryActivations++;
+            cooldown = 0;
+            log("[L4 RECOVERY ON]", "DD", dd.toFixed(2) + "%", "| block", block.score.toFixed(0), "| target", bits(recoveryTargetBalance));
+        }
+        return;
+    }
+
+    if (balance >= recoveryTargetBalance) {
+        recoveryActive = false;
+        recoveryRecovered++;
+        consecutiveLosses = 0;
+        cooldown = 0;
+        log("[L4 RECOVERY OFF]", "credito ripristinato", "| rounds", totalRounds - recoveryStartRound, "| Bal", bits(balance));
+    }
+}
+
+function evaluateLevel4(s, confidence, block, medianRepeat, context, volatility, selfPenalty) {
+    var dd = drawdownPct(userInfo.balance);
+    var debtBits = Math.max(0, balanceBits(recoveryTargetBalance - userInfo.balance));
+
+    /* Deep Recovery becomes more selective, not automatically more frequent. */
+    var threshold = 68;
+    if (dd >= 5) threshold += 3;
+    if (dd >= 10) threshold += 4;
+    if (dd >= 20) threshold += 5;
+    threshold += volatility * 0.15;
+    threshold += selfPenalty * 0.20;
+
+    var recoveryContext = context;
+    if (block.score >= 72) recoveryContext += 5;
+    if (medianRepeat >= 75) recoveryContext += 4;
+    if (s.slope5_14 > 0.25) recoveryContext += 5;
+    if (currentPhase === "NEGATIVE" && s.slope5_14 <= 0) recoveryContext -= 8;
+
+    if (block.score < 58 && dd < (Number(config.recoveryHardDD.value) || 4.0) + 2) {
+        return { enter: false, reason: "L4 block not ready" };
+    }
+
+    if (recoveryContext < threshold) {
+        return { enter: false, reason: "L4 wait " + recoveryContext.toFixed(0) + "/" + threshold.toFixed(0) };
+    }
+
+    var targetProfit = clamp(debtBits * 0.06, 1.20, 7.00);
+    if (dd >= 10) targetProfit = clamp(debtBits * 0.045, 1.20, 6.00);
+    if (dd >= 20) targetProfit = clamp(debtBits * 0.035, 1.00, 5.00);
+
+    var built = constructBet("L4", targetProfit, confidence, block.score, recoveryContext, volatility, true);
+    return { enter: true, amount: built.amount, payout: built.payout, reason: "L4 validated" };
+}
+
+/* ==========================================================
+   HIGH MULTIPLIER HUNT 50x -> 500x
+   EXTRA only, profit-buffer only, historical-context only.
+   ========================================================== */
+function updateHighEventMemory(bust) {
+    if (bust < HIGH_EVENT_THRESHOLD) return;
+
+    var prev = highEvents.length ? highEvents[highEvents.length - 1] : null;
+    var interval = prev ? totalRounds - prev.round : 0;
+    var pre = history.slice(Math.max(0, history.length - 4), history.length - 1);
+
+    highEvents.push({ round: totalRounds, value: bust, interval: interval, pre: pre });
+    if (highEvents.length > 30) highEvents.shift();
+}
+
+function computeHighContext() {
+    var intervals = [];
+    var i;
+    for (i = 0; i < highEvents.length; i++) {
+        if (highEvents[i].interval > 0) intervals.push(highEvents[i].interval);
+    }
+
+    var last = highEvents.length ? highEvents[highEvents.length - 1] : null;
+    var gap = last ? Math.max(0, totalRounds - last.round) : 0;
+    var med = medianNumbers(intervals);
+    var timing = 50;
+
+    if (intervals.length >= 3 && med > 0) {
+        timing = clamp(100 - Math.abs(gap - med) / Math.max(2, med) * 80, 10, 95);
+    }
+
+    var currentPre = history.slice(Math.max(0, history.length - 3));
+    var scores = [];
+    for (i = Math.max(0, highEvents.length - 12); i < highEvents.length; i++) {
+        if (highEvents[i].pre && highEvents[i].pre.length >= 2) {
+            scores.push(simpleSequenceSimilarity(currentPre, highEvents[i].pre));
+        }
+    }
+
+    var structure = topAverage(scores, 4, 50);
+    var coherence = timing * 0.45 + structure * 0.45 + clamp(highEvents.length * 4, 0, 100) * 0.10;
+
+    lastHighContext = {
+        events: highEvents.length,
+        gap: gap,
+        medianInterval: med,
+        timing: timing,
+        structure: structure,
+        coherence: clamp(coherence, 0, 100)
+    };
+
+    return lastHighContext;
+}
+
+function evaluateHighHunt(s, confidence, block, context, volatility) {
+    var p = profitPct(userInfo.balance);
+    var minProfit = Number(config.highHuntMinProfit.value) || 2.0;
+
+    if (p < minProfit) return { enter: false, reason: "no profit buffer" };
+    if (extraCount() >= EXTRA_CAP) return { enter: false, reason: "extra cap" };
+    if (volatility >= 32) return { enter: false, reason: "hunt volatility" };
+
+    var h = computeHighContext();
+    if (h.events < 3) return { enter: false, reason: "hunt sample" };
+
+    var huntScore = h.coherence * 0.55 + context * 0.25 + confidence * 0.20;
+    if (block.score >= 70) huntScore += 4;
+
+    /* Rare by design. It does not claim the next round will be a 50x+. */
+    if (huntScore < 84) return { enter: false, reason: "hunt score " + huntScore.toFixed(0) };
+
+    var target = 50;
+    if (huntScore >= 88) target = 75;
+    if (huntScore >= 91) target = 100;
+    if (huntScore >= 94) target = 150;
+    if (huntScore >= 96) target = 200;
+    if (huntScore >= 98) target = 300;
+    if (huntScore >= 99.3) target = 500;
+
+    /* Profit-buffer wager is deliberately tiny: normally 1 bit. */
+    var amountBits = 1;
+    if (profitPct(userInfo.balance) >= 5 && balanceBits(userInfo.balance) >= 1500 && huntScore >= 94) amountBits = 2;
+
+    return {
+        enter: true,
+        amount: roundSats(amountBits * 100),
+        payout: roundMultiplier(target),
+        reason: "HUNT " + target + "x score " + huntScore.toFixed(0)
+    };
+}
+
+/* ==========================================================
+   OUTCOME SELF-FEEDBACK
+   ========================================================== */
+function rememberOutcome(won, pnl, level, payout, context, block) {
+    outcomeMemory.push({ won: !!won, pnl: pnl, level: level, payout: payout, context: context, block: block });
+    if (outcomeMemory.length > 30) outcomeMemory.shift();
+}
+
+function recentPerformancePenalty() {
+    if (outcomeMemory.length < 4) return 0;
+
+    var arr = outcomeMemory.slice(Math.max(0, outcomeMemory.length - 8));
+    var pnl = 0;
+    var loss = 0;
+    var i;
+    for (i = 0; i < arr.length; i++) {
+        pnl += arr[i].pnl;
+        if (!arr[i].won) loss++;
+    }
+
+    if (pnl >= 0) return 0;
+    var penalty = 4;
+    if (loss / arr.length >= 0.60) penalty += 4;
+    if (loss / arr.length >= 0.75) penalty += 4;
+    return clamp(penalty, 0, 12);
+}
+
+/* ==========================================================
+   PLACE BET / FREQUENCY
+   ========================================================== */
+function placeCyberBet(amount, payout, level, mode, isExtra, s, context, blockScore, medianRepeat) {
+    amount = roundSats(amount);
+    payout = roundMultiplier(payout);
+
+    if (!isFinite(amount) || amount < UNIT || amount % 100 !== 0) {
+        log("[SKIP] invalid amount", amount);
+        return;
+    }
+
+    engine.bet(amount, payout);
+
+    playedThisRound = true;
+    if (isExtra) playedExtraThisRound = true;
+    else playedCoreThisRound = true;
+
+    lastMode = mode;
+    lastLevel = level;
+    lastAmount = amount;
+    lastPayout = payout;
+    lastContextScore = context;
+    lastBlockScore = blockScore;
+    lastMedianRepeat = medianRepeat;
+
+    if (levelBets[level] === undefined) levelBets[level] = 0;
+    levelBets[level]++;
+
+    log(
+        "[BET]",
+        level,
+        "|", mode,
+        "|", bits(amount), "bits @", payout.toFixed(2) + "x",
+        "| phase", currentPhase,
+        "| med14", s.m14.median.toFixed(2),
+        "| med50", s.m50.median.toFixed(2),
+        "| block", blockScore.toFixed(0),
+        "| repeat", medianRepeat.toFixed(0),
+        "| ctx", context.toFixed(0),
+        "| core", coreCount() + "/" + CORE_CAP,
+        "| extra", extraCount() + "/" + EXTRA_CAP
+    );
+}
+
+function coreCount() {
+    var n = 0;
+    for (var i = 0; i < coreWindow.length; i++) n += coreWindow[i];
+    return n;
+}
+
+function extraCount() {
+    var n = 0;
+    for (var i = 0; i < extraWindow.length; i++) n += extraWindow[i];
+    return n;
+}
+
+function canBet(amount) {
+    if (!isFinite(amount) || amount < UNIT) return false;
+    if (userInfo.balance < amount || userInfo.balance < UNIT) {
+        log("[CAPITAL WAIT]", "Balance", bits(userInfo.balance), "| need", bits(amount), "| bot continua ad osservare");
+        return false;
+    }
+    return true;
+}
+
+/* ==========================================================
+   SEQUENCE HELPERS
+   ========================================================== */
+function currentLowStreak() {
+    var n = 0;
+    for (var i = history.length - 1; i >= 0; i--) {
+        if (history[i] < 1.40) n++;
+        else break;
+    }
+    return n;
+}
+
+function currentHighStreak() {
+    var n = 0;
+    for (var i = history.length - 1; i >= 0; i--) {
+        if (history[i] >= 2.00) n++;
+        else break;
+    }
+    return n;
+}
+
+function extremeAlternation(windowSize) {
+    var n = Math.min(windowSize, history.length);
+    if (n < 3) return 0;
+    var arr = history.slice(history.length - n);
+    var eligible = 0;
+    var transitions = 0;
+
+    for (var i = 1; i < arr.length; i++) {
+        var aLow = arr[i - 1] < 1.40;
+        var bLow = arr[i] < 1.40;
+        var aHigh = arr[i - 1] >= 3.00;
+        var bHigh = arr[i] >= 3.00;
+        if (aLow || bLow || aHigh || bHigh) {
+            eligible++;
+            if ((aLow && bHigh) || (aHigh && bLow)) transitions++;
+        }
+    }
+
+    return eligible ? transitions / eligible : 0;
+}
+
+function simpleSequenceSimilarity(a, b) {
+    var n = Math.min(a.length, b.length, 3);
+    if (n < 2) return 50;
+    var total = 0;
+
+    for (var i = 0; i < n; i++) {
+        var av = Math.log(Math.max(1.01, a[a.length - n + i]));
+        var bv = Math.log(Math.max(1.01, b[b.length - n + i]));
+        total += clamp(100 - Math.abs(av - bv) * 45, 0, 100);
+    }
+
+    return total / n;
+}
+
+function topAverage(values, topN, fallback) {
+    if (!values.length) return fallback;
+    var arr = values.slice().sort(function (a, b) { return b - a; });
+    var n = Math.min(topN, arr.length);
+    var sum = 0;
+    for (var i = 0; i < n; i++) sum += arr[i];
+    return sum / n;
+}
+
+function medianNumbers(values) {
+    if (!values.length) return 0;
+    var arr = values.slice().sort(function (a, b) { return a - b; });
+    var n = arr.length;
+    if (n % 2) return arr[(n - 1) / 2];
+    return (arr[n / 2 - 1] + arr[n / 2]) / 2;
+}
+
+/* ==========================================================
+   BALANCE / STATS
+   ========================================================== */
+function updateBestBalance(balance) {
+    if (balance > bestBalance) bestBalance = balance;
+    var p = profitPct(balance);
+    if (p > bestProfitPct) bestProfitPct = p;
+}
+
+function balanceBits(balanceSats) {
+    return Number(balanceSats) / 100;
+}
+
+function profitPct(balance) {
+    if (startBalance <= 0) return 0;
+    return ((balance - startBalance) / startBalance) * 100;
+}
+
+function drawdownPct(balance) {
+    if (startBalance <= 0) return 0;
+    return Math.max(0, ((startBalance - balance) / startBalance) * 100);
+}
+
+function logDecision(label, s, confidence, blockScore, medianRepeat, context, extra) {
+    log(
+        "[" + label + "]",
+        currentPhase,
+        "| med14", s.m14.median.toFixed(2),
+        "| med50", s.m50.median.toFixed(2),
+        "| conf", confidence.toFixed(0),
+        "| block", blockScore.toFixed(0),
+        "| repeat", medianRepeat.toFixed(0),
+        "| ctx", context.toFixed(0),
+        "|", extra || ""
+    );
+}
+
+function printStats() {
+    var wr = totalBets ? wins / totalBets : 0;
+    log("----------------------------------------");
+    log("CYBER STRIKER 3.0 @", totalRounds, "round");
+    log("Bets", totalBets, "| W/L", wins + "/" + losses, "| WR", pct(wr));
+    log("CORE", coreCount() + "/100", "| EXTRA", extraCount() + "/100");
+    log("L1", levelBets.L1, signedBits(levelPnl.L1));
+    log("L2", levelBets.L2, signedBits(levelPnl.L2));
+    log("L3", levelBets.L3, signedBits(levelPnl.L3));
+    log("L4", levelBets.L4, signedBits(levelPnl.L4), "| RecAct", recoveryActivations, "| Recovered", recoveryRecovered);
+    log("HUNT", levelBets.HUNT, signedBits(levelPnl.HUNT), "| 50x+ events", highEvents.length);
+    log("Profit", profitPct(userInfo.balance).toFixed(2) + "%", "| Best", bestProfitPct.toFixed(2) + "%", "| DD", drawdownPct(userInfo.balance).toFixed(2) + "%");
+    log("Last context", lastContextScore.toFixed(0), "| block", lastBlockScore.toFixed(0), "| repeat", lastMedianRepeat.toFixed(0));
+    log("----------------------------------------");
+}
+
+/* ==========================================================
+   UTILITIES
+   ========================================================== */
+function roundSats(value) {
+    value = Number(value);
+    if (!isFinite(value)) return 100;
+    return Math.max(100, Math.floor(value / 100) * 100);
+}
+
+function roundMultiplier(value) {
+    return Math.round(Number(value) * 100) / 100;
+}
+
+function bits(sats) {
+    return (Number(sats) / 100).toFixed(2);
+}
+
+function signedBits(sats) {
+    var v = Number(sats) / 100;
+    return (v >= 0 ? "+" : "") + v.toFixed(2);
+}
+
+function pct(value) {
+    return (Number(value) * 100).toFixed(1) + "%";
+}
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
