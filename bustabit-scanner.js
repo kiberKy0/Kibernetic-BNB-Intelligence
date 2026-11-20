@@ -25,8 +25,12 @@ function parse(input){
       const cols=lines[0].split(sep).map(x=>x.trim().toLowerCase());
       const index=cols.findIndex(x=>/^(bust|crash|multiplier|payout|crashpoint|crash_point)$/.test(x));
       if(index<0)throw Error('CSV: manca colonna bust, crash o multiplier.');
-      rows=lines.slice(1).map(x=>x.split(sep)[index]);
-    }else rows=s.split(/[\s;|]+/).flatMap(t=>t.split(/,(?=\s*\d+(?:[.,]\d+)?x?(?:,|$))/i));
+      rows=lines.slice(1).map(x=>cols.length===1?x:x.split(sep)[index]);
+    }else{
+      const tokens=s.split(/\s+/).filter(Boolean);
+      rows=tokens.length>1&&tokens.every(x=>/^\d+(?:[.,]\d+)?x?$/i.test(x))
+        ?tokens.map(x=>x.replace(',','.')):s.split(/[\s;,|]+/).filter(Boolean);
+    }
   }
   if(rows.length>MAX_ROUNDS)throw Error('Limite '+MAX_ROUNDS.toLocaleString('it-IT')+' round per scansione.');
   if(rows.some(x=>x===null||x===undefined||x===''))throw Error('Valore vuoto in uno o più round.');
