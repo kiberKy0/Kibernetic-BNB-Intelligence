@@ -107,7 +107,7 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 .xau-guide-details summary{font-weight:750;font-size:13px;padding:7px 0;cursor:pointer;color:#e6c77f}
 .xau-guide-details p{font-size:12px;line-height:1.5;color:#b8cfdd}
 @media(max-width:650px){.xau-guidance{padding:11px 12px}.xau-guide-head h2{font-size:16px}.xau-guide-status{font-size:10px;padding:6px 7px;max-width:134px}.xau-guide-levels{gap:5px}.xau-guide-levels>div{padding:8px 6px}.xau-guide-levels small{font-size:10px}}
-</style><style>.xau-feed-health{border:1px solid #7b643c;background:#24291f;color:#f4d8a4;padding:8px 10px;border-radius:10px;font-size:12px;margin:10px 0}.xau-feed-health[data-state="live"]{border-color:#3c9b75;background:#122f25;color:#b8f7d4}</style><link rel="stylesheet" href="/profile-planets.css"><link rel="stylesheet" href="/xau-kiber.css"><link rel="stylesheet" href="/xau-compact.css?v=3"><link rel="stylesheet" href="/xau-advanced.css?v=1"><style>.xau-guidance{border-color:#806442}.xau-profile-btn{border-color:#6e7a68}.xau-topbar{border-bottom:1px solid #66513c}.panel[aria-label="Grafico oro"]{border-color:#82643e}.xau-guide-status{border-color:#b69552}.xau-topbar .identity h1 .gold{color:#f4c86d}</style></head>
+</style><style>.xau-feed-health{border:1px solid #7b643c;background:#24291f;color:#f4d8a4;padding:8px 10px;border-radius:10px;font-size:12px;margin:10px 0}.xau-feed-health[data-state="live"]{border-color:#3c9b75;background:#122f25;color:#b8f7d4}</style><link rel="stylesheet" href="/profile-planets.css"><link rel="stylesheet" href="/xau-kiber.css"><link rel="stylesheet" href="/xau-compact.css?v=3"><link rel="stylesheet" href="/xau-methods.css?v=1"><link rel="stylesheet" href="/xau-advanced.css?v=1"><style>.xau-guidance{border-color:#806442}.xau-profile-btn{border-color:#6e7a68}.xau-topbar{border-bottom:1px solid #66513c}.panel[aria-label="Grafico oro"]{border-color:#82643e}.xau-guide-status{border-color:#b69552}.xau-topbar .identity h1 .gold{color:#f4c86d}</style></head>
 <body>
 <div class="container">
 <header class="xau-topbar">
@@ -167,6 +167,61 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
   <p><strong>Uscita:</strong> <span id="xauGuideInvalidation">—</span></p>
   <p id="xauGuideDisclosure" class="xau-guide-note">I livelli sono ipotesi tecniche, da validare su dati storici.</p>
   <p><a href="#decoder">Imposta periodo o aggiorna il feed</a> · <a href="https://it.tradingview.com/symbols/XAUUSD/technicals/?exchange=OANDA" target="_blank" rel="noopener noreferrer">Confronta TradingView ↗</a></p>
+ </details>
+</section>
+<section class="panel xau-method-lab" id="xauMethodLab" aria-label="Laboratorio strategie, filtri e metodi XAU/USD">
+ <div class="xau-method-head">
+  <div><small>KIBER · LABORATORIO XAU/USD</small><h2>Strategie, filtri e metodi</h2></div>
+  <span id="xauMethodDirection" class="xau-method-pill" data-bias="unavailable" role="status">IN ATTESA</span>
+ </div>
+ <p class="xau-method-intro">Introduzione: Kiber studia la direzione dell'oro osservando candele M5, zone di supporto e resistenza, rotture e allineamento del trend. Sono regole sperimentali ispirate a tecniche pubbliche di price action, non una copia certificata dei metodi di Matteo Zanni.</p>
+ <p id="xauMethodLive" class="xau-method-live" role="status">Verifica delle candele M5 in corso.</p>
+ <p id="xauMethodMeta" class="xau-method-meta">Fonte e timestamp M5 in attesa.</p>
+ <details class="xau-method-root">
+  <summary>Esplora i 5 metodi e i filtri di direzione</summary>
+  <div class="xau-method-grid">
+   <details class="xau-method-card">
+    <summary><strong>01 · Hammer M5</strong> <span id="xauMethodhammerStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Che cos'è?</strong> Una candela con lunga ombra inferiore vicino a un supporto. Studiamo se il mercato ha respinto prezzi più bassi.</p>
+     <p class="xau-method-evidence" id="xauMethodhammerEvidence">In attesa delle candele.</p>
+     <p class="xau-method-limit">Filtro sperimentale: figura rilevata ≠ probabile rialzo. Serve conferma e test indipendente.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>02 · Shooting Star M5</strong> <span id="xauMethodshootingStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Che cos'è?</strong> Candela con lunga ombra superiore vicino a una resistenza. Studiamo un possibile rifiuto dei prezzi più alti.</p>
+     <p class="xau-method-evidence" id="xauMethodshootingEvidence">In attesa delle candele.</p>
+     <p class="xau-method-limit">Il pattern può fallire o comparire contro una tendenza forte: da solo non autorizza vendita.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>03 · Rottura del range</strong> <span id="xauMethodbreakoutStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Che cos'è?</strong> Confrontiamo la chiusura M5 con il massimo e il minimo delle 20 candele precedenti. Un filtro ATR evita di classificare ogni piccolo superamento come rottura.</p>
+     <p class="xau-method-evidence" id="xauMethodbreakoutEvidence">In attesa dei livelli.</p>
+     <p class="xau-method-limit">Rottura osservata non significa continuazione garantita; servono controlli sulle false rotture.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>04 · Direzione e trend</strong> <span id="xauMethodtrendStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Che cos'è?</strong> Mettiamo a confronto le direzioni rilevate su M5, M15 e H1. Se non concordano, il filtro evidenzia il conflitto invece di forzare un segnale.</p>
+     <p class="xau-method-evidence" id="xauMethodtrendEvidence">In attesa dei timeframe.</p>
+     <p class="xau-method-limit">Trend e struttura servono a descrivere il contesto, non sono previsioni certe.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>05 · Gestione TP1 / TP2</strong> <span id="xauMethodexitsStatus">SOLO STUDIO</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Che cos'è?</strong> Studio delle uscite parziali: primo obiettivo TP1, secondo obiettivo TP2 e possibile spostamento dello stop della posizione residua a pareggio.</p>
+     <p class="xau-method-evidence" id="xauMethodexitsEvidence">Ipotesi di gestione da verificare su uno storico.</p>
+     <p class="xau-method-limit">Non calcola ordini, lotti, profitto reale o leve: il broker personale non è collegato.</p>
+    </div>
+   </details>
+  </div>
+  <p class="xau-method-disclosure"><strong>Limiti del laboratorio:</strong> <span id="xauMethodQuality">Feed da verificare.</span> La valutazione definitiva resta nel validatore degli 8 livelli. Nessun acquisto o vendita automatica, nessuna percentuale di successo inventata.</p>
  </details>
 </section>
 <div class="grid-bottom">
@@ -250,7 +305,9 @@ apply();
 <script src="/xau-analysis.js?v=decoder-ohlc-2"></script>
 <script src="/xau-guidance.js"></script>
 <script src="/xau-advanced.js?v=decoder-ohlc-2"></script>
-<script src="/xau-ui.js?v=decoder-ohlc-2"></script>
+<script src="/xau-methods.js?v=1"></script>
+<script src="/xau-methods-ui.js?v=1"></script>
+<script src="/xau-ui.js?v=methods-lab-1"></script>
 <script src="/xau-kiber.js"></script>
 <script src="/xau-compact.js?v=3"></script>
 <script src="/xau-spot.js?v=1"></script>
