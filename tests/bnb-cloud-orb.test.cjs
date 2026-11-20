@@ -15,7 +15,7 @@ test('monitoring orb is loaded inside existing compact BNB home, not as a second
  assert.match(orb,/header\.insertBefore\(button,refresh\)/);
  assert.match(boot,/'bnb-cloud-orb\.js'/);
  assert.match(boot,/'bnb-cloud-orb\.css'/);
- assert.match(boot,/V='314-20261120-ia-finance-v2'/);
+ assert.match(boot,/V='314-20261120-finance-theme-fix'/);
 });
 
 test('sphere shows only verified cloud state and a scope warning',()=>{
