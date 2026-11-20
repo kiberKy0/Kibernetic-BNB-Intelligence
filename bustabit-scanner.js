@@ -24,7 +24,7 @@ function parse(input){
       const sep=lines[0].includes(';')?';':lines[0].includes('\t')?'\t':lines[0].includes('|')?'|':',';
       const cols=lines[0].split(sep).map(x=>x.trim().toLowerCase());
       const index=cols.findIndex(x=>/^(bust|crash|multiplier|payout|crashpoint|crash_point)$/.test(x));
-      if(index<0)throw Error('CSV: manca colonna bust, crash o multiplier.');
+      if(index<0)throw Error('Input non valido: CSV senza colonna bust, crash o multiplier.');
       rows=lines.slice(1).map(x=>cols.length===1?x:x.split(sep)[index]);
     }else{
       const tokens=s.split(/\s+/).filter(Boolean);
