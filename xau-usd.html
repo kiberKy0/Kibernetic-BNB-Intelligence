@@ -107,7 +107,7 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 .xau-guide-details summary{font-weight:750;font-size:13px;padding:7px 0;cursor:pointer;color:#e6c77f}
 .xau-guide-details p{font-size:12px;line-height:1.5;color:#b8cfdd}
 @media(max-width:650px){.xau-guidance{padding:11px 12px}.xau-guide-head h2{font-size:16px}.xau-guide-status{font-size:10px;padding:6px 7px;max-width:134px}.xau-guide-levels{gap:5px}.xau-guide-levels>div{padding:8px 6px}.xau-guide-levels small{font-size:10px}}
-</style><style>.xau-feed-health{border:1px solid #7b643c;background:#24291f;color:#f4d8a4;padding:8px 10px;border-radius:10px;font-size:12px;margin:10px 0}.xau-feed-health[data-state="live"]{border-color:#3c9b75;background:#122f25;color:#b8f7d4}</style><link rel="stylesheet" href="/xau-kiber.css"><link rel="stylesheet" href="/xau-compact.css?v=3"><link rel="stylesheet" href="/xau-methods.css?v=2"><link rel="stylesheet" href="/xau-learning.css?v=1"><link rel="stylesheet" href="/xau-advanced.css?v=1"><link rel="stylesheet" href="/xau-platform.css?v=1"><link rel="stylesheet" href="/xau-finance-theme.css?v=1"><style>.xau-guidance{border-color:#806442}.xau-profile-btn{border-color:#6e7a68}.xau-topbar{border-bottom:1px solid #66513c}.panel[aria-label="Grafico oro"]{border-color:#82643e}.xau-guide-status{border-color:#b69552}.xau-topbar .identity h1 .gold{color:#f4c86d}</style></head>
+</style><style>.xau-feed-health{border:1px solid #7b643c;background:#24291f;color:#f4d8a4;padding:8px 10px;border-radius:10px;font-size:12px;margin:10px 0}.xau-feed-health[data-state="live"]{border-color:#3c9b75;background:#122f25;color:#b8f7d4}</style><link rel="stylesheet" href="/xau-kiber.css"><link rel="stylesheet" href="/xau-compact.css?v=3"><link rel="stylesheet" href="/xau-methods.css?v=2"><link rel="stylesheet" href="/xau-learning.css?v=1"><link rel="stylesheet" href="/xau-advanced.css?v=1"><link rel="stylesheet" href="/xau-platform.css?v=1"><link rel="stylesheet" href="/xau-finance-theme.css?v=1"><link rel="stylesheet" href="/xau-nav-orb.css?v=1"><style>.xau-guidance{border-color:#806442}.xau-profile-btn{border-color:#6e7a68}.xau-topbar{border-bottom:1px solid #66513c}.panel[aria-label="Grafico oro"]{border-color:#82643e}.xau-guide-status{border-color:#b69552}.xau-topbar .identity h1 .gold{color:#f4c86d}</style></head>
 <body>
 <div class="container">
 <header class="xau-topbar">
@@ -117,16 +117,35 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
   <button type="button" id="xauMt5Open" class="xau-platform-button" aria-controls="xauBrokerInfo" aria-expanded="false">MT5</button>
  </nav>
  <div class="xau-header-right">
-  <button type="button" id="xauFeedOrb" class="xau-feed-orb" data-state="offline" aria-controls="xauStatusPopover" aria-expanded="false" aria-label="Controlla stato online e ultimo aggiornamento del feed XAU/USD" title="Stato online e ultimo aggiornamento"><span class="xau-orb-dot" aria-hidden="true"></span><span id="xauFeedOrbText">OFFLINE</span></button>
-  <a class="back" id="xauBackToBnb" href="/">← BNB</a>
+  <button type="button" id="xauFeedOrb" class="xau-feed-orb" data-state="offline" aria-controls="xauStatusPopover" aria-expanded="false" aria-label="Apri pallina Kiber: online, ultima analisi e ultima rettifica della pagina" title="Stato online e ultime modifiche">
+   <span class="xau-orb-sphere" aria-hidden="true"></span><span id="xauFeedOrbText" class="xau-orb-label">OFFLINE</span>
+  </button>
+  <button type="button" class="xau-destinations-btn" id="xauDestinationsBtn" aria-controls="xauDestinationsPanel" aria-expanded="false">☰ Reparti</button>
  </div>
 </header>
 <section id="xauStatusPopover" class="xau-top-popover xau-status-popover" hidden aria-label="Dettagli feed XAU/USD">
  <div class="xau-drawer-head"><strong>Stato aggiornamento oro</strong><button type="button" id="xauStatusClose" aria-label="Chiudi stato aggiornamento">×</button></div>
  <p><strong id="xauStatusState">Feed non verificato</strong></p>
- <dl class="xau-status-facts"><div><dt>Ultima verifica</dt><dd id="xauStatusLastCheck">—</dd></div><div><dt>Ultima quotazione</dt><dd id="xauStatusLastTick">—</dd></div><div><dt>Ultima candela chiusa</dt><dd id="xauStatusLastBar">—</dd></div><div><dt>Fonte</dt><dd id="xauStatusSource">—</dd></div></dl>
+ <dl class="xau-status-facts">
+  <div><dt>Ultima verifica feed</dt><dd id="xauStatusLastCheck">—</dd></div>
+  <div><dt>Ultima quotazione</dt><dd id="xauStatusLastTick">—</dd></div>
+  <div><dt>Ultima candela chiusa</dt><dd id="xauStatusLastBar">—</dd></div>
+  <div><dt>Fonte quotazioni</dt><dd id="xauStatusSource">—</dd></div>
+  <div><dt>Ultima analisi Kiber</dt><dd id="xauOrbLastAnalysis">Nessuna analisi verificata</dd></div>
+  <div><dt>Ultima modifica pagina (GitHub)</dt><dd id="xauOrbLastRevision">Apri il pannello per controllare</dd></div>
+ </dl>
+ <p class="xau-revision-detail"><strong>Ultima rettifica del codice:</strong> <span id="xauOrbRevisionNote">Verifica GitHub in attesa.</span></p>
  <button type="button" class="xau-platform-button xau-verify-button" id="xauStatusRefresh">Verifica ora</button>
  <p class="small">Orari visualizzati in Italia (Europe/Rome). ONLINE significa che Kiber ha ricevuto tick e candele recenti dalla fonte esterna. Non certifica la latenza del provider e non significa che il broker personale sia collegato.</p>
+</section>
+<section id="xauDestinationsPanel" class="xau-top-popover xau-nav-panel" hidden aria-label="Naviga fra i reparti IA Finance">
+ <div class="xau-drawer-head"><strong>Scegli dove tornare</strong><button type="button" id="xauDestinationsClose" aria-label="Chiudi menu reparti">×</button></div>
+ <p class="xau-nav-intro">Tre destinazioni dello stesso progetto. Il Decoder dell’oro resta separato dai sistemi BNB e Bustabit.</p>
+ <nav class="xau-destination-list" aria-label="Destinazioni interne">
+  <button type="button" id="xauDestinationFinance"><span class="xau-destination-icon" aria-hidden="true">⌂</span><span><strong>IA Finance</strong><small>Dashboard principale Kiber</small></span></button>
+  <button type="button" id="xauDestinationBustabit"><span class="xau-destination-icon" aria-hidden="true">🎯</span><span><strong>Bustabit</strong><small>Laboratorio e archivio bot</small></span></button>
+  <button type="button" id="xauDestinationBnb"><span class="xau-destination-icon" aria-hidden="true">⬡</span><span><strong>BNB Chain</strong><small>Mercato token e analisi</small></span></button>
+ </nav>
 </section>
 <section id="xauBrokerInfo" class="xau-top-popover xau-broker-popover" hidden aria-label="Broker e MT5 per XAU/USD">
  <div class="xau-drawer-head"><strong>Broker · XAU/USD</strong><button type="button" id="xauBrokerClose" aria-label="Chiudi piattaforme">×</button></div>
@@ -444,17 +463,6 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 </div>
 <footer class="container small" style="padding:24px 0">Kibernetic Intelligence · XAU/USD isolato dall'ecosistema BNB · Prima validazione tecnica, poi backtest e confronto dei risultati.</footer>
 </div>
-<script>
-(()=>{
-'use strict';
-const back=document.getElementById('xauBackToBnb');
-if(back)back.addEventListener('click',e=>{
- let embedded=false;
- try{embedded=window.parent!==window&&!!window.parent.document.getElementById('goldPanel')}catch(_){}
- if(embedded){e.preventDefault();window.parent.postMessage({type:'KIBER_XAU_CLOSE'},window.location.origin)}
-});
-})();
-</script>
 <script src="/xau-analysis.js?v=decoder-ohlc-2"></script>
 <script src="/xau-guidance.js"></script>
 <script src="/xau-advanced.js?v=finance-models-1"></script>
@@ -465,6 +473,7 @@ if(back)back.addEventListener('click',e=>{
 <script src="/xau-learning.js?v=1"></script>
 <script src="/xau-learning-ui.js?v=1"></script>
 <script src="/xau-platform.js?v=2"></script>
+<script src="/xau-nav-orb.js?v=1"></script>
 <script src="/xau-ui.js?v=status-1"></script>
 <script src="/xau-kiber.js"></script>
 <script src="/xau-compact.js?v=3"></script><script src="/xau-finance-models.js?v=1"></script>
