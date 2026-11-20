@@ -31,6 +31,11 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
 function mount(){
  let d;try{d=app.contentDocument}catch{return false}
  const nav=d?.getElementById('hubNav');if(!nav)return false;
+ if(!d.getElementById('kiberBustabitInnerStyle')){
+  const style=d.createElement('style');style.id='kiberBustabitInnerStyle';
+  style.textContent='#kiberBustabitTab{border-color:#7469ad!important;background:#231c40!important;color:#f0e9ff!important}#kiberBustabitTab b{color:#f0e9ff!important}';
+  d.head.append(style);
+ }
  let btn=d.getElementById('kiberBustabitTab');
  if(!btn){
   btn=d.createElement('button');btn.type='button';btn.id='kiberBustabitTab';
