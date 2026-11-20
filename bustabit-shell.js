@@ -31,7 +31,7 @@ layer.append(top,frame);document.body.append(layer);
 let lastNav=null;
 function open(){
  if(!frame.src)frame.src=frame.dataset.src;
- layer.hidden=false;quick.setAttribute('aria-expanded','true');lastNav=document.getElementById('app')?.contentDocument?.getElementById('kiberBustabitTab')||lastNav;
+ layer.hidden=false;quick.setAttribute('aria-expanded','true');lastNav=document.getElementById('app')?.contentDocument?.getElementById('kiberHeaderBustabit')||document.getElementById('app')?.contentDocument?.getElementById('kiberBustabitTab')||lastNav;
  close.focus();
 }
 function shut(){layer.hidden=true;quick.setAttribute('aria-expanded','false');if(lastNav&&lastNav.isConnected)lastNav.focus()}
@@ -41,6 +41,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!layer.hidden)shut(
 window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===frame.contentWindow&&e.data?.type==='KIBER_BUSTABIT_CLOSE')shut()});
 function mount(){
  let d;try{d=app.contentDocument}catch{return false}
+ const headerButton=d?.getElementById('kiberHeaderBustabit');
+ if(headerButton&&!headerButton.dataset.kiberBustabitBound){
+  headerButton.dataset.kiberBustabitBound='1';
+  headerButton.addEventListener('click',open);
+  // Only the entrypoint moves: keep the existing Bustabit overlay, iframe and close behavior.
+  quick.style.display='none';
+ }
  const nav=d?.getElementById('hubNav');if(!nav)return false;
  if(!d.getElementById('kiberBustabitInnerStyle')){
   const style=d.createElement('style');style.id='kiberBustabitInnerStyle';
