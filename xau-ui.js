@@ -103,6 +103,7 @@
   }
   async function loadFeed() {
     importActive = false;lastFetchAt=Date.now();
+    window.XauPlatform?.setChecking();
     $('refresh').disabled = true;feedHealth('Feed XAU/USD · verifica connessione…');
     waiting('Verifica della disponibilità del feed…', 'Decoder XAU/USD');
     try {
@@ -119,10 +120,12 @@
       const feedLine='Feed esterno '+String(body.source||'XAU')+' · Bid '+bid+' / Ask '+ask+
         ' · tick '+seconds+' s · OHLC '+lag+' min dall’inizio candela · non è il tuo conto MT5';
       feedHealth(result.ready?feedLine:'Dati ricevuti ma non validati · '+(result.reasons||[]).join(' · '),result.ready?'ohlc':'offline');
+      window.XauPlatform?.setLive(body);
       render(result, body.source + ' · feed esterno',body);
       setText('csvMessage', 'Feed biquote esterno · candele completate per gli indicatori. TradingView e il conto MT5 Android sono separati.');
     } catch (error) {
-      feedFailed=true;feedHealth('Feed non disponibile · '+String(error.message||'errore sorgente')+' · nessun segnale operativo');
+      feedFailed=true;window.XauPlatform?.setOffline(error.message||'Sorgente non disponibile');
+      feedHealth('Feed non disponibile · '+String(error.message||'errore sorgente')+' · nessun segnale operativo');
       waiting(error.message, 'Feed automatico non operativo');
       setText('csvMessage', 'Per lo storico puoi usare un CSV con candele OHLC valide. Nessun segnale senza dati.');
     } finally { $('refresh').disabled = false; }
@@ -161,6 +164,7 @@
       const candles = parseCsv(await file.text());
       if (candles.length < 60) throw new Error('Meno di 60 candele valide: ' + candles.length);
       importActive = true;
+      window.XauPlatform?.setOffline('Storico CSV locale: non è un feed online.');
       feedHealth('STORICO CSV · dati locali, non in tempo reale', 'offline');
       render(decoder.analyze(candles, $('interval').value), 'CSV locale (non collegato al mercato live)');
       setText('csvMessage', 'Storico letto localmente: ' + candles.length + ' candele. Non salvato e non inviato al server.');
