@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#060c1c">
+<title>Archivio Codici & Intelligenza | Kiber Bustabit</title>
+<meta name="description" content="Archivio delle versioni originali Kiber Striker e Cyberstriker, log documentati, test e spiegazioni Kiber. Nessuna puntata automatica.">
+<link rel="stylesheet" href="/bustabit-lab.css?v=2">
+<link rel="stylesheet" href="/bustabit-finance.css?v=2">
+<script defer src="/bustabit-archive-data.js?v=2"></script>
+<script defer src="/bustabit-archive-ui.js?v=2"></script>
+</head>
+<body class="bf-page">
+<main>
+<header class="bf-head">
+ <div class="bf-brand"><img src="/assets/kiber-logo.svg" alt="Logo Kiber"><div><h1>Kiber Bustabit · Archivio</h1><small>Intelligenza · Sorgenti originali · Prove documentate</small></div></div>
+ <button type="button" id="bustaClose">← BNB</button>
+</header>
+<section class="bf-hero" aria-label="Introduzione all'archivio">
+ <div><span class="bf-eyebrow"><i class="bf-led"></i> Kibernetic Intelligence · Processo 2</span>
+ <h2>Archivio codici <span>&amp; intelligenza</span></h2>
+ <p>Una memoria ordinata delle versioni Cyberstriker e Kiber Striker: codice identico all'originale, impronta SHA-256, test, log, strategie e cause degli errori. Senza confondere vecchie versioni, replay e giocate LIVE.</p></div>
+ <div class="bf-ai"><img src="/assets/kiber-logo.svg" alt="Kiber"><div><b>Kiber spiega</b><small>Ogni strategia ha una lettura chiara dei risultati e dei limiti. Le spiegazioni sono documentate, non un segnale automatico di puntata.</small></div></div>
+</section>
+<nav class="bf-navigation" aria-label="Navigazione archivio">
+ <a href="#bf-evidence">◈ Risultati</a>
+ <a href="#bf-codes">⌘ Codici originali</a>
+ <a href="#bf-intelligence">✧ Intelligenza Kiber</a>
+ <a href="/bustabit-lab.html">◎ Scanner</a>
+</nav>
+<div class="bf-metrics" aria-label="Indicatori della prova">
+ <div class="bf-stat"><small>Puntate annotate nei CSV</small><strong id="bfStatBets">—</strong><em>3 sessioni · 07/11/2026</em></div>
+ <div class="bf-stat"><small>Vittorie annotate</small><strong id="bfStatWins">—</strong><em>Registrazioni, non certificazione LIVE</em></div>
+ <div class="bf-stat"><small>Saldo del registro</small><strong class="bf-negative" id="bfStatNet">—</strong><em>Somma dei P/L nel CSV</em></div>
+ <div class="bf-stat"><small>Cyberstriker V3.5</small><strong id="bfStatTests">—</strong><em>Test locali del report originale</em></div>
+</div>
+<section id="bf-evidence" class="bf-section">
+ <div class="bf-section-head"><div><h2>📊 Registro delle prove</h2><p>Numeri estratti dal file originale. Puoi confrontare le famiglie di strategie e capire quali hanno prodotto perdite o vincite nel registro.</p></div><span class="bf-pill warn">Non certificato LIVE</span></div>
+ <div class="bf-note"><strong>Attenzione alla provenienza.</strong> Il CSV elenca 333 puntate con importi, target, esito e profitto. Non contiene da solo la prova che i fondi siano stati effettivamente puntati sul server Bustabit. Non chiameremo “realmente giocate” le righe che non si riescono a riconciliare con l'account.</div>
+ <p class="bf-proof-footer">Fonte archivio privato: <strong id="bfSourceLabel">—</strong>. Dati aggregati pubblicati, righe originali non pubblicate.</p>
+ <div class="bf-tablescroll"><table class="bf-table"><thead><tr><th>Strategia</th><th class="num">Puntate</th><th class="num">Vittorie</th><th class="num">Vittorie %</th><th class="num">P/L</th></tr></thead><tbody id="bfStrategyRows"></tbody></table></div>
+ <span class="bf-digest" id="bfReportHash"></span>
+ <div class="bf-breakdown">
+  <div class="bf-mini"><b>🧪 Cyberstriker V3.5</b><small>29 test locali superati. Verificati eventi, funzioni di rischio e casi di riconciliazione nel simulatore. Non è un certificato di trading reale.</small></div>
+  <div class="bf-mini"><b>📉 Kiber V3.4 e V3.3</b><small>Il report sui 300.000 round sintetici registra P/L negativi per entrambe le versioni. Altri replay usano round osservati ma restano SHADOW.</small></div>
+ </div>
+ <p class="bf-note blue"><b>Livelli di prova:</b> sorgente recuperato → sintassi/test locali → backtest o replay → puntata riconciliata da log account/server. Solo l'ultimo livello può documentare un'esecuzione LIVE specifica, e non significa redditività futura.</p>
+</section>
+<section id="bf-codes" class="bf-section">
+ <div class="bf-section-head"><div><h2>🗂 Archivio dei sorgenti originali</h2><p>Sei versioni identificate negli archivi Kibernetic, senza riscriverle. La pagina verifica i byte con SHA-256 prima di riconoscerle.</p></div><span class="bf-pill">Codice immutabile</span></div>
+ <p class="bf-note blue">Il sito GitHub è pubblico: per non pubblicare i tuoi algoritmi, <strong>importa qui i file .js originali una sola volta per questo browser</strong>. Saranno conservati localmente e consultabili senza modifiche. Nessun sorgente viene inviato al sito o eseguito.</p>
+ <div class="bf-import"><label for="bfArchiveImport"><b>Carica originali dalla tua Libreria</b></label><input type="file" id="bfArchiveImport" accept=".js,text/javascript" multiple aria-label="Importa uno o più codici originali .js"></div>
+ <output id="bfArchiveStatus" role="status" aria-live="polite">Archivio pronto: i file originali non sono stati pubblicati.</output>
+ <p id="bfSourceCount" class="bf-proof-footer">0 / 6 sorgenti originali conservati su questo dispositivo</p>
+ <div id="bfArchiveCards" class="bf-list" aria-label="Elenco versioni originali"></div>
+</section>
+<section id="bf-intelligence" class="bf-section">
+ <div class="bf-section-head"><div><h2>🤖 Kiber Intelligence spiega</h2><p>Le sette strategie, più SENTINEL, Recovery, memoria e 21 pattern, spiegate con i risultati e i loro limiti.</p></div><span class="bf-pill">Guida documentata</span></div>
+ <div class="bf-help">
+  <div><label for="bfTeachSelect" class="bf-proof-footer">Seleziona modulo o strategia</label><select id="bfTeachSelect" aria-label="Scegli algoritmo da spiegare"></select></div>
+  <div class="bf-kiber-panel"><b id="bfTeachTitle">Kiber spiega</b><p id="bfTeachText">Scegli una strategia per leggere la spiegazione.</p><p id="bfTeachEvidence">Dati in preparazione.</p><small>Spiegazioni offline basate sul registro e sui report archiviati. Nessuna previsione o azione automatica sul conto.</small></div>
+ </div>
+ <div class="bf-breakdown">
+  <div class="bf-mini"><b>📘 Cos'è Bustabit?</b><small>Gioco crash: scegli una puntata e un cashout. Il moltiplicatore sale ma il round può terminare. Gli storici non anticipano il round successivo.</small></div>
+  <div class="bf-mini"><b>🛡 Cosa protegge il capitale?</b><small>Limiti di perdita, verifica wager, stop agli eventi duplicati e controlli su saldo e stato del game. Proteggono dall'errore tecnico, non eliminano il margine del banco.</small></div>
+ </div>
+</section>
+<footer class="bf-proof-footer">Kiber IA Finance · Bustabit Intelligence 2.0. Archivio, ricerca e formazione: nessuna puntata LIVE eseguita dalla pagina. <a href="/bustabit-lab.html">Vai al Decoder Bustabit</a>.</footer>
+</main>
+<dialog id="bfSourceDialog" class="bf-code-dialog" aria-label="Visualizzatore del codice originale">
+ <header><h2 id="bfSourceTitle">Codice originale</h2><button type="button" id="bfSourceClose" class="bf-action secondary">Chiudi ×</button></header>
+ <p id="bfSourceDigest"><small>SHA-256</small></p>
+ <div class="bf-card-actions"><button type="button" id="bfSourceDownload" class="bf-action">Scarica originale .js</button><button type="button" id="bfSourceCopy" class="bf-action secondary">Copia testo</button></div>
+ <pre id="bfSourceText" aria-label="Sorgente originale in sola lettura"></pre>
+</dialog>
+<script>document.getElementById('bustaClose').addEventListener('click',function(){if(window.parent!==window){window.parent.postMessage({type:'KIBER_BUSTABIT_CLOSE'},location.origin)}else{location.href='/'}});</script>
+</body>
+</html>
