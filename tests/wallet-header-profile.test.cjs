@@ -28,7 +28,7 @@ test('BNB shell bridges the real Saldo button without duplicating buttons over t
 test('XAU/USD offers separate Broker and MT5 information, not a connected account',()=>{
   assert.match(gold,/<header class="xau-topbar">/);
   assert.match(gold,/<nav class="xau-finance xau-platform-nav"[^>]*>[\s\S]*?id="xauBrokerOpen"[\s\S]*?id="xauMt5Open"[\s\S]*?<\/nav>/);
-  assert.match(gold,/id="xauWalletBalanceBtn"[^>]*hidden/);
+  assert.match(gold,/#xauWalletBalanceBtn\[hidden\]\{display:none!important\}/);
   assert.match(gold,/id="xauBrokerInfo"/);
   assert.match(gold,/Nessuna operazione/);
   assert.doesNotMatch(gold,/id="xauWalletAccountBtn"[^>]*MetaMask/);
