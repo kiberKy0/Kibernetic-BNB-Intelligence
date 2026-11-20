@@ -10,7 +10,7 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
  const ALLOWED=['finance','bustabit','bnb'];
- const RELEASE='https://api.github.com/repos/kiberKy0/Kibernetic-BNB-Intelligence/commits?path=xau-usd.html&per_page=1';
+ const RELEASE='/api/xau-revision';
  const $=id=>document.getElementById(id);
  const fmt=(date)=>{
    const n=Date.parse(date||'');
@@ -40,14 +40,13 @@
      try{response=await fetch(RELEASE,{cache:'no-store',signal:controller.signal,headers:{Accept:'application/vnd.github+json'}})}
      finally{clearTimeout(timeout);}
      if(!response.ok)throw Error('GitHub '+response.status);
-     const list=await response.json();
-     const item=Array.isArray(list)?list[0]:null;
-     const date=item?.commit?.committer?.date;
+     const item=await response.json();
+     const date=item?.at;
      const sha=item?.sha;
-     if(!date||!Number.isFinite(Date.parse(date))||typeof sha!=='string'||sha.length<7)
+     if(item?.ok!==true||!date||!Number.isFinite(Date.parse(date))||typeof sha!=='string'||sha.length!==7)
        throw Error('Dati revisione non completi');
-     assign('xauOrbLastRevision',fmt(date)+' · '+sha.slice(0,7));
-     const subject=String(item?.commit?.message||'').split('\n')[0].trim();
+     assign('xauOrbLastRevision',fmt(date)+' · '+sha);
+     const subject=String(item?.message||'').split('\n')[0].trim();
      assign('xauOrbRevisionNote',subject?subject.slice(0,125):'Ultima modifica del codice della pagina.');
      revisionLoaded=Date.now();
    }catch(_){
