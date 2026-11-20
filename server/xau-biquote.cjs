@@ -14,7 +14,7 @@ const INTERVALS = Object.freeze({
   '1day': {remote:'1d',minutes:1440}
 });
 const SOURCE = 'biquote.io · MT5 broker esterno';
-const FRAME_NAMES = ['5min','15min','1h','4h','1day'];
+const FRAME_NAMES = ['1min','5min','15min','1h','4h','1day'];
 const validN = n => typeof n === 'number' && Number.isFinite(n) && n > 0;
 const round = (value,digits=2)=> Number.isFinite(value) ? Number(value.toFixed(digits)) : null;
 function parseIso(value){
@@ -93,7 +93,7 @@ async function getSnapshot(options={}){
   if(!INTERVALS[interval])throw Error('Intervallo non valido');
   const fetchImpl=options.fetchImpl||fetch;
   const frames=[...new Set([interval,...FRAME_NAMES])];
-  const frameReq=frames.map(k=>readJSON('https://biquote.io/api/XAUUSD/ohlc?interval='+INTERVALS[k].remote+'&limit=110',fetchImpl));
+  const frameReq=frames.map(k=>readJSON('https://biquote.io/api/XAUUSD/ohlc?interval='+INTERVALS[k].remote+'&limit='+(k==='1min'||k==='5min'?300:110),fetchImpl));
   const tickReq=readJSON('https://biquote.io/api/XAUUSD?allowStale=false',fetchImpl);
   const calendarFrom=new Date(now-30*60000).toISOString();
   const calendarTo=new Date(now+48*3600000).toISOString();
@@ -125,7 +125,7 @@ async function getSnapshot(options={}){
     nearHighImpact?'Evento economico USA ad alto impatto ±30 minuti':'Tick e candele recenti verificati sulla stessa fonte; ritardo a monte non certificato';
   // Reuse the already fetched M5 history for the separate educational strategy lab.
   // Never expose an unverified or out-of-date M5 series as a current reading.
-  let methodM5=null;
+  let methodM5=null,methodM1=null;
   if(ok){
     const m5Index=frames.indexOf('5min');
     if(m5Index!==-1&&settled[m5Index].status==='fulfilled'){
@@ -136,12 +136,19 @@ async function getSnapshot(options={}){
         };
       }catch(_){/* Keep methods unavailable, never substitute another timeframe. */}
     }
+    const m1Index=frames.indexOf('1min');
+    if(m1Index!==-1&&settled[m1Index].status==='fulfilled'){
+      try{
+        const sample=normalizeBars(settled[m1Index].value,'1min',now);
+        if(sample.recent)methodM1={interval:'1min',recent:true,lastClosedAt:sample.lastClosedAt,candles:sample.candles};
+      }catch(_){/* Missing M1 is a visible filter block, never guessed. */}
+    }
   }
   return {
-    symbol:'XAU/USD',interval,source:SOURCE,feedStatus:ok?'recent':'blocked',
+    symbol:'XAU/USD',interval,source:SOURCE,feedStatus:ok?'recent',
     timestamp:new Date(now).toISOString(),lastCandleStart:selected.lastCandleStart,lastClosedAt:selected.lastClosedAt,
     quality:{ok,reason,selectedAgeSeconds:selected.ageSeconds,tick,provider:'biquote.io',independentLatencyVerified:false},
-    multiTimeframe:series,strategySeries:{m5:methodM5},calendar:{connected:calendar!==null,highImpactNear:nearHighImpact,next:calendar&&calendar.length?calendar[0]:null,events:calendar||[]},
+    multiTimeframe:series,strategySeries:{m5:methodM5,m1:methodM1},calendar:{connected:calendar!==null,highImpactNear:nearHighImpact,next:calendar&&calendar.length?calendar[0]:null,events:calendar||[]},
     candles: ok?selected.candles:[],
     // The client may show the latest tick for reference but must not use it as an executable quote.
     note:ok?'Dati tecnici derivati da broker esterno, nessun collegamento con il conto MT5 Android. Nessun ordine automatico.':
