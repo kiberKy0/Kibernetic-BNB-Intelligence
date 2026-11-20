@@ -8,9 +8,9 @@ const profile=fs.readFileSync(require.resolve('../v17.js'),'utf8');
 const gold=fs.readFileSync(require.resolve('../xau-usd.html'),'utf8');
 const css=fs.readFileSync(require.resolve('../wallet-monitor.css'),'utf8');
 
-test('BNB header has one centered Portafoglio and adjacent Oro before profile actions',()=>{
+test('BNB header has XAU and Bustabit with MetaMask and CoinGecko below; profile hidden',()=>{
   assert.match(bnb,/<header class="top kiber-wallet-top">/);
-  assert.match(bnb,/<nav class="kiber-header-wallet"[^>]*>[\s\S]*?id="kiberHeaderWalletBalance"[\s\S]*?id="kiberHeaderGold"[\s\S]*?<\/nav><div class="top-actions">/);
+  assert.match(bnb,/<nav class="kiber-header-wallet"[^>]*>[\s\S]*?id="kiberHeaderWalletBalance"[\s\S]*?id="kiberHeaderGold"[\s\S]*?id="kiberHeaderBustabit"[\s\S]*?id="kiberHeaderCoinGecko"[\s\S]*?<\/nav><div class="top-actions">/);
   assert.doesNotMatch(bnb,/id="kiberHeaderWalletLink"/);
   assert.match(bnb,/\.kiber-header-wallet #kiberHeaderWalletBalance/);
   assert.match(bnb, /header\.top\.kiber-wallet-top\{display:grid!important/);
