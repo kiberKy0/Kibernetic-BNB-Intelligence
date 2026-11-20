@@ -1,0 +1,45 @@
+/*
+ * Kiber IA Finance colour skin for the parent shell only.
+ * Wallet overlays, gold switcher and boot screen retain their DOM, events,
+ * positions, controls and security boundaries.
+ */
+html,body,#app{background-color:#060c1c!important}
+.boot{
+  background:
+    radial-gradient(ellipse at 50% -5%,rgba(65,76,195,.39),transparent 65%),
+    linear-gradient(145deg,#080f29,#060c1c)!important;
+  color:#f0f7ff;
+}
+.boot b{color:#f0f7ff}
+.boot span{color:#9fb8d3}
+#bootRetry{
+  background:linear-gradient(120deg,#15427e,#125b90);
+  border-color:#66d9f5;
+  color:#eafaff;
+}
+#walletMini{
+  background:linear-gradient(135deg,rgba(19,35,81,.985),rgba(9,23,58,.99));
+  border-color:rgba(96,190,249,.6);
+  color:#e8f7ff;
+  box-shadow:0 16px 55px #000b,0 0 21px rgba(47,162,225,.16);
+}
+#walletMini .wallet-mini-head strong{color:#f0f7ff}
+#walletMini .wallet-mini-status{background:#1a356b;color:#c1d9ef}
+#walletMini .wallet-mini-meta{color:#b6cee7}
+#walletMini .wallet-mini-balances{border-color:rgba(91,179,234,.45)}
+#walletMini .wallet-mini-balances div{border-color:rgba(91,179,234,.24)}
+#walletMini .wallet-mini-actions :is(button,a),
+#walletMini .wallet-mini-launch{
+  background:#153977;
+  border-color:#5b9eda;
+  color:#e6faff;
+}
+#goldPanel{background:#060c1c}
+.gold-panel-head{
+  background:linear-gradient(113deg,#171d4d,#241e54);
+  border-bottom-color:rgba(255,206,134,.56);
+}
+.gold-panel-head strong{color:#ffdfac}
+.gold-panel-head small{color:#b2c8dd}
+#goldBack{background:#362a52;border-color:#bd94dc;color:#ffe0ae}
+#goldFrame{background:#060c1c}
