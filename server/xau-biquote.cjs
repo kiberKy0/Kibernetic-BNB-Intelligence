@@ -123,11 +123,25 @@ async function getSnapshot(options={}){
     !tick.fresh?'Ultima quotazione Bid-Ask troppo vecchia':
     !barValid?'Ultima candela OHLC troppo vecchia':
     nearHighImpact?'Evento economico USA ad alto impatto ±30 minuti':'Tick e candele recenti verificati sulla stessa fonte; ritardo a monte non certificato';
+  // Reuse the already fetched M5 history for the separate educational strategy lab.
+  // Never expose an unverified or out-of-date M5 series as a current reading.
+  let methodM5=null;
+  if(ok){
+    const m5Index=frames.indexOf('5min');
+    if(m5Index!==-1&&settled[m5Index].status==='fulfilled'){
+      try{
+        const sample=normalizeBars(settled[m5Index].value,'5min',now);
+        if(sample.recent)methodM5={
+          interval:'5min',recent:true,lastClosedAt:sample.lastClosedAt,candles:sample.candles
+        };
+      }catch(_){/* Keep methods unavailable, never substitute another timeframe. */}
+    }
+  }
   return {
     symbol:'XAU/USD',interval,source:SOURCE,feedStatus:ok?'recent':'blocked',
     timestamp:new Date(now).toISOString(),lastCandleStart:selected.lastCandleStart,lastClosedAt:selected.lastClosedAt,
     quality:{ok,reason,selectedAgeSeconds:selected.ageSeconds,tick,provider:'biquote.io',independentLatencyVerified:false},
-    multiTimeframe:series,calendar:{connected:calendar!==null,highImpactNear:nearHighImpact,next:calendar&&calendar.length?calendar[0]:null,events:calendar||[]},
+    multiTimeframe:series,strategySeries:{m5:methodM5},calendar:{connected:calendar!==null,highImpactNear:nearHighImpact,next:calendar&&calendar.length?calendar[0]:null,events:calendar||[]},
     candles: ok?selected.candles:[],
     // The client may show the latest tick for reference but must not use it as an executable quote.
     note:ok?'Dati tecnici derivati da broker esterno, nessun collegamento con il conto MT5 Android. Nessun ordine automatico.':
