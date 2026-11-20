@@ -25,7 +25,7 @@ test('CoinGecko opens official BNB ecosystem externally without touching token d
  assert.doesNotMatch(shell,/onclick="[^"]*(?:ethereum|wallet|transaction)/);
 });
 
-test('floating Bustabit button is hidden when header launcher binds existing lab',()=>{
+test('floating Bustabit button is hidden when header launcher binds archive sector',()=>{
  assert.match(busta,/getElementById\('kiberHeaderBustabit'\)/);
  assert.match(busta,/headerButton\.addEventListener\('click',open\)/);
  assert.match(busta,/quick\.style\.display='none'/);
@@ -33,7 +33,7 @@ test('floating Bustabit button is hidden when header launcher binds existing lab
  assert.match(busta,/layer\.hidden=false/);
  assert.match(busta,/close\.addEventListener\('click',shut\)/);
  assert.match(index,/bustabit-shell\.js\?v=busta-20261120-header/);
- assert.match(originalLab,/kbtAnalyze/);
+ assert.match(originalLab,/id="bvaBotList"/);
 });
 
 test('only visual profile entrypoints are hidden; data and code remain untouched',()=>{
