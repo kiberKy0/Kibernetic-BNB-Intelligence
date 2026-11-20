@@ -11,6 +11,16 @@ const css=document.createElement('style');css.textContent=
  '#kiberBustaTop{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #314962;padding:8px 13px;background:#0d1d30}'+
  '#kiberBustaTop b{font-size:14px}#kiberBustaClose{border:1px solid #6485a4;background:#1b3a53;color:#fff;padding:10px 13px;border-radius:10px;min-height:42px}';
 document.head.append(css);
+/* Root-level entry: the new BNB home view may not display the legacy hubNav. */
+const quick=document.createElement('button');
+quick.id='kiberBustabitQuick';quick.type='button';
+quick.textContent='🎯 Bustabit';
+quick.setAttribute('aria-label','Apri Bustabit Intelligence Lab');
+quick.setAttribute('aria-controls','kiberBustaOverlay');
+quick.setAttribute('aria-expanded','false');
+quick.style.cssText='position:fixed;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:38;min-height:48px;padding:10px 17px;border:1px solid #ab99ff;border-radius:15px;background:#251c48;color:#f5efff;box-shadow:0 8px 30px #0009;font:700 14px system-ui,sans-serif;cursor:pointer';
+document.body.append(quick);
+
 const layer=document.createElement('section');layer.id='kiberBustaOverlay';layer.hidden=true;layer.setAttribute('aria-label','Reparto Bustabit indipendente');
 const top=document.createElement('div');top.id='kiberBustaTop';
 const title=document.createElement('b');title.textContent='🎯 Kibernetic · Bustabit Intelligence';
@@ -21,11 +31,12 @@ layer.append(top,frame);document.body.append(layer);
 let lastNav=null;
 function open(){
  if(!frame.src)frame.src=frame.dataset.src;
- layer.hidden=false;lastNav=document.getElementById('app')?.contentDocument?.getElementById('kiberBustabitTab')||lastNav;
+ layer.hidden=false;quick.setAttribute('aria-expanded','true');lastNav=document.getElementById('app')?.contentDocument?.getElementById('kiberBustabitTab')||lastNav;
  close.focus();
 }
-function shut(){layer.hidden=true;if(lastNav&&lastNav.isConnected)lastNav.focus()}
+function shut(){layer.hidden=true;quick.setAttribute('aria-expanded','false');if(lastNav&&lastNav.isConnected)lastNav.focus()}
 close.addEventListener('click',shut);
+quick.addEventListener('click',open);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!layer.hidden)shut()});
 window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===frame.contentWindow&&e.data?.type==='KIBER_BUSTABIT_CLOSE')shut()});
 function mount(){
