@@ -1,0 +1,24 @@
+/* Compact educational module; closed by default, independent of trading controls. */
+.xau-learning{margin:0 0 10px!important;padding:0!important;border:1px solid #35566b!important;background:#102131!important;overflow:hidden}
+.xau-learning>summary{cursor:pointer;list-style:revert;padding:12px 14px;display:list-item}
+.xau-learning>summary .xau-learning-title{font-size:14px;color:#e2eff7;font-weight:800;vertical-align:middle}
+.xau-learning>summary .xau-learning-count{font-size:10px;color:#82cadd;font-weight:700;display:block;margin:3px 0 0 0}
+.xau-learning[open]>summary{border-bottom:1px solid #2e4c5c}
+.xau-learning-inner{padding:10px}
+.xau-learning-head{display:flex;justify-content:space-between;gap:7px;align-items:center;flex-wrap:wrap;margin:1px 0 4px}
+.xau-learning-head strong{font-size:12px;color:#e8d59a}
+.xau-learning-head small{font-size:10px;color:#91b3c6}
+.xau-learning-head-note{font-size:11px;color:#b6ccda;line-height:1.45;margin:5px 0}
+.xau-learning-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:9px}
+.xau-learning-card{min-width:0;border:1px solid #304d5f;border-radius:10px;background:#0b1c2a;overflow:hidden}
+.xau-learning-card>summary{cursor:pointer;padding:10px;font-size:12px;line-height:1.35;min-height:66px}
+.xau-learning-card>summary strong{display:block;color:#daeefa}
+.xau-learning-card>summary span{font-size:10px;color:#97bccd;display:block;margin-top:6px}
+.xau-learning-card[open]>summary{border-bottom:1px solid #2e485b}
+.xau-learning-card-content{padding:10px}
+.xau-learning-card-content p{font-size:11px;line-height:1.52;color:#b7cddb;margin:6px 0}
+.xau-learning-card-content p strong{color:#e4edf3}
+.xau-learning-card-content .xau-learning-reading{border-left:2px solid #a7c6d4;padding-left:8px;color:#dfedf5}
+.xau-learning-card-content a{display:inline-block;color:#f2d39c;font-size:11px;margin:4px 0 0}
+.xau-learning-note{font-size:10px;color:#9bb6c7;line-height:1.45;margin:10px 2px 2px}
+@media(max-width:550px){.xau-learning-grid{grid-template-columns:1fr}.xau-learning-card>summary{min-height:0;padding:11px}.xau-learning-card>summary strong,.xau-learning-card>summary span{display:inline}.xau-learning-card>summary span{margin-left:6px}.xau-learning-inner{padding:8px}}
