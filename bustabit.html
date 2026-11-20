@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1227"><title>Bustabit · Kiber IA Finance</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#edf4ff;background:#080e21}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#18254c,#080e21 55%);min-height:100vh}
+a{color:#7be3ff}.shell{max-width:1050px;margin:auto;padding:24px 18px 70px}
+.top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800}.logo img{width:48px;height:48px}
+.home{border:1px solid #34547b;border-radius:12px;padding:11px 15px;text-decoration:none;background:#132643}
+.hero{margin:40px 0 25px}.eyebrow{color:#66dfff;text-transform:uppercase;letter-spacing:.16em;font-size:12px;font-weight:800}
+h1{font-size:clamp(30px,5vw,52px);margin:10px 0}h2{font-size:20px}p{color:#b6c7df;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.card{border:1px solid #2d4164;border-radius:18px;background:#101d37;padding:18px;min-width:0}
+.card strong{display:block;font-size:clamp(21px,3vw,30px);margin:7px 0}
+.card small{color:#a9bfdb}label{display:block;font-weight:700;margin-bottom:10px}
+textarea{width:100%;min-height:145px;resize:vertical;background:#080f24;border:1px solid #365077;border-radius:12px;color:#fff;padding:15px;font:15px/1.6 ui-monospace,monospace}
+button{border:0;background:#53cfff;border-radius:12px;color:#07152c;font-weight:800;padding:13px 24px;cursor:pointer;margin-top:13px}
+button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#result{margin-top:17px}#feedback{min-height:24px;color:#a9e6ff}
+.note{border-left:3px solid #f8c36b;padding:12px 15px;margin:22px 0;background:#2b2530;color:#ffe0a7;border-radius:0 12px 12px 0;line-height:1.5}
+@media(max-width:750px){.grid{grid-template-columns:1fr 1fr}}@media(max-width:420px){.grid{grid-template-columns:1fr 1fr}.card{padding:12px}.shell{padding:16px 12px 55px}}
+</style></head>
+<body><main class="shell"><nav class="top">
+<div class="logo"><img src="assets/kiber-logo-official.webp" alt="Logo Kiber"><span>Kiber IA Finance</span></div>
+<a class="home" href="/">← Pagina principale</a></nav>
+<section class="hero"><div class="eyebrow">Settore 03 · Game analytics</div>
+<h1>Bustabit <span style="color:#5bdcff">Scanner storico</span></h1>
+<p>Analisi descrittiva dei moltiplicatori. Questa sezione rimane separata da BNB Chain e XAU/USD e non effettua puntate, né è collegata al gioco in tempo reale.</p></section>
+<div class="note"><strong>Importante:</strong> nei giochi crash, sequenze, medie e pattern storici non permettono di prevedere con affidabilità i round futuri. Nessun risultato dello scanner dimostra un vantaggio di gioco.</div>
+<section class="card"><h2>Analizza un elenco di round</h2>
+<label for="rounds">Incolla i moltiplicatori (per esempio: 1.20x 2.45x 1.01x 8.50x)</label>
+<textarea id="rounds" spellcheck="false" placeholder="Incolla qui i round reali del tuo storico. Nessun dato di esempio viene usato nei calcoli."></textarea>
+<button id="analyze" type="button">Analizza storico</button>
+<p id="feedback" role="status"></p></section>
+<section id="result" hidden aria-live="polite"><h2>Statistiche calcolate</h2><div class="grid">
+<div class="card"><small>Round analizzati</small><strong id="total">—</strong></div>
+<div class="card"><small>Mediana</small><strong id="median">—</strong></div>
+<div class="card"><small>Quota ≥ 2×</small><strong id="above2">—</strong></div>
+<div class="card"><small>Quota ≥ 10×</small><strong id="above10">—</strong></div>
+<div class="card"><small>Massimo osservato</small><strong id="max">—</strong></div>
+<div class="card"><small>Media aritmetica</small><strong id="mean">—</strong></div>
+<div class="card"><small>Sequenza max sotto 2×</small><strong id="streak">—</strong></div>
+<div class="card"><small>Round dall'ultimo ≥ 10×</small><strong id="gap">—</strong></div>
+</div><p>Statistiche retrospettive: non sono segnali di ingresso e non stimano le probabilità del prossimo round.</p></section>
+<p style="margin-top:32px;font-size:13px">Integrazione dei bot e dei codici delle precedenti versioni: da verificare singolarmente prima di dichiararli operativi.</p></main>
+<script>
+(function(){
+const d=id=>document.getElementById(id),f=(x,n=2)=>Number(x).toLocaleString('it-IT',{minimumFractionDigits:n,maximumFractionDigits:n});
+d('analyze').addEventListener('click',()=>{
+const raw=d('rounds').value.trim();
+if(!raw){d('feedback').textContent='Incolla prima dei dati reali.';d('result').hidden=true;return}
+const entries=raw.split(/[\s;]+/).filter(Boolean);
+if(entries.length>50000){d('feedback').textContent='Massimo 50.000 round per analisi.';d('result').hidden=true;return}
+const values=entries.map(t=>Number(t.replace(/x$/i,'').replace(',','.')));
+if(values.some(x=>!Number.isFinite(x)||x<1||x>1000000)){
+d('feedback').textContent='Formato non valido. Usa valori numerici ≥ 1 separati da spazi, righe o punti e virgola.';d('result').hidden=true;return}
+const s=[...values].sort((a,b)=>a-b),len=values.length,m=Math.floor(len/2);
+const median=len%2?s[m]:(s[m-1]+s[m])/2;let curr=0,best=0,gap=0;
+for(const v of values){curr=v<2?curr+1:0;best=Math.max(best,curr);gap=v>=10?0:gap+1}
+const output={total:len,median:f(median)+'×',above2:f(100*values.filter(v=>v>=2).length/len,1)+'%',above10:f(100*values.filter(v=>v>=10).length/len,1)+'%',max:f(s[len-1])+'×',mean:f(values.reduce((a,b)=>a+b,0)/len)+'×',streak:String(best),gap:values.some(v=>v>=10)?String(gap):'Mai osservato'};
+Object.entries(output).forEach(([k,v])=>d(k).textContent=v);
+d('feedback').textContent='Analisi locale completata su '+len+' round.';d('result').hidden=false;
+});
+})();
+</script></body></html>
