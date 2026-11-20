@@ -175,7 +175,7 @@
       ' È un’ipotesi di price action, non la definizione completa del metodo di alcun trader.',pullPlan);
     // (4) M1 continuation scalp: ONLY independent complete fresh M1 + M5/M15 direction
     const m1=context?.strategySeries?.m1;
-    const validM1=m1?.recent&&barsValid(m1.candles,1,60,180);
+    const validM1=m1?.recent&&barsValid(m1.candles,1,60,now,180);
     let microMethod;
     if(!validM1)microMethod=blank('M1 NON DISPONIBILE','Candele M1 indipendenti insufficienti o non fresche.');
     else{
