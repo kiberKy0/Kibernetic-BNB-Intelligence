@@ -338,7 +338,7 @@ const FOCUS=Object.freeze({
  v271Liq:'liquidity',v271Chart:'chart',v271Forecast:'forecast',v271Why:'forecast',v271Factors:'factors',v271News:'factors',
  v271KiberBox:'kiberai',v271AiAnswer:'kiberai',v271Monitor:'watch',v271TradeLevels:'support',v271Source:'sources',
  v272Search:'search',v272Health:'sources',profileBtn:'profile',xauMethodLab:'xaumethods',xauOperationalGuide:'xauguide',
- xauWalletAccountBtn:'xaubroker',xauProfileBtn:'profile',
+ xauWalletAccountBtn:'xaubroker',xauProfileBtn:'profile',xauResearchSupplement:'xauresearch',xauResearchScenarioPanel:'xaulevels',
  'action:bnb':'market','action:new':'new','action:defi':'defi','action:compare':'compare',
  'action:market':'market','action:watch':'watch','action:search':'search','action:profile':'profile',
  'action:home':'home','action:refresh':'home','action:ai':'kiberai','action:gold':'xau',
@@ -359,7 +359,7 @@ function match(question,{focus='',area='bnb'}={}){
  if(/\b(?:attivo|attiva|online|adesso|in questo momento|ultimi minuti|cosa hai rilevato|quanti token|quanti asset|quale token sale)\b/.test(q)&&!/\b(?:a cosa serve|come funziona|spiegami|cosa significa|che cos)\b/.test(q))return null;
  const explicitFocus=FOCUS[String(focus||'').slice(0,95)]||'';
  if(!q)return null;
- const guideIntent=GUIDE_PATTERNS.test(q)||OVERVIEW.test(q);
+ const guideIntent=GUIDE_PATTERNS.test(q)||OVERVIEW.test(q)||wantsExternalGuideResearch(q);
  const scores=CATALOG.map(x=>{
    let strength=0,matched=[];
    for(const a of x.aliases){
