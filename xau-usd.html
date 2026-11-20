@@ -107,7 +107,7 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
 .xau-guide-details summary{font-weight:750;font-size:13px;padding:7px 0;cursor:pointer;color:#e6c77f}
 .xau-guide-details p{font-size:12px;line-height:1.5;color:#b8cfdd}
 @media(max-width:650px){.xau-guidance{padding:11px 12px}.xau-guide-head h2{font-size:16px}.xau-guide-status{font-size:10px;padding:6px 7px;max-width:134px}.xau-guide-levels{gap:5px}.xau-guide-levels>div{padding:8px 6px}.xau-guide-levels small{font-size:10px}}
-</style><style>.xau-feed-health{border:1px solid #7b643c;background:#24291f;color:#f4d8a4;padding:8px 10px;border-radius:10px;font-size:12px;margin:10px 0}.xau-feed-health[data-state="live"]{border-color:#3c9b75;background:#122f25;color:#b8f7d4}</style><link rel="stylesheet" href="/profile-planets.css"><link rel="stylesheet" href="/xau-kiber.css"><link rel="stylesheet" href="/xau-compact.css?v=3"><link rel="stylesheet" href="/xau-methods.css?v=1"><link rel="stylesheet" href="/xau-advanced.css?v=1"><style>.xau-guidance{border-color:#806442}.xau-profile-btn{border-color:#6e7a68}.xau-topbar{border-bottom:1px solid #66513c}.panel[aria-label="Grafico oro"]{border-color:#82643e}.xau-guide-status{border-color:#b69552}.xau-topbar .identity h1 .gold{color:#f4c86d}</style></head>
+</style><style>.xau-feed-health{border:1px solid #7b643c;background:#24291f;color:#f4d8a4;padding:8px 10px;border-radius:10px;font-size:12px;margin:10px 0}.xau-feed-health[data-state="live"]{border-color:#3c9b75;background:#122f25;color:#b8f7d4}</style><link rel="stylesheet" href="/profile-planets.css"><link rel="stylesheet" href="/xau-kiber.css"><link rel="stylesheet" href="/xau-compact.css?v=3"><link rel="stylesheet" href="/xau-methods.css?v=2"><link rel="stylesheet" href="/xau-advanced.css?v=1"><style>.xau-guidance{border-color:#806442}.xau-profile-btn{border-color:#6e7a68}.xau-topbar{border-bottom:1px solid #66513c}.panel[aria-label="Grafico oro"]{border-color:#82643e}.xau-guide-status{border-color:#b69552}.xau-topbar .identity h1 .gold{color:#f4c86d}</style></head>
 <body>
 <div class="container">
 <header class="xau-topbar">
@@ -174,11 +174,11 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
   <div><small>KIBER · LABORATORIO XAU/USD</small><h2>Strategie, filtri e metodi</h2></div>
   <span id="xauMethodDirection" class="xau-method-pill" data-bias="unavailable" role="status">IN ATTESA</span>
  </div>
- <p class="xau-method-intro">Introduzione: Kiber studia la direzione dell'oro osservando candele M5, zone di supporto e resistenza, rotture e allineamento del trend. Sono regole sperimentali ispirate a tecniche pubbliche di price action, non una copia certificata dei metodi di Matteo Zanni.</p>
+ <p class="xau-method-intro">Introduzione: Kiber confronta candele M1/M5, supporti, resistenze, rotture, retest, trend, spread e notizie. Studia idee pubbliche di Matteo Zanni e metodi generali di price action di Al Brooks, Linda Raschke e Toby Crabel. Le regole numeriche sono <strong>ipotesi di Kiber da verificare</strong>, non le strategie proprietarie di questi autori.</p>
  <p id="xauMethodLive" class="xau-method-live" role="status">Verifica delle candele M5 in corso.</p>
  <p id="xauMethodMeta" class="xau-method-meta">Fonte e timestamp M5 in attesa.</p>
  <details class="xau-method-root">
-  <summary>Esplora i 5 metodi e i filtri di direzione</summary>
+  <summary>Esplora 11 metodi, filtri e scenari</summary>
   <div class="xau-method-grid">
    <details class="xau-method-card">
     <summary><strong>01 · Hammer M5</strong> <span id="xauMethodhammerStatus">IN ATTESA</span></summary>
@@ -220,7 +220,68 @@ ul{padding-left:20px;line-height:1.65}.small{font-size:13px;color:#9cb0bf}
      <p class="xau-method-limit">Non calcola ordini, lotti, profitto reale o leve: il broker personale non è collegato.</p>
     </div>
    </details>
+   <details class="xau-method-card">
+    <summary><strong>06 · Rottura + retest</strong> <span id="xauResearchretestStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Metodo:</strong> dopo una rottura M5, il prezzo torna vicino al vecchio livello e mostra una candela di conferma. Zanni descrive la lettura del ritorno sul livello rotto.</p>
+     <p class="xau-method-evidence" id="xauResearchretestEvidence">In attesa.</p>
+     <p class="xau-method-limit">Modello algoritmico Kiber. Retest non significa continuazione certa.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>07 · Falsa rottura / liquidità</strong> <span id="xauResearchsweepStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Metodo:</strong> la candela supera un massimo/minimo del range ma chiude nuovamente all'interno. Studio della possibile falsa rottura, presente anche nella letteratura price action.</p>
+     <p class="xau-method-evidence" id="xauResearchsweepEvidence">In attesa.</p>
+     <p class="xau-method-limit">Lettura sperimentale: non sappiamo quanti falsi segnali produrrà senza backtest.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>08 · Pullback EMA20</strong> <span id="xauResearchpullbackStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Metodo:</strong> in un trend M5/M15 concorde, cerchiamo un ritorno verso EMA20 e una chiusura nella direzione precedente. Studio di continuazione ispirato alla price action di Al Brooks, non replica delle sue formule.</p>
+     <p class="xau-method-evidence" id="xauResearchpullbackEvidence">In attesa.</p>
+     <p class="xau-method-limit">La media non è un livello certo di supporto o resistenza.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>09 · Scalping M1</strong> <span id="xauResearchmicroStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Metodo:</strong> rottura dei 10 massimi/minimi precedenti in M1, solo se M5 e M15 sono allineati. Zanni descrive rotture di continuazione M1, ma i parametri sono scelti per i test Kiber.</p>
+     <p class="xau-method-evidence" id="xauResearchmicroEvidence">In attesa.</p>
+     <p class="xau-method-limit">Lo spread può consumare il vantaggio dei movimenti piccoli. Nessun trading automatico.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>10 · Range delle sessioni</strong> <span id="xauResearchsessionStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Metodo:</strong> misuriamo il range delle prime sei M5 alle 08:00 di Londra e alle 08:20 di New York, con correzione automatica del fuso orario. Esperimento basato su opening range e ricerche di Toby Crabel/Linda Raschke.</p>
+     <p class="xau-method-evidence" id="xauResearchsessionEvidence">In attesa.</p>
+     <p class="xau-method-limit">Le finestre di studio non sono orari esclusivi dell'oro; la rottura di sessione non ha ancora vantaggio dimostrato.</p>
+    </div>
+   </details>
+   <details class="xau-method-card">
+    <summary><strong>11 · Filtro notizie USA</strong> <span id="xauResearchmacroStatus">IN ATTESA</span></summary>
+    <div class="xau-method-body">
+     <p><strong>Metodo:</strong> monitoriamo eventi ad alto impatto. Sebbene Zanni mostri operazioni dopo le notizie, senza il dato effettivo della sorpresa macro non tentiamo di ricostruire quella strategia.</p>
+     <p class="xau-method-evidence" id="xauResearchmacroEvidence">In attesa.</p>
+     <p class="xau-method-limit">In prossimità degli eventi il sistema resta in attesa, senza ordini.</p>
+    </div>
+   </details>
   </div>
+  <details class="xau-research-scenario" id="xauResearchScenarioPanel">
+   <summary>Studio dei punti di entrata, stop e uscita (solo simulazione)</summary>
+   <p id="xauResearchScenarioStatus" class="xau-research-status">NESSUNA IPOTESI VALIDABILE</p>
+   <p id="xauResearchScenarioMethod" class="xau-research-explain">Nessuna ipotesi qualificata sull'ultima candela.</p>
+   <div class="xau-research-levels" aria-label="Livelli tecnici ipotetici in dollari per oncia">
+    <div><small>Entrata condizionata</small><strong id="xauResearchEntry">—</strong></div>
+    <div><small>Stop ipotetico</small><strong id="xauResearchStop">—</strong></div>
+    <div><small>TP1 (+1R)</small><strong id="xauResearchTP1">—</strong></div>
+    <div><small>TP2 (+2R)</small><strong id="xauResearchTP2">—</strong></div>
+   </div>
+   <p id="xauResearchScenarioNote" class="xau-method-limit">I livelli compariranno solo dopo un pattern verificato. Nessun ordine.</p>
+  </details>
+  <p class="xau-research-quality"><strong>Controlli:</strong> <span id="xauResearchQuality">In attesa di dati verificati.</span></p>
   <p class="xau-method-disclosure"><strong>Limiti del laboratorio:</strong> <span id="xauMethodQuality">Feed da verificare.</span> La valutazione definitiva resta nel validatore degli 8 livelli. Nessun acquisto o vendita automatica, nessuna percentuale di successo inventata.</p>
  </details>
 </section>
@@ -307,7 +368,9 @@ apply();
 <script src="/xau-advanced.js?v=decoder-ohlc-2"></script>
 <script src="/xau-methods.js?v=1"></script>
 <script src="/xau-methods-ui.js?v=1"></script>
-<script src="/xau-ui.js?v=methods-lab-1"></script>
+<script src="/xau-strategy-research.js?v=2"></script>
+<script src="/xau-research-ui.js?v=2"></script>
+<script src="/xau-ui.js?v=research-2"></script>
 <script src="/xau-kiber.js"></script>
 <script src="/xau-compact.js?v=3"></script>
 <script src="/xau-spot.js?v=1"></script>
