@@ -145,7 +145,7 @@ async function getSnapshot(options={}){
     }
   }
   return {
-    symbol:'XAU/USD',interval,source:SOURCE,feedStatus:ok?'recent',
+    symbol:'XAU/USD',interval,source:SOURCE,feedStatus:ok?'recent':'blocked',
     timestamp:new Date(now).toISOString(),lastCandleStart:selected.lastCandleStart,lastClosedAt:selected.lastClosedAt,
     quality:{ok,reason,selectedAgeSeconds:selected.ageSeconds,tick,provider:'biquote.io',independentLatencyVerified:false},
     multiTimeframe:series,strategySeries:{m5:methodM5,m1:methodM1},calendar:{connected:calendar!==null,highImpactNear:nearHighImpact,next:calendar&&calendar.length?calendar[0]:null,events:calendar||[]},
