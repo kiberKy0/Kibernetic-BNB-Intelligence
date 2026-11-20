@@ -329,7 +329,7 @@ const FOCUS=Object.freeze({
  'ai:token360':'kiberai','ai:scenario':'forecast','ai:risk':'risk','ai:newsimpact':'factors'
 });
 const INDEX=new Map(CATALOG.map(x=>[x.id,x]));
-const GUIDE_PATTERNS=/(?:\b(?:cosa|cos|che|chi|come|dove|quali|qual|perche|spieg|descriv|a cosa|a che|funzion|utilizz|istruzion|guida|aiut|non capisco|signific|serve|trovo|usare|mostr|riassum|sezioni|settori|pulsant|riquadr|strument|differenza|compos|sai fare|insegn|cerca informazioni|approfondisc)\b)/;
+const GUIDE_PATTERNS=/(?:\b(?:cosa|cos|che|chi|come|dove|quali|qual|perche|spieg\w*|descriv\w*|a cosa|a che|funzion\w*|utilizz\w*|istruzion\w*|guida|aiut\w*|non capisco|signific\w*|serve|trovo|usare|mostr\w*|riassum\w*|sezioni|settori|pulsant\w*|riquadr\w*|strument\w*|differenza|compos\w*|sai fare|insegn\w*|cerca informazioni|approfondisc\w*)\b)/;
 const DEICTIC=/(?:\b(?:questo|questa|quel|quella|pulsante|riquadro|sezione|qui|dove sono|cosa sto vedendo)\b)/;
 const OVERVIEW=/(?:tutt[ieo]|ogni |panoramica|cosa sai fare|cos e kibernetic|come funziona (?:il sito|la piattaforma)|che cosa (?:fa|contiene) la piattaforma|quali (?:funzioni|sezioni|strumenti)|guida completa)/;
 function match(question,{focus='',area='bnb'}={}){
