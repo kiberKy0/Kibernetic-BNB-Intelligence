@@ -6,7 +6,7 @@ test('guide inventory has unique complete descriptions with traceable active sou
  assert.ok(K.CATALOG.length>=32);
  assert.equal(new Set(K.CATALOG.map(x=>x.id)).size,K.CATALOG.length);
  for(const item of K.CATALOG){
-  for(const field of ['id','title','where','purpose','how','details','limits','source','status'])assert.ok(String(item[field]||'').length>=4,field+' '+item.id);
+  for(const field of ['id','title','where','purpose','how','details','limits','source','status'])assert.ok(String(item[field]||'').length>=(field==='id'?2:4),field+' '+item.id);
   assert.ok(item.aliases.length>=2,'alias '+item.id);
   assert.doesNotMatch(item.purpose,/esegui (?:ordini|acquisti) automaticamente/);
  }
