@@ -122,6 +122,7 @@
       feedHealth(result.ready?feedLine:'Dati ricevuti ma non validati · '+(result.reasons||[]).join(' · '),result.ready?'ohlc':'offline');
       window.XauPlatform?.setLive(body);
       render(result, body.source + ' · feed esterno',body);
+      if(result.ready&&body.quality?.ok)window.XauFinanceNavigation?.setAnalyzed({validated:true,at:new Date().toISOString(),interval:result.interval,sourceTime:result.time});
       setText('csvMessage', 'Feed biquote esterno · candele completate per gli indicatori. TradingView e il conto MT5 Android sono separati.');
     } catch (error) {
       feedFailed=true;window.XauPlatform?.setOffline(error.message||'Sorgente non disponibile');
