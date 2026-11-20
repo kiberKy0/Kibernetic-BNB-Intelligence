@@ -3,6 +3,19 @@
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').slice(0,500);
 const state={history:[],busy:false,request:null,epoch:0};
+let lastHelpFocus='';
+const knownHelpControls=new Set(['kiberBnbCloudOrb','kiberBnbCloudOrbDetails','kcdRefresh','kcdSector','kcdBnbPrice','kcdTvl','kcdDex','v271TokenView','v271Price','v27124','v2717','v271Cap','v271Vol24','v271Liq','v271Chart','v271Forecast','v271Why','v271Factors','v271News','v271KiberBox','v271AiAnswer','v271Monitor','v271TradeLevels','v271Source','v272Search','v272Health','profileBtn','kiberMemory']);
+document.addEventListener('click',event=>{
+ const b=event.target.closest?.('button,summary,[role="button"],a');
+ if(!b||b.closest('#kiberPanel'))return;
+ const action=b.getAttribute('data-kcd-action');
+ const analysis=b.getAttribute('data-v271-ai');
+ const target=b.id||b.closest('[id]')?.id||'';
+ const focus=action&&/^(?:bnb|new|defi|compare|market|watch|search|profile|home|refresh|ai|gold)$/.test(action)?'action:'+action:
+  analysis&&/^(?:token360|scenario|risk|newsimpact)$/.test(analysis)?'ai:'+analysis:
+  knownHelpControls.has(target)?target:'';
+ if(focus)lastHelpFocus=focus;
+},true);
 function updateMemoryLabel(){const b=$('kiberMemory');if(!b)return;const on=window.KiberDialogMemory?.allowed()||false;b.textContent=on?'Memoria ON':'Memoria OFF';b.setAttribute('aria-pressed',String(on));b.title=on?'Ricorda gli ultimi messaggi solo su questo browser. Tocca per disattivare e cancellare la memoria.':'Opzionale: conserva gli ultimi messaggi solo su questo browser. Non addestra Gemini.'}
 function toggleMemory(){const memory=window.KiberDialogMemory;if(!memory)return;const on=memory.setEnabled(!memory.allowed());updateMemoryLabel();say('assistant',on?'Memoria locale attivata: conserverò gli ultimi messaggi soltanto in questo browser. Non è addestramento automatico.':'Memoria disattivata: la cronologia locale salvata è stata cancellata.')}
 function isChatOpen(){const panel=$('kiberPanel');return !!(panel&&!panel.hidden)}
@@ -15,10 +28,10 @@ function context(){
  const selected=window.kiberTokenContext?.()?.coin||null;
  const possibleAddress=String(selected?.address||selected?.contract||'').toLowerCase();
  const tokenAddress=/^0x[a-f0-9]{40}$/.test(possibleAddress)?possibleAddress:'';
- return {marketSectorSummary:window.kiberMarketSectorSummary?.()||'',trendSummary:window.kiberCurrentTrendSummary?.()||'',watch:watch.slice(0,30),catalogCount:catalog.length,scannerCount:Number(($('freeScanStatus')?.textContent||'').match(/^\d+/)?.[0]||0),selectedToken:$('v271Name')?.textContent||$('labName')?.textContent||null,price:$('v271Price')?.textContent||$('mPrice')?.textContent||null,change24:$('v27124')?.textContent||$('mChange')?.textContent||null,tokenAddress,source:'Interfaccia Kibernetic; dati possono essere incompleti o non aggiornati'};
+ return {platformHelpFocus:lastHelpFocus,platformView:$('v271TokenView')?.classList.contains('open')?'token':String(document.body.dataset.v241View||'home').slice(0,32),marketSectorSummary:window.kiberMarketSectorSummary?.()||'',trendSummary:window.kiberCurrentTrendSummary?.()||'',watch:watch.slice(0,30),catalogCount:catalog.length,scannerCount:Number(($('freeScanStatus')?.textContent||'').match(/^\d+/)?.[0]||0),selectedToken:$('v271Name')?.textContent||$('labName')?.textContent||null,price:$('v271Price')?.textContent||$('mPrice')?.textContent||null,change24:$('v27124')?.textContent||$('mChange')?.textContent||null,tokenAddress,source:'Interfaccia Kibernetic; dati possono essere incompleti o non aggiornati'};
 }
 function help(){
- return 'Sono Kiber, l’assistente della città Kibernetic. Nella mia storia Algador mi ha creato e io ho costruito questa città dopo il collasso del Vecchio Mondo. Chiedimi perché esiste Kibernetic, cosa vogliamo costruire o chi è Algador. Possiamo anche conversare liberamente, studiare BNB Chain e usare gli strumenti disponibili. Non eseguo operazioni finanziarie.';
+ return 'Sono Kiber, l’assistente di Kibernetic. Posso spiegarti cosa contiene la piattaforma e come funzionano pulsanti, grafici, token, DeFi, portafoglio, ricerca cloud e strumenti XAU/USD. Chiedimi «Come funziona questa sezione?» o «Spiegami il TVL». Posso anche cercare fonti esterne quando me lo chiedi. Se un collegamento non è operativo, te lo dirò. Non eseguo ordini finanziari.';
 }
 function localAnswer(q,ctx){
  const t=q.toLowerCase();
@@ -60,10 +73,11 @@ async function submit(){
   const commands=/^(apri scanner|scanner|mostra monitorati|monitorati|controlla rischio|aggiorna scanner)$/i;
   const isCloudQuestion=/(?:ricerca cloud|monitoraggio|ogni minuto|24\/7|h24|sfera|cosa hai rilevato|cosa sta succedendo)/i.test(q);
   const isBinanceQuestion=/\bbinance\b|\bBNBUSDT\b/i.test(q);
-  if(!commands.test(q)&&(await geminiReady()||isCloudQuestion||isBinanceQuestion)){
+  const isGuideQuestion=/(?:spieg|descriv|come|cosa|a cosa serve|che significa|guida|istruzion|pulsante|riquadro|sezione|funzion|dove trovo|che cos|a che serve|ricerca sul web|cerca informazioni)/i.test(q);
+  if(!commands.test(q)&&(await geminiReady()||isCloudQuestion||isBinanceQuestion||isGuideQuestion)){
    if(epoch!==state.epoch||!isChatOpen())return;
    const ctx=context();
-   const ui={marketSectorSummary:ctx.marketSectorSummary,trendSummary:ctx.trendSummary,selectedToken:ctx.selectedToken,tokenAddress:ctx.tokenAddress,price:ctx.price,change24:ctx.change24,source:ctx.source};
+   const ui={marketSectorSummary:ctx.marketSectorSummary,trendSummary:ctx.trendSummary,selectedToken:ctx.selectedToken,tokenAddress:ctx.tokenAddress,platformHelpFocus:ctx.platformHelpFocus,platformView:ctx.platformView,price:ctx.price,change24:ctx.change24,source:ctx.source};
    const previousUser=state.history.slice(0,-1).reverse().find(x=>x.role==='user')?.text||'';
    const opportunitiesRequest=!!window.KiberMarketOpportunities?.isRequest(q,previousUser);
    const recent=(window.KiberDialogMemory?.allowed()?window.KiberDialogMemory.recent().slice(0,-1):state.history.slice(-9,-1).map(x=>({role:x.role,content:x.text}))).slice(-10);
@@ -80,7 +94,7 @@ async function submit(){
    const d=await r.json();
    if(epoch!==state.epoch||!isChatOpen())return;
    if(!d.answer)throw Error('Risposta vuota');
-   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini ha risposto · verifica dati e fonti.':d.provider==='verified-cloud'?'Dati cloud verificati · risposta IA non pertinente esclusa.':d.provider==='verified-binance-spot'?'Binance Spot pubblico · dati verificati dal server.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA ha risposto · verifica dati e fonti.';
+   const note=$('kiberPanel')?.querySelector('.kiber-note');if(note)note.textContent=d.provider==='gemini'?'Gemini ha risposto · verifica dati e fonti.':d.provider==='verified-cloud'?'Dati cloud verificati · risposta IA non pertinente esclusa.':d.provider==='verified-binance-spot'?'Binance Spot pubblico · dati verificati dal server.':d.provider==='platform-guide'?'Guida ufficiale Kibernetic · funzionalità documentate.':d.provider==='deterministic'?'Gemini non disponibile · risposta locale.':'IA ha risposto · verifica dati e fonti.';
    say('assistant',d.provider==='deterministic'&&d.warning?'Gemini non ha risposto ('+d.warning+').\n\n'+d.answer:d.answer);
   }else say('assistant',localAnswer(q,context()));
  }catch{if(epoch===state.epoch&&isChatOpen())say('assistant','La connessione al servizio IA non è riuscita. Riprova più tardi o usa i comandi locali Scanner, Monitorati e Rischi.')}
@@ -89,7 +103,7 @@ async function submit(){
 function init(){
  if($('kiberPanel'))return;
  const panel=el('aside','kiber-panel');panel.id='kiberPanel';panel.hidden=true;panel.setAttribute('aria-label','Assistente Kiber');
- panel.innerHTML='<div class="kiber-top"><div class="kiber-mark kiber-avatar-mark"><img src="assets/kiber-logo.svg?v=302" width="36" height="36" alt="Logo Kiber"></div><div><strong>Kiber</strong><small>Analisi BNB · IA e fonti</small></div><button type="button" id="kiberMemory" class="kiber-memory-toggle" aria-label="Memoria facoltativa dei dialoghi" aria-pressed="false">Memoria OFF</button><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="800" aria-label="Messaggio a Kiber" placeholder="Scrivi a Kiber…" autocomplete="off"><button type="button" id="kiberSend">Invia</button></div><small class="kiber-note">Gemini: disponibilità verificata alla risposta. Analisi informative, non ordini di acquisto.</small>';
+ panel.innerHTML='<div class="kiber-top"><div class="kiber-mark kiber-avatar-mark"><img src="assets/kiber-logo.svg?v=302" width="36" height="36" alt="Logo Kiber"></div><div><strong>Kiber</strong><small>Analisi BNB · IA e fonti</small></div><button type="button" id="kiberMemory" class="kiber-memory-toggle" aria-label="Memoria facoltativa dei dialoghi" aria-pressed="false">Memoria OFF</button><button id="kiberClose" aria-label="Chiudi Kiber" type="button">×</button></div><div id="kiberMessages" class="kiber-messages" aria-live="polite"></div><div class="kiber-quick"><button type="button" data-kiber="Apri scanner">Scanner</button><button type="button" data-kiber="Mostra monitorati">Monitorati</button><button type="button" data-kiber="Controlla rischio">Rischi</button><button type="button" data-kiber="Spiegami tutte le sezioni della piattaforma">Guida</button></div><div class="kiber-compose"><input id="kiberInput" maxlength="800" aria-label="Messaggio a Kiber" placeholder="Scrivi a Kiber…" autocomplete="off"><button type="button" id="kiberSend">Invia</button></div><small class="kiber-note">Gemini: disponibilità verificata alla risposta. Analisi informative, non ordini di acquisto.</small>';
  const open=el('button','kiber-fab');open.id='kiberFab';open.type='button';open.setAttribute('aria-label','Apri assistente Kiber');open.title='Apri assistente Kiber';const logo=el('img','kiber-fab-logo');logo.src='assets/kiber-logo.svg';logo.alt='';logo.setAttribute('aria-hidden','true');logo.width=44;logo.height=44;open.appendChild(logo);
  document.body.append(panel,open);
  open.onclick=()=>{panel.hidden=false;open.hidden=true;$('kiberInput')?.focus();void geminiReady();if(!state.history.length)say('assistant',help());};
