@@ -108,8 +108,9 @@
   if(typeof document==='undefined')return null;
   let root=document.getElementById('xauAdvancedPanel');
   if(root)return root;
-  const anchor=document.querySelector('.grid-bottom');
-  if(!anchor)return null;
+  const model=document.getElementById('xauModelOriginal');
+  const anchor=document.querySelector('.grid-bottom') || document.getElementById('xauSupplement');
+  if(!model&&!anchor)return null;
   root=document.createElement('section');
   root.id='xauAdvancedPanel';root.className='panel xau-advanced';
   root.setAttribute('aria-label','Filtri Kiber avanzati XAU/USD');
@@ -118,7 +119,11 @@
    '<p id="xauAdvReason" class="xau-adv-reason" role="status">La valutazione definitiva rimane in attesa finché le verifiche non sono complete.</p>'+
    '<details class="xau-adv-details"><summary>Esamina gli 8 livelli di intelligence</summary><div id="xauAdvRows"></div></details>'+
    '<p class="xau-adv-note">Valutazione informativa. MT5 Android non è collegato automaticamente. Dati storici, grafico TradingView e feed del Decoder sono fonti distinte.</p>';
-  anchor.parentNode.insertBefore(root,anchor);
+  if(model){
+    const supplement=model.querySelector('#xauSupplement');
+    if(supplement)model.insertBefore(root,supplement);
+    else model.appendChild(root);
+  }else anchor.parentNode.insertBefore(root,anchor);
   return root;
  }
  function render(audit){
