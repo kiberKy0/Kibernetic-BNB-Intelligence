@@ -1,0 +1,38 @@
+/* Reparto XAU/USD · Laboratorio Strategie e Metodi (mobile-first).
+ * A compact additional category, distinct from BNB/TradingView and existing filters.
+ */
+.xau-method-lab{margin:0 0 10px;padding:12px!important;border-color:#3c6470!important;background:#102332!important}
+.xau-method-head{display:flex;align-items:center;justify-content:space-between;gap:9px;min-width:0}
+.xau-method-head>div{min-width:0}
+.xau-method-head small{display:block;color:#83c7df;letter-spacing:.07em;font-size:9px;font-weight:800}
+.xau-method-head h2{font-size:15px;margin:4px 0;line-height:1.3}
+.xau-method-pill{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.02em;padding:7px 9px;border-radius:999px;border:1px solid #9a8153;background:#382e1c;color:#f8ddad;text-align:center;max-width:150px}
+.xau-method-pill[data-bias="rialzista"]{color:#bbf4d6;background:#143b2d;border-color:#35795f}
+.xau-method-pill[data-bias="ribassista"]{color:#ffcece;background:#442629;border-color:#9d5555}
+.xau-method-intro{color:#b9d2df;font-size:12px;line-height:1.45;margin:7px 0 6px}
+.xau-method-live{color:#f0d7a8;font-size:11px;line-height:1.35;margin:6px 0}
+.xau-method-meta{color:#8aaec0;font-size:10px;line-height:1.4;margin:3px 0 7px}
+.xau-method-root{border-top:1px solid #2a4b5b;padding-top:5px}
+.xau-method-root>summary{cursor:pointer;padding:9px 2px;color:#a9dfeb;font-size:12px;font-weight:750}
+.xau-method-root[open]>summary{border-bottom:1px solid #2c4f60;margin-bottom:8px}
+.xau-method-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.xau-method-card{min-width:0;border:1px solid #2a4b5c;background:#0b1b29;border-radius:10px}
+.xau-method-card>summary{cursor:pointer;list-style:revert;padding:11px 9px;min-height:72px;color:#d7e9f5}
+.xau-method-card>summary strong{display:block;font-size:12px;font-weight:780;line-height:1.3}
+.xau-method-card>summary span{display:block;font-size:10px;line-height:1.35;color:#a1becf;margin-top:6px}
+.xau-method-card[open]>summary{border-bottom:1px solid #294759}
+.xau-method-card .xau-method-body{padding:8px 10px 12px}
+.xau-method-card .xau-method-body p{margin:5px 0 8px;font-size:11px;color:#b7cddb;line-height:1.48}
+.xau-method-card .xau-method-evidence{color:#e4f1f8!important}
+.xau-method-card .xau-method-limit{font-size:10px!important;color:#98b4c4!important}
+.xau-method-disclosure{font-size:10px;color:#9cb8c8;line-height:1.45;margin:10px 1px 0}
+.xau-method-disclosure strong{color:#f0d8a1}
+.xau-method-lab *{overflow-wrap:break-word}
+@media(max-width:440px){
+ .xau-method-head h2{font-size:14px}
+ .xau-method-pill{font-size:9px;padding:6px 7px;max-width:120px}
+ .xau-method-grid{grid-template-columns:1fr;gap:6px}
+ .xau-method-card>summary{min-height:0;padding:10px}
+ .xau-method-card>summary strong,.xau-method-card>summary span{display:inline}
+ .xau-method-card>summary span{margin-left:5px}
+}
