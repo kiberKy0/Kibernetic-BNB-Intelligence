@@ -19,7 +19,7 @@
  const fmt=x=>{
    const time=validDate(x);
    return time===null?'—':new Date(time).toLocaleString('it-IT',{
-      day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'
+      timeZone:'Europe/Rome',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'
    });
  };
  let last=null,manualFailure=null;
