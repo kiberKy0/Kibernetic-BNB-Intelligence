@@ -13,7 +13,7 @@
    try{d=app?.contentDocument}catch(_){}
    if(!d||!d.getElementById('v241Home')||!d.getElementById('v241Back'))return false;
    if(destination==='bustabit'){
-     const entry=d.getElementById('kiberHeaderBustabit') || $('kiberBustabitQuick');
+     const entry=$('kiberBustabitQuick')||d.getElementById('kiberHeaderBustabit');
      if(!entry||typeof entry.click!=='function')return false;
    }
    return true;
@@ -30,9 +30,11 @@
    let d;
    try{d=$('app').contentDocument}catch(_){return false;}
    if(destination==='bustabit'){
-     const button=d.getElementById('kiberHeaderBustabit')||$('kiberBustabitQuick');
-     button.click();
-     return true;
+     // The shell's quick button is always bound to the ORIGINAL lab overlay,
+     // even if the header shortcut is visible but has not finished initialization.
+     const button=$('kiberBustabitQuick')||d.getElementById('kiberHeaderBustabit');
+     button?.click();
+     return $('kiberBustaOverlay')?.hidden===false;
    }
    // IA Finance is the home dashboard of the same application, not another website.
    d.getElementById('v241Back').click();
