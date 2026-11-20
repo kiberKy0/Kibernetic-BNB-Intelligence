@@ -1,0 +1,84 @@
+/* XAU orb: same illuminated spherical language as the BNB scanner.
+ * Semantic colours always come from verified feed state, never from animation.
+ */
+.xau-header-right{gap:7px}
+.xau-header-right .xau-feed-orb{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;width:54px;min-width:54px;min-height:55px;padding:1px 2px;
+  border:0!important;background:transparent!important;box-shadow:none!important;
+  border-radius:10px;color:#c4eaff;cursor:pointer;
+}
+.xau-feed-orb .xau-orb-sphere{
+ position:relative;display:block;width:35px;height:35px;flex:none;border-radius:50%;
+ background:radial-gradient(circle at 29% 22%,#d3faff 0%,#71c7fb 18%,#165e99 42%,#102d58 72%,#071327 100%);
+ border:1px solid #49bff6;box-shadow:inset -5px -5px 12px #04182ed9,0 0 8px #2c95c36b;
+}
+.xau-feed-orb .xau-orb-sphere:before{
+ content:"";position:absolute;inset:-4px -6px;border:1.5px solid #80cffa94;
+ border-radius:50%;transform:rotate(-30deg) scaleY(.52)
+}
+.xau-feed-orb .xau-orb-sphere:after{
+ content:"";position:absolute;right:5px;bottom:6px;width:5px;height:5px;
+ border-radius:50%;background:#d4ebf4;box-shadow:0 0 0 2px #ffffff19
+}
+.xau-feed-orb .xau-orb-label{font-size:9px;font-weight:800;letter-spacing:.45px;line-height:1.1;color:#c4eaff}
+.xau-feed-orb[data-state="online"] .xau-orb-sphere{
+ border-color:#6ef3db;box-shadow:inset -5px -5px 12px #04182ebd,0 0 0 2px #36cbbd4a,0 0 13px #40d3c579
+}
+.xau-feed-orb[data-state="online"] .xau-orb-sphere:after{background:#83ffcb;box-shadow:0 0 7px #a0ffe0}
+.xau-feed-orb[data-state="online"] .xau-orb-label{color:#9ef2d7}
+.xau-feed-orb[data-state="stale"] .xau-orb-sphere,
+.xau-feed-orb[data-state="checking"] .xau-orb-sphere{
+ filter:saturate(.6);border-color:#e8ba75;box-shadow:0 0 0 2px #c68f4950
+}
+.xau-feed-orb[data-state="stale"] .xau-orb-sphere:after,
+.xau-feed-orb[data-state="checking"] .xau-orb-sphere:after{background:#ffc577}
+.xau-feed-orb[data-state="stale"] .xau-orb-label,.xau-feed-orb[data-state="checking"] .xau-orb-label{color:#ffd9a1}
+.xau-feed-orb[data-state="offline"] .xau-orb-sphere{filter:grayscale(.85);box-shadow:none}
+.xau-header-right .xau-destinations-btn{
+ display:inline-flex;align-items:center;justify-content:center;
+ height:36px;min-height:36px;padding:6px 9px;
+ font-size:11px;font-weight:780;white-space:nowrap;gap:5px;
+ border:1px solid rgba(115,180,239,.55);border-radius:11px;
+ background:linear-gradient(123deg,#194278,#192a64);color:#ecf9ff;cursor:pointer
+}
+.xau-header-right .xau-destinations-btn[aria-expanded="true"]{
+ border-color:#7be3ff;background:linear-gradient(120deg,#174f93,#293e83)
+}
+.xau-nav-panel{max-width:720px!important;padding:12px!important;margin:3px auto 8px!important}
+.xau-nav-intro{font-size:11px;color:#b4cadc;line-height:1.4;margin:4px 0 9px}
+.xau-destination-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.xau-destination-list button{
+ display:flex;align-items:flex-start;gap:8px;text-align:left;
+ min-width:0;min-height:73px;padding:10px 9px;
+ border-radius:12px;border:1px solid rgba(105,174,238,.39);
+ background:linear-gradient(140deg,rgba(19,53,119,.94),rgba(12,27,75,.95));
+ color:#ecf5ff;cursor:pointer
+}
+.xau-destination-list button:hover{border-color:#7cdfff;background:#194478}
+.xau-destination-list button .xau-destination-icon{font-size:18px;line-height:1}
+.xau-destination-list button strong{display:block;font-size:12px;margin-bottom:4px}
+.xau-destination-list button small{display:block;font-size:10px;line-height:1.35;color:#b4cbe4}
+.xau-status-facts dd#xauOrbLastRevision,.xau-status-facts dd#xauOrbLastAnalysis{font-variant-numeric:tabular-nums}
+.xau-revision-detail{font-size:11px;color:#adcadf;overflow-wrap:anywhere;line-height:1.45;margin:4px 0 8px}
+.xau-revision-detail strong{color:#e7f5ff}
+.xau-status-note{font-size:10px;color:#9db8d0;line-height:1.45}
+@media(max-width:700px){
+ .xau-header-right{gap:4px}
+ .xau-header-right .xau-feed-orb{width:48px;min-width:48px;min-height:50px}
+ .xau-header-right .xau-feed-orb .xau-orb-sphere{width:31px;height:31px}
+ .xau-feed-orb .xau-orb-label{font-size:8px}
+ .xau-header-right .xau-destinations-btn{height:34px;min-height:34px;font-size:10px;padding:5px 7px}
+ .xau-destination-list{gap:5px}
+ .xau-destination-list button{min-height:69px;padding:8px 6px;gap:4px}
+ .xau-destination-list button .xau-destination-icon{font-size:15px}
+ .xau-destination-list button strong{font-size:10px}
+ .xau-destination-list button small{font-size:9px}
+}
+@media(max-width:360px){
+ .xau-header-right .xau-feed-orb{width:44px;min-width:44px}
+ .xau-header-right .xau-destinations-btn{padding:5px 6px;font-size:9px}
+ .xau-destination-list{grid-template-columns:1fr}
+ .xau-destination-list button{min-height:47px;align-items:center}
+ .xau-destination-list button small{display:inline}
+}
