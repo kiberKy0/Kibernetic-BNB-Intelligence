@@ -90,7 +90,7 @@ test('BNB backend routes internal explanations and XAU independently',()=>{
 });
 
 test('40 current help topics including 11 XAU research methods and theoretical study levels',()=>{
- assert.equal(K.CATALOG.length,40);
+ assert.equal(K.CATALOG.length,41);
  const a=K.match('Spiegami gli 11 metodi di XAU/USD',{area:'xau'});
  assert.ok(a?.entries.some(x=>x.id==='xaumethods'));
  assert.match(K.summaries(a),/Falsa rottura|Pullback EMA20/);
@@ -112,4 +112,13 @@ test('web research is explicit, not triggered by a feature named Ricerca',()=>{
  assert.ok(K.match('Fai una ricerca su TVL e DeFi')?.entries.some(x=>x.id==='defi'));
  const api=fs.readFileSync('api/kiber.js','utf8');
  assert.match(api,/PlatformGuide\.wantsExternalGuideResearch\(question\)/);
+});
+
+test('BNB strategy guide exposes the Donchian system and rejects guaranteed trading claims',()=>{
+ const v=K.match('Spiegami la strategia speculativa BNB con breakout Donchian');
+ assert.ok(v?.entries.some(x=>x.id==='bnbspec'));
+ const answer=K.summaries(v);
+ assert.match(answer,/candele OHLC reali/);
+ assert.match(answer,/nessun rendimento garantito/i);
+ assert.match(answer,/Home BNB/);
 });
