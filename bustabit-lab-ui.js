@@ -8,10 +8,11 @@ const set=(id,v)=>{const e=$(id);if(e)e.textContent=String(v)};
 const fx=v=>Number.isFinite(v)?v.toLocaleString('it-IT',{maximumFractionDigits:2})+'x':'—';
 const pc=v=>Number.isFinite(v)?(v*100).toFixed(2).replace('.',',')+'%':'—';
 const roi=v=>Number.isFinite(v)?(v>=0?'+':'')+pc(v):'—';
+// Historical sources remain in the private ChatGPT file library; do not leak unpublished strategy source to public GitHub.
 const catalog=[
- {name:'Cyberstriker Adaptive Core V3.5',note:'Codice presente. Report locale: 29/29 test superati. Non verificato sul game reale.',url:'bustabit/archive/cyberstriker-adaptive-v3.5.js'},
- {name:'Kiber Striker V4.0 Event Audit',note:'Codice presente. Esecuzione e compatibilità LIVE da certificare.',url:'bustabit/archive/kiber-striker-v4.0-event-audit.js'},
- {name:'Kiber Striker V3.3 Balanced',note:'Codice presente. Test storici locali; gioco reale non verificato.',url:'bustabit/archive/kiber-striker-v3.3-balanced.js'},
+ {name:'Cyberstriker Adaptive Core V3.5',note:'Codice presente. Report locale: 29/29 test superati. Non verificato sul game reale.',url:''},
+ {name:'Kiber Striker V4.0 Event Audit',note:'Codice presente. Esecuzione e compatibilità LIVE da certificare.',url:''},
+ {name:'Kiber Striker V3.3 Balanced',note:'Codice presente. Test storici locali; gioco reale non verificato.',url:''},
  {name:'Kiber Striker V3.6 Restored',note:'Versione storica recuperata nell’archivio originale; in attesa di audit.',url:''},
  {name:'Cyberstriker V3.4',note:'Versione storica recuperata nell’archivio originale; in attesa di audit.',url:''}
 ];
