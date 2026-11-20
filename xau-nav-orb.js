@@ -85,7 +85,9 @@
    if(embedded){
      root.parent.postMessage({type:'KIBER_XAU_NAVIGATE',destination},location.origin);
    }else{
-     const target=destinationPath(destination);
+     // Standalone gold page: open the existing Bustabit lab directly,
+     // not a non-existent /bustabit route. Finance/BNB use the shell.
+     const target=destination==='bustabit'?'/bustabit-lab.html':destinationPath(destination);
      if(target)root.location.assign(target);
    }
    return true;
