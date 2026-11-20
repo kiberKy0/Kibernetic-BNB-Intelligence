@@ -1,42 +1,223 @@
-<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#050b14"><title>Kiber BNB Chain</title><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050b14}#app{position:fixed;inset:0;width:100%;height:100%;border:0;background:#050b14}.boot{position:fixed;inset:0;z-index:5;display:grid;place-items:center;background:#050b14;color:#dcecff;font-family:system-ui,sans-serif}.boot div{text-align:center}.boot img{display:block;width:96px;height:96px;object-fit:contain;margin:0 auto 14px;background:transparent}.boot b{display:block;font-size:23px}.boot span{display:block;margin-top:8px;color:#8fa7bf;font-size:13px}.boot.err b{color:#ff6b7a}#bootRetry{margin-top:16px;padding:12px 24px;border:1px solid #59d7ff;border-radius:12px;background:#072033;color:#dcecff;font:600 15px system-ui;cursor:pointer}#switchGold{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:12;border:1px solid #edbf62;border-radius:16px;background:#352819;color:#ffe5ad;min-height:54px;padding:12px 18px;box-shadow:0 8px 30px #0009;font:700 15px system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;gap:9px}#switchGold:focus-visible,#goldBack:focus-visible{outline:3px solid #fce6a5;outline-offset:3px}#goldPanel{position:fixed;inset:0;z-index:15;background:#08121c;color:#eef5fb;font-family:system-ui,sans-serif}#goldPanel[hidden]{display:none!important}.gold-panel-head{height:61px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 15px;background:#111e2d;border-bottom:1px solid #705635}.gold-panel-head strong{font-size:17px;color:#f2cc76}.gold-panel-head small{display:block;font-size:12px;color:#a5b8c7;margin-top:3px}#goldBack{background:#30271e;border:1px solid #b49352;color:#ffe1a0;border-radius:12px;min-height:44px;padding:8px 12px;font:600 14px system-ui;cursor:pointer}#goldFrame{width:100%;height:100%;height:100dvh;border:0;display:block;background:#08121c}@media(max-width:500px){#switchGold{right:10px;padding:11px 15px;min-height:51px;font-size:14px}.gold-panel-head{padding:6px 10px}.gold-panel-head strong{font-size:15px}.gold-panel-head small{font-size:11px}#goldBack{font-size:13px;padding:8px 9px}}#switchGold{display:none!important}</style><link rel="stylesheet" href="wallet-monitor.css?v=wallet-20261118-top"></head><body><iframe id="app" title="Kiber BNB Chain" ></iframe><button type="button" id="switchGold" aria-label="Apri reparto Oro XAU/USD all'interno dell'Oracolo BNB" aria-controls="goldPanel" aria-expanded="false"><span aria-hidden="true">🟡</span><b>Oro XAU/USD</b></button><section id="goldPanel" hidden aria-label="Reparto Oro XAU/USD"><iframe id="goldFrame" title="Grafico e analisi indipendente XAU/USD" data-src="/xau-usd" tabindex="-1"></iframe></section><div id="walletShortcuts" aria-label="Accesso a MetaMask">
-<a id="walletOpen" href="https://link.metamask.io/home" rel="noopener" aria-label="Apri l'app MetaMask per vedere il portafoglio ed effettuare trasferimenti"><span aria-hidden="true">◈</span> MetaMask</a>
-<button id="walletBalanceToggle" type="button" aria-controls="walletMini" aria-expanded="false">Saldo</button>
-</div>
-<section id="walletMini" hidden aria-label="Saldo collegato a MetaMask">
-<div class="wallet-mini-head"><strong>Saldo MetaMask · BNB Chain</strong><button id="walletClose" type="button" aria-label="Chiudi saldo">×</button></div>
-<p id="walletStatus" class="wallet-mini-status" role="status" aria-live="polite">Connetti MetaMask per leggere i saldi reali.</p>
-<div id="walletAccount" class="wallet-mini-meta">Account: <strong id="walletAddress">Non collegato</strong><span id="walletNetwork">Rete non verificata</span></div>
-<div class="wallet-mini-balances">
-<div><span>BNB</span><strong id="walletBnb">—</strong></div>
-<div><span>USDT · BNB Chain</span><strong id="walletUsdt">—</strong></div>
-<div><span>USDC · BNB Chain</span><strong id="walletUsdc">—</strong></div>
-</div>
-<div class="wallet-mini-actions">
-<button type="button" id="walletConnect">Collega per visualizzare</button>
-<button type="button" id="walletRefresh">Aggiorna</button>
-<a id="walletExplorer" href="https://bscscan.com/" hidden target="_blank" rel="noopener noreferrer">BscScan</a>
-</div>
-<a class="wallet-mini-launch" href="https://link.metamask.io/home" rel="noopener">Apri MetaMask per trasferire o vedere tutti gli asset</a>
-<p id="walletMobileHelp" hidden class="wallet-mini-note">Per collegare il saldo da Android, <a href="https://link.metamask.io/dapp/kibernetic-bnb-intelligence.vercel.app/" rel="noopener">apri l'Oracolo dal browser di MetaMask</a>, poi premi Collega per visualizzare.</p>
-<small class="wallet-mini-note">Lettura limitata a BNB, USDT e USDC su BNB Chain. Per il totale su altre reti e per i trasferimenti usa MetaMask. Nessun wallet interno, registro contabile o autorizzazione a spendere.</small>
-</section><div class="boot" id="boot"><div><img src="assets/kiber-logo.svg?v=272" alt="Kiber"><b>Kiber BNB Chain</b><span>Caricamento V28.9 · assistente Kiber e scanner BNB…</span></div></div><script>(()=>{
-'use strict';
-const f=document.getElementById('app'),boot=document.getElementById('boot'),V='314-20261120-platform-guide';
-const styles=['v21-market-v2.css','v21-cleanup.css','v21-sectors.css','v22-classifica.css','v23-experience.css','v23-fix.css','v23-5.css','v24.css','v24-1-ui.css','v26.css','v26-fix.css','v26-6.css','v26-6-token.css','v26-7-clean.css','v26-8.css','v26-9.css','v27-1.css','v27-2-oracle.css','v27-3-forensics.css','v27-4-oracle.css','v27-6.css','v27-7.css','free-scanner-ui.css','kiber-assistant.css','compact-trends.css','dashboard-compact.css','profile-planets.css','bnb-cloud-orb.css'],scripts=['request-dedupe.js','v22-coingecko-bridge.js','kiber-sector-classifier.js','kiber-market-opportunities.js','kiber-dialog-memory.js','v21-market-v2.js','v21-cleanup.js','v21-sectors.js','v21-kiber-context.js','v22-classifica.js','v23-experience.js','v23-fix.js','intelligence-utils.js','v24.js','v24-profile-fix.js','v24-1-ui-fixed.js','v24-1-brand.js','v26.js','v26-brand.js','v26-6.js','v26-6-token.js','v26-7-clean.js','kiber-platform-control.js','v26-8.js','chart-interaction.js','v26-9.js','market-history-utils.js','token-chart-utils.js','token-loading-utils.js','v27-1.js','v27-2-oracle.js','analysis-utils.js','v27-3-forensics.js','v27-4-oracle.js','v27-6.js','watch-utils.js','v27-7.js','evidence-ui.js','v28-main-forecast.js','access-guide.js','oracle-utils.js','oracle-auto.js','live-status.js','ui-cleanup.js','free-scanner-ui.js','kiber-assistant.js','sector-trend-utils.js','compact-trends.js','dashboard-compact.js','profile-planets.js','bnb-trading-core.js','bnb-trading-panel.js','bnb-cloud-orb.js'];let started=false,poll,frameTimer;
-function fail(message){clearInterval(poll);clearTimeout(frameTimer);boot.classList.add('err');boot.innerHTML='<div><img src="assets/kiber-logo.svg?v=272" alt="Kiber"><b>Avvio interrotto</b><span id="bootError"></span><button type="button" id="bootRetry">Riprova</button></div>';document.getElementById('bootError').textContent=message;document.getElementById('bootRetry').onclick=()=>location.reload()}
-function asset(doc,tag,attrs){return new Promise((resolve,reject)=>{const e=doc.createElement(tag),name=attrs.href||attrs.src;let finished=false;const timer=setTimeout(()=>finish(new Error('Tempo esaurito: '+name.split('?')[0])),15000);function finish(error){if(finished)return;finished=true;clearTimeout(timer);e.onload=e.onerror=null;if(error){e.remove();reject(error)}else resolve()}Object.entries(attrs).forEach(([k,v])=>e[k]=v);e.onload=()=>finish();e.onerror=()=>finish(new Error('File non caricato: '+name.split('?')[0]));(tag==='link'?doc.head:doc.body).appendChild(e)})}
-function mountHeaderWallet(d){const gold=d.getElementById?.('kiberHeaderGold');if(gold&&!gold.dataset.kiberGoldBound){gold.dataset.kiberGoldBound='1';gold.addEventListener('click',()=>document.getElementById('switchGold')?.click())}const balance=d.getElementById?.('kiberHeaderWalletBalance');if(balance&&balance.dataset&&!balance.dataset.kiberWalletBound&&typeof balance.addEventListener==='function'){balance.dataset.kiberWalletBound='1';balance.addEventListener('click',()=>document.getElementById('walletBalanceToggle')?.click())}}
-async function start(){if(started)return;let d;try{d=f.contentDocument;if(!d?.body||d.readyState==='loading'||!f.contentWindow.location.pathname.includes('v20-production'))return}catch{return}started=true;clearInterval(poll);clearTimeout(frameTimer);try{mountHeaderWallet(d);d.documentElement.dataset.kiberVersion='28.9';d.querySelector('.pro')?.remove();const status=boot.querySelector('span');if(status)status.textContent='Preparazione della piattaforma…';await Promise.all(styles.map(href=>asset(d,'link',{rel:'stylesheet',href:href+'?v='+V})));for(const src of scripts){if(status)status.textContent='Avvio '+src.replace('.js','')+'…';await asset(d,'script',{src:src+'?v='+V})}d.documentElement.dataset.kiberVersion='28.9';boot.remove()}catch(e){fail(e.message+' · Premi Riprova per riavviare.')}}
-const goldButton=document.getElementById('switchGold'),goldPanel=document.getElementById('goldPanel'),goldFrame=document.getElementById('goldFrame');
-function showGold(){if(!goldFrame.src)goldFrame.src=goldFrame.dataset.src;goldPanel.hidden=false;goldButton.setAttribute('aria-expanded','true');goldFrame.focus()}
-function hideGold(){goldPanel.hidden=true;goldButton.setAttribute('aria-expanded','false');try{f.contentWindow?.KiberPlanets?.refresh()}catch{}goldButton.focus()}
-if(goldButton&&goldPanel&&goldFrame&&typeof goldButton.addEventListener==='function'){
-  goldButton.addEventListener('click',showGold);
-  if(typeof window.addEventListener==='function')window.addEventListener('message',e=>{
-    if(e.origin!==window.location.origin||e.data?.type!=='KIBER_XAU_CLOSE')return;
-    hideGold();
-  });
-  if(typeof document.addEventListener==='function')document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!goldPanel.hidden)hideGold()});
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071124">
+<meta name="description" content="Kiber IA Finance: BNB Chain, decoder XAU/USD, analisi Bustabit, notizie economiche e monitor Bitcoin.">
+<title>Kiber IA Finance · Dashboard principale</title>
+<link rel="icon" href="assets/kiber-logo-official.webp">
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#edf5ff;background:#070e20;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#273e7b 0%,#0b1430 48%,#070e20 82%);line-height:1.45}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #6ae6ff;outline-offset:4px}
+.shell{max-width:1220px;margin:auto;padding:0 22px}
+.topbar{border-bottom:1px solid #6bdafc24;background:#071229de;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}
+.navrow{min-height:77px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand img{width:46px;height:46px;object-fit:contain}
+.brand strong{display:block;font-size:20px;letter-spacing:-.03em}
+.brand small{display:block;font-size:11px;color:#8eb5d8;letter-spacing:.08em;text-transform:uppercase}
+.navlinks{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.navlinks a{border:1px solid #4873a255;color:#c4dbf3;padding:10px 14px;border-radius:11px;font-size:13px;font-weight:750}
+.navlinks a:hover,.navlinks a[aria-current]{border-color:#4de2ff;color:white;background:#123f62}
+.hero{position:relative;overflow:hidden;isolation:isolate;border:1px solid #5fdcf84d;border-radius:28px;min-height:325px;margin-top:27px;display:grid;grid-template-columns:1.2fr .8fr;align-items:center;background:linear-gradient(105deg,#07172cf7 7%,#092550dc 55%,#101d48b0),url("assets/kibernetic-city.webp") center/cover;box-shadow:0 26px 75px #0006}
+.hero:after{content:"";position:absolute;inset:auto -20% -45% 10%;height:240px;z-index:-1;background:radial-gradient(ellipse,#04d7ff2d,transparent 70%);pointer-events:none}
+.hero-copy{padding:45px 0 40px 45px;max-width:655px;z-index:1}
+.eyebrow{font-weight:850;font-size:12px;letter-spacing:.15em;color:#69e7ff;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:#51f8de;box-shadow:0 0 0 5px #47e2d628}
+h1{font-size:clamp(34px,5.4vw,67px);line-height:1.06;letter-spacing:-.055em;margin:17px 0}
+h1 span{color:#65e4ff}
+.hero p{color:#c5ddf3;max-width:560px;font-size:16px;margin:0 0 22px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px}
+.hero-tags span{border:1px solid #7bdfff52;background:#081c39a6;color:#b6eaff;border-radius:99px;padding:6px 11px;font-size:12px;font-weight:750}
+.mascot{position:relative;align-self:end;display:flex;align-items:end;justify-content:center;min-height:300px;overflow:visible}
+.mascot img{max-height:295px;max-width:93%;object-fit:contain;filter:drop-shadow(0 0 35px #00cfff76);animation:float 4s ease-in-out infinite}
+.mascot .speech{position:absolute;right:6%;top:15px;max-width:160px;padding:10px 13px;background:#e8f8ff;color:#113052;border:2px solid #91f2ff;border-radius:16px 16px 4px 16px;font-size:12px;font-weight:800;line-height:1.3;box-shadow:0 10px 35px #0005;transform:rotate(3deg)}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:36px 0 16px}
+.section-head h2{font-size:clamp(22px,3vw,29px);margin:0;letter-spacing:-.035em}
+.section-head p{font-size:13px;color:#91aac8;margin:5px 0 0}
+.sector-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.sector{border:1px solid #314e74;border-radius:21px;padding:23px 22px;min-height:215px;position:relative;overflow:hidden;background:linear-gradient(145deg,#13284c,#0e1a34);transition:transform .2s,border-color .2s}
+.sector:after{content:"";position:absolute;right:-40px;bottom:-50px;width:150px;height:150px;border-radius:50%;background:#00d4ff10;filter:blur(10px)}
+.sector:hover{transform:translateY(-4px);border-color:#5bdcff}
+.sector.gold{background:linear-gradient(145deg,#392d22,#171c2c);border-color:#806142}
+.sector.gold:hover{border-color:#ffcf75}
+.sector.purple{background:linear-gradient(145deg,#252548,#11162e);border-color:#574e84}
+.sector.purple:hover{border-color:#aa8fff}
+.sector .sector-icon{font-size:28px;width:53px;height:53px;display:grid;place-items:center;background:#ffffff10;border:1px solid #ffffff2f;border-radius:14px}
+.sector h3{font-size:22px;margin:15px 0 4px}
+.sector p{color:#b0c4da;font-size:13px;margin:0 0 16px;min-height:58px}
+.sector .entry{font-size:13px;font-weight:850;color:#6ae6ff}
+.sector.gold .entry{color:#f6d184}.sector.purple .entry{color:#c9b5ff}
+.data-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.38fr);gap:16px}
+.panel{background:linear-gradient(150deg,#101d39,#0b152c);border:1px solid #304a6e;border-radius:22px;padding:22px;min-width:0}
+.pill{display:inline-flex;align-items:center;gap:7px;border-radius:30px;padding:6px 10px;background:#18344e;color:#9ceeff;font-size:11px;font-weight:850;letter-spacing:.05em}
+.pill:before{content:"";height:7px;width:7px;border-radius:50%;background:#4ce6d3}
+.btc-head{display:flex;align-items:center;justify-content:space-between;gap:9px}
+.btc-head h3{margin:0;font-size:19px}
+.btc-price{font-size:clamp(33px,4.2vw,49px);font-weight:850;letter-spacing:-.04em;margin:24px 0 4px;font-variant-numeric:tabular-nums}
+.btc-price.up{color:#8ef6ca}.btc-price.down{color:#ff9fae}
+.btc-change{font-weight:800;font-size:16px;min-height:24px}
+.btc-change.up{color:#65deb5}.btc-change.down{color:#ff91a6}
+.meta{font-size:12px;color:#91abc7;line-height:1.6}
+.btc-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:18px}
+.refresh{background:#153b5b;color:#b6ecff;border:1px solid #3e84a7;border-radius:10px;padding:9px 13px;font-weight:800;font-size:12px}
+.refresh:hover{background:#1e527c}
+.chart-header{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px}
+.chart-header strong{font-size:15px}.chart-header small{font-size:11px;color:#8fa9c9}
+.chart-wrap{height:235px;position:relative;background:linear-gradient(180deg,#0f213c,#0b162d);border:1px solid #263c5e;border-radius:14px;overflow:hidden}
+.chart-wrap svg{width:100%;height:100%;display:block}
+.gridline{stroke:#446386;stroke-opacity:.3;stroke-dasharray:4 8}
+#btcLine{fill:none;stroke:#60e6ff;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 7px #5de6ff76)}
+#btcArea{fill:url(#areaFill)}
+#btcDot{fill:#b7ffff;stroke:#24e1ff;stroke-width:4;filter:drop-shadow(0 0 7px #36efff);animation:pulse 1.7s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.7)}}
+.chart-empty{position:absolute;inset:0;display:grid;place-items:center;color:#88a1c2;text-align:center;font-size:13px;padding:18px;pointer-events:none}
+.chart-empty[hidden]{display:none}
+.chart-footer{display:flex;justify-content:space-between;gap:10px;color:#89a9c8;font-size:11px;margin-top:9px}
+.news-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.news{border:1px solid #2d496d;border-radius:18px;background:#111d35;padding:21px;min-height:210px;display:flex;flex-direction:column;gap:11px}
+.news-tag{font-size:11px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
+.news[data-news="macro"] .news-tag{color:#a8d3ff}
+.news[data-news="markets"] .news-tag{color:#ffcf82}
+.news[data-news="crypto"] .news-tag{color:#9ce9d9}
+.news h3{font-size:17px;margin:0;line-height:1.4;overflow-wrap:anywhere}
+.news small{color:#97afcc;font-size:12px}
+.news a{display:inline-flex;margin-top:auto;color:#7be7ff;font-size:13px;font-weight:850;align-items:center}
+.news a:hover{text-decoration:underline}
+.news a[hidden]{display:none}
+.foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid #34506f66;margin-top:42px;padding:20px 0 38px;color:#8caac7;font-size:12px}
+.foot img{width:32px;height:32px;object-fit:contain}
+@media(max-width:940px){.data-grid{grid-template-columns:1fr 1.1fr}.navlinks a{padding:8px 10px;font-size:12px}.hero-copy{padding:35px 0 35px 30px}.mascot img{max-height:260px}}
+@media(max-width:760px){.topbar{position:static}.navrow{align-items:flex-start;flex-direction:column;padding:12px 0}.navlinks{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}.navlinks a{text-align:center}.hero{grid-template-columns:1fr;min-height:0;margin-top:16px}.hero-copy{padding:30px 24px 5px}.mascot{min-height:205px}.mascot img{max-height:220px}.mascot .speech{right:13%;top:4px}.sector-grid,.news-grid{grid-template-columns:1fr}.sector{min-height:0}.sector p{min-height:0}.data-grid{grid-template-columns:1fr}}
+@media(max-width:460px){.shell{padding:0 13px}.brand strong{font-size:18px}.hero{border-radius:20px}.hero-copy{padding:24px 18px 3px}.hero p{font-size:14px}.section-head{margin:27px 0 12px}.panel,.news{padding:17px}.btc-price{font-size:38px}.chart-wrap{height:200px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style></head>
+<body>
+<header class="topbar"><div class="shell navrow">
+<a class="brand" href="/" aria-label="Kiber IA Finance, torna alla pagina principale"><img src="assets/kiber-logo-official.webp" alt="Logo Kiber"><span><strong>Kiber IA Finance</strong><small>Intelligence · Analisi · Mercati</small></span></a>
+<nav class="navlinks" aria-label="Settori"><a href="/bnb-chain.html">BNB Chain</a><a href="/xau-usd.html">XAU/USD</a><a href="/bustabit.html">Bustabit</a></nav>
+</div></header>
+<main class="shell">
+<section class="hero" aria-labelledby="hero-title"><div class="hero-copy">
+<div class="eyebrow">La centrale Kibernetic</div>
+<h1 id="hero-title">Benvenuto in <span>Kiber IA Finance</span></h1>
+<p>Un solo punto di accesso per osservare i mercati, leggere le notizie del giorno e aprire i tre laboratori di analisi.</p>
+<div class="hero-tags"><span>◈ BNB Chain</span><span>◆ Oro / Dollaro</span><span>✦ Bustabit</span></div>
+</div><div class="mascot"><img src="assets/kiber-mascot.webp" alt="Kiber, mascotte robot bianca e blu" width="320" height="380"><span class="speech">Ciao! Sono Kiber. Da qui esplori i nostri tre settori.</span></div>
+</section>
+<section aria-labelledby="sector-title"><div class="section-head"><div><h2 id="sector-title">Esplora i tre settori</h2><p>Ogni settore conserva strumenti e dati indipendenti.</p></div></div>
+<div class="sector-grid">
+<a class="sector" href="/bnb-chain.html"><span class="sector-icon" aria-hidden="true">⬡</span><h3>BNB Chain</h3><p>Scanner dei token, analisi crypto, portafoglio MetaMask e intelligence sulla rete BNB.</p><span class="entry">Entra nell'Oracolo BNB →</span></a>
+<a class="sector gold" href="/xau-usd.html"><span class="sector-icon" aria-hidden="true">◆</span><h3>XAU/USD</h3><p>Decoder oro/dollaro, strategie, filtri, scenari e analisi del mercato dell'oro.</p><span class="entry">Apri il decoder XAU/USD →</span></a>
+<a class="sector purple" href="/bustabit.html"><span class="sector-icon" aria-hidden="true">⌁</span><h3>Bustabit</h3><p>Scanner locale dei round e statistiche storiche. Integrazione dei bot non ancora verificata.</p><span class="entry">Apri l'area Bustabit →</span></a>
+</div></section>
+<section aria-labelledby="btc-title"><div class="section-head"><div><h2 id="btc-title">Monitor Bitcoin</h2><p>BTC/USD, prezzo osservato e andamento delle ultime 24 ore.</p></div><span class="pill" id="btcState">Connessione ai dati…</span></div>
+<div class="data-grid">
+<article class="panel"><div class="btc-head"><h3>Bitcoin <span style="color:#ffca66">(BTC)</span></h3><span class="pill">USD</span></div>
+<div class="btc-price" id="btcPrice" aria-live="polite">Dati in attesa</div>
+<div class="btc-change" id="btcChange">Variazione 24h: —</div>
+<p class="meta" id="btcUpdated">Nessun valore ricevuto dal fornitore.</p>
+<div class="btc-actions"><button class="refresh" type="button" id="refreshBtc">Aggiorna BTC</button><span class="meta">Aggiornamento automatico circa ogni 90 secondi.</span></div>
+<p class="meta">Fonte: CoinGecko tramite server Kiber. Prezzi indicativi, non quotazioni eseguibili.</p></article>
+<article class="panel"><div class="chart-header"><strong>Andamento BTC · 24 ore</strong><small id="chartStatus">Caricamento grafico</small></div>
+<div class="chart-wrap" role="img" aria-label="Grafico dell'andamento BTC su 24 ore, basato su punti CoinGecko">
+<svg id="btcChart" viewBox="0 0 820 230" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2bcbff" stop-opacity=".36"/><stop offset="1" stop-color="#2bcbff" stop-opacity="0"/></linearGradient></defs>
+<path class="gridline" d="M20 50H800M20 100H800M20 150H800M20 200H800"></path>
+<path id="btcArea"></path><path id="btcLine"></path><circle id="btcDot" r="5" cx="-50" cy="-50"></circle></svg>
+<div class="chart-empty" id="chartEmpty">Caricamento dati storici reali…</div></div>
+<div class="chart-footer"><span>24 ore fa</span><span id="chartFresh">Fonte CoinGecko</span><span>Adesso</span></div></article>
+</div></section>
+<section aria-labelledby="news-title"><div class="section-head"><div><h2 id="news-title">Le 3 notizie del giorno</h2><p>Una per categoria. Selezione automatica per attualità e pertinenza, non una classifica oggettiva.</p></div><button class="refresh" type="button" id="refreshNews">Aggiorna notizie</button></div>
+<div class="news-grid">
+<article class="news" data-news="macro"><span class="news-tag">01 / Macroeconomia</span><h3 id="macroTitle">Ricerca notizia macroeconomica…</h3><small id="macroMeta">In attesa della fonte</small><a id="macroLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Leggi la notizia ↗</a></article>
+<article class="news" data-news="markets"><span class="news-tag">02 / Mercati</span><h3 id="marketsTitle">Ricerca notizia dei mercati…</h3><small id="marketsMeta">In attesa della fonte</small><a id="marketsLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Leggi la notizia ↗</a></article>
+<article class="news" data-news="crypto"><span class="news-tag">03 / Criptovalute</span><h3 id="cryptoTitle">Ricerca notizia crypto…</h3><small id="cryptoMeta">In attesa della fonte</small><a id="cryptoLink" href="#" target="_blank" rel="noopener noreferrer" hidden>Leggi la notizia ↗</a></article>
+</div><p class="meta" id="newsStatus">Aggiornamento delle notizie ogni 10 minuti, quando la pagina è aperta.</p></section>
+<footer class="foot"><div style="display:flex;align-items:center;gap:9px"><img src="assets/kiber-logo-official.webp" alt=""><strong>Kiber IA Finance</strong></div><span>Informazioni e analisi, non consulenza finanziaria. Bustabit è un gioco con rischio di perdita.</span></footer>
+</main>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const usd=new Intl.NumberFormat('it-IT',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2});
+const when=iso=>{const n=Date.parse(iso||'');return Number.isFinite(n)?new Intl.DateTimeFormat('it-IT',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Rome'}).format(new Date(n))+' (Roma)':'orario non disponibile'};
+let lastQuoteOk=false;
+async function getJSON(path){
+const r=await fetch(path,{headers:{Accept:'application/json'},cache:'no-store',signal:AbortSignal.timeout(15000)});
+if(!r.ok)throw new Error('HTTP '+r.status);
+return r.json();
 }
-f.addEventListener('load',start);poll=setInterval(start,200);frameTimer=setTimeout(()=>{if(!started)fail('La pagina non risponde. Premi Riprova per riavviare.')},20000);f.src='v20-production.html?v='+V;
-})();</script><script src="wallet-ledger.js?v=wallet-20261117-simple"></script><script src="wallet-monitor.js?v=wallet-20261117-simple"></script></body></html>
+async function loadQuote(){
+$('btcState').textContent='Aggiornamento BTC…';
+try{
+const d=await getJSON('/api/coingecko?type=coin_detail&id=bitcoin');
+const coin=d?.coin,price=Number(coin?.price),change=Number(coin?.change24);
+if(!d?.ok||!Number.isFinite(price)||price<=0)throw new Error('Prezzo non valido');
+const p=$('btcPrice');p.textContent=usd.format(price);p.className='btc-price'+(Number.isFinite(change)?change>0?' up':change<0?' down':'':'');
+const c=$('btcChange');c.textContent=Number.isFinite(change)?'24h: '+(change>0?'+':'')+change.toFixed(2).replace('.',',')+'%':'Variazione 24h: non disponibile';
+c.className='btc-change'+(Number.isFinite(change)?change>0?' up':change<0?' down':'':'');
+const stamp=coin.lastUpdated||d.updatedAt;
+$('btcUpdated').textContent='Ultimo dato: '+when(stamp)+' · Fonte: '+String(d.source||'CoinGecko');
+const age=Date.now()-Date.parse(stamp||'');const delayed=Number.isFinite(age)&&age>5*60*1000;
+$('btcState').textContent=delayed?'Dato ricevuto in ritardo':'Dati BTC disponibili';
+lastQuoteOk=true;
+}catch{
+$('btcState').textContent='BTC non aggiornabile';
+$('btcUpdated').textContent=lastQuoteOk?'Ultimo prezzo mostrato non aggiornato: riprova tra poco.':'Prezzo non disponibile: nessun dato reale ricevuto.';
+if(!lastQuoteOk){$('btcPrice').textContent='Non disponibile';$('btcChange').textContent='Variazione 24h: —'}
+}
+}
+async function loadChart(){
+try{
+const d=await getJSON('/api/coingecko?type=coin_chart&id=bitcoin&days=1');
+if(!d?.ok||!Array.isArray(d.points))throw new Error('Grafico non disponibile');
+const values=d.points.filter(p=>Number.isFinite(Number(p?.t))&&Number.isFinite(Number(p?.p))&&Number(p.p)>0).slice(-220);
+if(values.length<2)throw new Error('Punti insufficienti');
+const min=Math.min(...values.map(p=>Number(p.p))),max=Math.max(...values.map(p=>Number(p.p))),delta=Math.max(1,max-min),left=20,right=800,top=22,bottom=211;
+const points=values.map((p,i)=>[left+i*(right-left)/(values.length-1),bottom-((Number(p.p)-min)/delta)*(bottom-top)]);
+const path=points.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+$('btcLine').setAttribute('d',path);
+$('btcArea').setAttribute('d',path+' L'+right+' '+bottom+' L'+left+' '+bottom+' Z');
+const last=points[points.length-1];$('btcDot').setAttribute('cx',last[0]);$('btcDot').setAttribute('cy',last[1]);
+$('chartEmpty').hidden=true;
+$('chartStatus').textContent='Storico reale disponibile';
+$('chartFresh').textContent='Ricevuto: '+when(d.updatedAt);
+}catch{
+$('chartStatus').textContent='Grafico non aggiornabile';
+if(!$('btcLine').getAttribute('d')){$('chartEmpty').textContent='Impossibile ottenere lo storico BTC in questo momento.';$('chartEmpty').hidden=false;}
+else $('chartFresh').textContent='Dati precedenti, aggiornamento non riuscito';
+}
+}
+async function loadNews(){
+$('newsStatus').textContent='Aggiornamento notizie in corso…';
+try{
+const d=await getJSON('/api/finance-headlines');
+if(!Array.isArray(d.items))throw new Error('Risposta non valida');
+for(const name of ['macro','markets','crypto']){
+const a=d.items.find(x=>x.category===name),title=$(name+'Title'),meta=$(name+'Meta'),link=$(name+'Link');
+if(a?.status==='available'&&/^https:\/\//.test(a.url)){
+title.textContent=a.title;meta.textContent=String(a.source||'Fonte esterna')+' · '+when(a.publishedAt);
+link.href=a.url;link.hidden=false;
+}else{title.textContent=a?.message||'Notizia del giorno non disponibile.';meta.textContent='Nessuna fonte pubblicata oggi verificabile';link.hidden=true;link.removeAttribute('href')}
+}
+$('newsStatus').textContent='Ultima verifica: '+when(d.updatedAt)+' · '+(d.selection||'Selezione automatica')+'.';
+}catch{
+for(const name of ['macro','markets','crypto']){const link=$(name+'Link');link.hidden=true;link.removeAttribute('href');$(name+'Title').textContent='Notizia non disponibile in questo momento.';$(name+'Meta').textContent='Fonte temporaneamente irraggiungibile'}
+$('newsStatus').textContent='La fonte delle notizie non risponde. Nessun titolo inventato.';
+}
+}
+const visible=()=>document.visibilityState==='visible';
+$('refreshBtc').addEventListener('click',()=>{loadQuote();loadChart()});
+$('refreshNews').addEventListener('click',loadNews);
+loadQuote();loadChart();loadNews();
+setInterval(()=>{if(visible())loadQuote()},90000);
+setInterval(()=>{if(visible())loadChart()},300000);
+setInterval(()=>{if(visible())loadNews()},600000);
+document.addEventListener('visibilitychange',()=>{if(visible())loadQuote()});
+})();
+</script>
+</body></html>
