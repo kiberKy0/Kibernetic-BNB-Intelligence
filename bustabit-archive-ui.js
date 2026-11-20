@@ -4,6 +4,7 @@
 (function(){
 'use strict';
 const D=window.KiberBustabitArchiveData;
+const L=window.KiberBustabitLegacy;
 if(!D)return;
 const $=id=>document.getElementById(id);
 const n=v=>Number(v).toLocaleString('it-IT',{maximumFractionDigits:2});
@@ -64,9 +65,12 @@ async function forget(entry){
  renderCodes();status('Copia locale di '+entry.file+' eliminata solo da questo browser. Nessun originale della Libreria modificato.');
 }
 function renderCodes(){
- const root=$('bfArchiveCards');if(!root)return;
- root.replaceChildren();
+ const root=$('bfArchiveCards'),prior=$('bfLegacyPrimary'),variants=$('bfLegacyVariants');
+ if(!root)return;
+ [root,prior,variants].forEach(node=>node?.replaceChildren());
+ const term=($('bfCodeSearch')?.value||'').trim().toLocaleLowerCase('it-IT');
  for(const entry of D.codes){
+  if(term && ![entry.name,entry.file,entry.family,entry.detail].some(v=>String(v||'').toLocaleLowerCase('it-IT').includes(term)))continue;
   const saved=cache.has(entry.sha);
   const card=make('article','bf-code');
   const head=make('div','bf-code-title');
@@ -87,7 +91,9 @@ function renderCodes(){
    const del=make('button','bf-action danger','Rimuovi locale');
    del.addEventListener('click',()=>forget(entry));actions.append(del);
   }
-  card.append(actions);root.append(card);
+  card.append(actions);
+  const isPrimary=L?.primary.some(v=>v.sha===entry.sha),isVariant=L?.variants.some(v=>v.sha===entry.sha);
+  (isPrimary?prior:isVariant?variants:root)?.append(card);
  }
  const count=D.codes.filter(c=>cache.has(c.sha)).length;
  $('bfSourceCount').textContent=count+' / '+D.codes.length+' sorgenti originali conservati su questo dispositivo';
@@ -100,12 +106,12 @@ async function digestBytes(buffer){
 async function importFiles(files){
  if(!files?.length)return;
  let added=0,ignored=0,errors=[];
- for(const file of Array.from(files).slice(0,20)){
+ for(const file of Array.from(files).slice(0,50)){
   if(!/\.js$/i.test(file.name)||file.size>1048576){ignored++;continue}
   try{
    const bytes=await file.arrayBuffer(),sha=await digestBytes(bytes);
    const match=D.codes.find(v=>v.sha===sha && v.bytes===bytes.byteLength);
-   if(!match){errors.push(file.name+' non coincide con una delle 6 versioni originali catalogate');continue}
+   if(!match){errors.push(file.name+' non coincide con una delle '+D.codes.length+' versioni originali catalogate');continue}
    if(cache.has(sha)){ignored++;continue}
    const record={sha,filename:match.file,bytes,verifiedAt:new Date().toISOString()};
    const stored=await transact('readwrite',s=>s.put(record));
@@ -165,6 +171,7 @@ $('bfSourceCopy')?.addEventListener('click',async()=>{
  try{await navigator.clipboard.writeText($('bfSourceText').textContent);status('Codice copiato come testo. Per conservare i byte esatti, usa Scarica .js.')}
  catch(e){status('Copia automatica non autorizzata dal browser: usa Scarica .js.')}
 });
+$('bfCodeSearch')?.addEventListener('input',renderCodes);
 renderEvidence();renderCodes();
 openDatabase().then(db=>{database=db;readKnown();});
 })();
