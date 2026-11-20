@@ -5,7 +5,7 @@
  * wallet behavior, trading rules, event listeners, or reordering.
  * Loaded LAST into the existing BNB iframe. XAU/USD remains an independent page.
  */
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+/* Font stack uses already available local/system fonts so no blocking external CSS @import. */
 
 :root {
   --fia-night:#060c1c;
