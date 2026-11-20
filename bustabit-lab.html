@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="it"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kiber Bustabit Intelligence Lab</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#08121f;color:#e9f4ff;font-family:system-ui,-apple-system,sans-serif}body{padding:14px 12px 32px}main{max-width:1160px;margin:auto}
+button{cursor:pointer}a{color:#8ed9ff}h1{font-size:22px;margin:4px 0}h2{font-size:17px}h3{font-size:15px}p{line-height:1.55}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:14px;border-bottom:1px solid #2e4660}header small{display:block;color:#9aafc8;margin-top:4px}
+#bustaClose{min-width:80px;background:#1b3550;border:1px solid #567791;color:#eff8ff;padding:11px 14px;border-radius:11px}
+#section-bustabit{margin:14px 0;background:transparent}#section-bustabit .section-body{display:block}
+</style>
+<link rel="stylesheet" href="bustabit-lab.css?v=1">
+<script src="bustabit-scanner.js?v=1" defer></script>
+<script src="bustabit-lab-ui.js?v=1" defer></script>
+</head>
+<body>
+<main>
+<header><div><h1>🎯 Kiber Bustabit Intelligence Lab</h1><small>Scanner storico · algoritmi · strategie · sorgenti dei bot</small></div><button id="bustaClose" type="button">← BNB</button></header>
+<section id="section-bustabit">
+<div class="section-body">
+<p class="kbt-intro">Terzo reparto indipendente da BNB Chain, MetaMask e XAU/USD. Analizza frequenze, medie, mediane, sequenze, pattern e rischio. I dati restano sul tuo dispositivo.</p>
+<div class="kbt-warning"><b>ANALISI, non LIVE.</b> Lo scanner elabora gli storici che importi, ma non riceve automaticamente round da Bustabit e non piazza puntate. I pattern descrivono ciò che è accaduto, non ciò che accadrà.</div>
+<div class="kbt-grid">
+<div class="kbt-cell"><small>Round analizzati</small><b id="kbtRounds">—</b></div>
+<div class="kbt-cell"><small>Ultimo moltiplicatore</small><b id="kbtLast">—</b></div>
+<div class="kbt-cell"><small>Mediana ultimi 15</small><b id="kbtMedian">—</b></div>
+<div class="kbt-cell"><small>Pattern rilevati / 21</small><b id="kbtDetected">—</b></div>
+</div>
+<details class="kbt-details" open><summary>📡 Scanner statistico potente</summary><div class="kbt-inside">
+<p>Incolla moltiplicatori in ordine cronologico (dal più vecchio al recente), per esempio <code>1.23x 2.15x 1.07x</code>. Oppure carica TXT, CSV con colonna <code>multiplier</code>, <code>bust</code> o <code>crash</code>, o JSON. Massimo 200.000 round. Nessuna cifra viene inventata.</p>
+<label for="kbtRaw" class="kbt-muted">Dati storici</label>
+<textarea id="kbtRaw" spellcheck="false" placeholder="1.25x 1.04x 2.11x 3.70x 1.19x ..."></textarea>
+<div class="kbt-controls"><input type="file" id="kbtFile" accept=".txt,.csv,.json,text/plain,application/json,text/csv" aria-label="Carica storico">
+<label for="kbtTarget">Moltiplicatore da studiare</label><select id="kbtTarget"><option value="1.2">1.20x</option><option value="1.35">1.35x</option><option value="2" selected>2.00x</option><option value="3">3.00x</option><option value="5">5.00x</option><option value="10">10.00x</option><option value="20">20.00x</option></select>
+<button id="kbtAnalyze" type="button">Analizza storico</button><button id="kbtClear" type="button">Pulisci</button></div>
+<p id="kbtStatus" role="status" aria-live="polite">Scanner pronto. Importa uno storico reale per iniziare.</p>
+<div id="kbtResults" hidden>
+<div class="kbt-grid">
+<div class="kbt-cell"><small>Media 5 / 15 / 50</small><b id="kbtMeans">—</b></div>
+<div class="kbt-cell"><small>Mediana 5 / 15 / 50</small><b id="kbtMedians">—</b></div>
+<div class="kbt-cell"><small>Rossi &lt;2x / verdi ≥2x</small><b id="kbtCategories">—</b></div>
+<div class="kbt-cell"><small>Gap da ultimo ≥10x</small><b id="kbtGap">—</b></div>
+</div>
+<div class="kbt-scroll"><table class="kbt-table"><thead><tr><th>Soglia</th><th>Round</th><th>Frequenza</th></tr></thead><tbody id="kbtDistribution"></tbody></table></div>
+<h3>Studio del cashout</h3>
+<div class="kbt-grid">
+<div class="kbt-cell"><small>Frequenza osservata</small><b id="kbtHits">—</b></div>
+<div class="kbt-cell"><small>Intervallo di confidenza 95%</small><b id="kbtCI">—</b></div>
+<div class="kbt-cell"><small>ROI storico con 1 bit costante</small><b id="kbtRoi">—</b></div>
+<div class="kbt-cell"><small>Riferimento teorico</small><b id="kbtModel">—</b></div>
+</div>
+<p class="kbt-muted">Il ROI è una simulazione retrospettiva di una puntata da 1 bit per ogni round con cashout costante, non il risultato reale di un bot. La probabilità teorica si basa sull'approssimazione 0,99 ÷ target; il vantaggio del banco non viene eliminato.</p>
+<p class="kbt-warning" id="kbtHoldout"></p>
+<h3>21 pattern CAT / SEQ / DIR / PIC / REG</h3>
+<p class="kbt-muted">PREALLERTA e CONFERMA rappresentano la forza della descrizione storica, non segnali di acquisto o puntata.</p>
+<div id="kbtPatterns" class="kbt-pattern-list"></div>
+</div>
+</div></details>
+<details class="kbt-details"><summary>📘 Cos'è Bustabit e come giocare</summary><div class="kbt-inside">
+<p>Bustabit è un gioco di tipo crash. Prima di ogni round si decide quanto puntare e il moltiplicatore desiderato. Il valore cresce da 1,00x e il gioco può terminare in qualsiasi momento. Se incassi prima, ricevi la puntata moltiplicata per il cashout; altrimenti perdi la puntata.</p>
+<p>Esistono cashout manuale e automatico. Il sistema <i>provably fair</i> consente la verifica crittografica dei risultati, non la previsione dei round futuri. Bustabit dichiara un vantaggio del banco dell'1%.</p>
+<p><a href="https://bustabit.com/help/how-to-play" target="_blank" rel="noopener noreferrer">Guida ufficiale</a> · <a href="https://bustabit.com/help/provable-fairness" target="_blank" rel="noopener noreferrer">Provably fair</a> · <a href="https://bustabit.com/help/house-edge" target="_blank" rel="noopener noreferrer">Vantaggio del banco</a> · <a href="https://github.com/bustabit/autobet" target="_blank" rel="noopener noreferrer">API ufficiale</a></p>
+</div></details>
+<details class="kbt-details"><summary>🧠 Strategie, ML e protezioni</summary><div class="kbt-inside">
+<div class="kbt-grid">
+<div class="kbt-cell"><b>SCOUT</b><small>Studia cashout 1.20–1.40x e frequenze</small></div>
+<div class="kbt-cell"><b>FLOW</b><small>Medie e mediane 5/15/50; ritmo osservato</small></div>
+<div class="kbt-cell"><b>PATTERN</b><small>21 rilevatori con stato dati sufficienti / insufficienti</small></div>
+<div class="kbt-cell"><b>BAYES</b><small>Incertezza statistica, nessuna probabilità garantita</small></div>
+<div class="kbt-cell"><b>ADAPTIVE</b><small>Confronto sviluppo e dati successivi non visti</small></div>
+<div class="kbt-cell"><b>STRIKE</b><small>Studio frequenza di picchi maggiori di 5x e 10x</small></div>
+<div class="kbt-cell"><b>DEEP STRIKE</b><small>Eventi estremi e code di distribuzione</small></div>
+<div class="kbt-cell"><b>SENTINEL</b><small>Blocchi, storico incompleto, analisi di rischio</small></div>
+</div>
+<p>Il vecchio Recovery con aumento delle puntate va verificato separatamente: rincorrere le perdite non annulla il margine del banco. La pagina non abilita puntate automatiche né una modalità live non testata.</p>
+</div></details>
+<details class="kbt-details"><summary>🤖 Archivio codici e versioni bot</summary><div class="kbt-inside">
+<p>Versioni reali rintracciate nei tuoi archivi. L'esistenza di un file o il superamento di test locali non certificano il funzionamento sul sito. Nessuno di questi script viene eseguito automaticamente dalla dashboard.</p>
+<div class="kbt-grid" id="kbtRegistry"></div>
+</div></details>
+<details class="kbt-details"><summary>🧪 Verifica API, eventi e test</summary><div class="kbt-inside">
+<p>La fase successiva è l'audit dei bot originali: compatibilità con gli eventi dell'engine ufficiale, warmup, doppie attivazioni, gestione dei round ripetuti, limiti di capitale, memoria tra sessioni, SCOUT e sei altre strategie, 21 pattern e log verificabili.</p>
+<p>Il backtest deve essere cronologico e separare sviluppo e verifica fuori campione. Un test Node o un simulatore non dimostra né che un bot esegua puntate reali, né che abbia vantaggio matematico.</p>
+<p><a href="https://bustabit.com/backtesting" target="_blank" rel="noopener noreferrer">Backtesting ufficiale Bustabit</a></p>
+</div></details>
+</div></section>
+</main></body></html>
