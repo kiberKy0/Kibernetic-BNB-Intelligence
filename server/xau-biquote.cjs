@@ -94,7 +94,10 @@ async function getSnapshot(options={}){
   const fetchImpl=options.fetchImpl||fetch;
   const frames=[...new Set([interval,...FRAME_NAMES])];
   const frameReq=frames.map(k=>readJSON('https://biquote.io/api/XAUUSD/ohlc?interval='+INTERVALS[k].remote+'&limit='+(k==='1min'||k==='5min'?300:110),fetchImpl));
-  const tickReq=readJSON('https://biquote.io/api/XAUUSD?allowStale=false',fetchImpl);
+  // Request the latest tick even when the market is closed. The freshness/market-state gate
+  // below still blocks stale prices from operational analysis. `allowStale=false`
+  // returns 404 at weekends, misclassifying a closed market as a provider outage.
+  const tickReq=readJSON('https://biquote.io/api/XAUUSD',fetchImpl);
   const calendarFrom=new Date(now-30*60000).toISOString();
   const calendarTo=new Date(now+48*3600000).toISOString();
   const calendarReq=readJSON('https://biquote.io/api/calendar?from='+encodeURIComponent(calendarFrom)+'&to='+encodeURIComponent(calendarTo)+'&countries=US&importance=high&limit=40',fetchImpl);
