@@ -97,6 +97,13 @@
    if(initialized)return;
    if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init,{once:true});return;}
    initialized=true;
+   $('xauBackToBnb')?.addEventListener('click',()=>{
+     // Embedded decoder returns to its parent BNB shell without navigating the iframe itself.
+     let embedded=false;
+     try{embedded=root.parent!==root&&!!root.parent.document.getElementById('goldPanel')}catch(_){}
+     if(embedded)root.parent.postMessage({type:'KIBER_XAU_CLOSE'},location.origin);
+     else navigate('bnb');
+   });
    $('xauDestinationsBtn')?.addEventListener('click',()=>{
      toggleMenu($('xauDestinationsPanel')?.hidden===true);
    });

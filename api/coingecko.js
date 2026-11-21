@@ -1,5 +1,6 @@
 module.exports = async function handler(req,res){
   if(req.query?.type==='xau') return require('../server/xau-handler.cjs')(req,res);
+  if(req.query?.type==='xau-revision') return require('../server/xau-revision.cjs')(req,res);
   if(req.query?.type==='bnb-dex-live') return require('../server/bnb-dex-snapshot.cjs')(req,res);
   if(req.query?.type==='bnb-pool-verify') return require('../server/bnb-pool-verify.cjs').handler(req,res);
   if(req.query?.type==='oracle-live') return require('../server/cloud-refresh.cjs').handler(req,res);

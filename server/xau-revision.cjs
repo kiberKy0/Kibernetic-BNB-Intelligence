@@ -1,4 +1,4 @@
-/* Same-origin read-only revision status for the gold page.
+/* Shared-proxy read-only revision status for the gold page.
  * Proxies PUBLIC GitHub commit metadata without any user credentials.
  * No repository editing, secret access or trading behavior.
  */
