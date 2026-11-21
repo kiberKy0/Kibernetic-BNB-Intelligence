@@ -56,6 +56,19 @@ test('live snapshots have 100+ real-shaped candles, timeframe and calendar diagn
  assert.equal(data.multiTimeframe['4h'].status,'observed');
  assert.equal(data.calendar.connected,true);
 });
+test('closed market keeps last quote metadata without using allowStale=false',async()=>{
+ const urls=[];
+ const mock=mockFetch({marketState:'closed'});
+ const data=await getSnapshot({now:NOW,interval:'15min',fetchImpl:async u=>{
+  urls.push(u);
+  return mock(u);
+ }});
+ assert.ok(urls.some(u=>new URL(u).pathname==='/api/XAUUSD'));
+ assert.ok(!urls.some(u=>String(u).includes('allowStale=false')));
+ assert.equal(data.quality.tick.marketState,'closed');
+ assert.equal(data.quality.ok,false);
+ assert.equal(data.candles.length,0);
+});
 test('market closed blocks all operative OHLC',async()=>{
  const d=await getSnapshot({now:NOW,interval:'5min',fetchImpl:mockFetch({marketState:'closed'})});
  assert.equal(d.quality.ok,false);assert.equal(d.candles.length,0);

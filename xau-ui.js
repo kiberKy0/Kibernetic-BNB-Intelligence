@@ -110,7 +110,18 @@
       const response = await fetch('/api/xau?interval=' + encodeURIComponent($('interval').value),
         { cache: 'no-store' });
       const body = await response.json();
-      if (!response.ok) throw new Error(body.error || 'Dati XAU/USD non disponibili');
+      if (!response.ok) {
+        if (body.code === 'FEED_BLOCKED' && body.quality?.tick) {
+          feedFailed=true;
+          window.XauPlatform?.setBlocked(body);
+          const reason=String(body.quality.reason||'Dati non validati');
+          feedHealth('Mercato non operativo · '+reason+' · prezzi storici non eseguibili','offline');
+          waiting(reason,'Attesa di nuove quotazioni');
+          setText('csvMessage','Mercato chiuso o feed non fresco: l’ultima quotazione è solo storica. Kiber non genera BUY/SELL.');
+          return;
+        }
+        throw new Error(body.error || 'Dati XAU/USD non disponibili');
+      }
       if (!Array.isArray(body.candles) || body.symbol !== 'XAU/USD' || !body.quality?.ok) throw new Error('Serie OHLC o controllo quotazioni non valido');
       const result=decoder.analyze(body.candles, $('interval').value);
       feedFailed=false;

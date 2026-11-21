@@ -22,7 +22,7 @@
       timeZone:'Europe/Rome',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'
    });
  };
- let last=null,manualFailure=null;
+ let last=null,manualFailure=null,manualState='offline';
  function derive(snapshot,now=Date.now()){
    if(!snapshot||!snapshot.quality?.ok||!snapshot.quality?.tick?.ok||
       !snapshot.quality.tick.fresh||snapshot.symbol!=='XAU/USD')
@@ -39,7 +39,7 @@
  function txt(id,value){const element=$(id);if(element)element.textContent=str(value);}
  function paint(){
    const orb=$('xauFeedOrb');if(!orb)return;
-   const state=manualFailure?{state:'offline',label:'OFFLINE',detail:manualFailure}:
+   const state=manualFailure?{state:manualState==='closed'?'stale':'offline',label:manualState==='closed'?'CHIUSO':'OFFLINE',detail:manualFailure}:
      derive(last,Date.now());
    orb.dataset.state=state.state;
    txt('xauFeedOrbText',state.label);
@@ -51,7 +51,7 @@
    orb.title=state.label+' · Ultima verifica '+(last?.timestamp?fmt(last.timestamp):'non disponibile');
  }
  function setChecking(){
-   manualFailure=null;
+   manualFailure=null;manualState='offline';
    const orb=$('xauFeedOrb');
    if(orb){orb.dataset.state='checking';txt('xauFeedOrbText','VERIFICA');txt('xauStatusState','Controllo fonte XAU/USD in corso…');}
  }
@@ -61,11 +61,23 @@
        ok:true,tick:{ok:feed.quality.tick.ok,fresh:feed.quality.tick.fresh,
         timestamp:feed.quality.tick.timestamp}},
       timestamp:feed.timestamp,lastClosedAt:feed.lastClosedAt,source:feed.source};
-     manualFailure=null;
+     manualFailure=null;manualState='offline';
    }else manualFailure='Il server non ha convalidato le quotazioni XAU/USD.';
    paint();
  }
+ function setBlocked(body){
+   const tick=body?.quality?.tick||{};
+   last={symbol:'XAU/USD',timestamp:body?.checkedAt||null,
+     lastClosedAt:body?.lastClosedAt||null,source:body?.source||'Fonte esterna non identificata',
+     quality:{ok:false,tick:{ok:false,fresh:false,timestamp:tick.timestamp||null}}};
+   const reason=String(body?.quality?.reason||body?.error||'Dati non verificati').slice(0,190);
+   manualState=tick.marketState==='closed'?'closed':'offline';
+   manualFailure=(manualState==='closed'?'Mercato XAU/USD chiuso. ':'Feed non operativo. ')+reason+
+     ' L’ultima quotazione è storica, non un segnale.';
+   paint();
+ }
  function setOffline(reason){
+   manualState='offline';
    manualFailure='Ultimo controllo non riuscito: '+str(reason||'feed non disponibile').slice(0,160);
    paint();
  }
@@ -122,5 +134,5 @@
    document.addEventListener('visibilitychange',()=>{if(!document.hidden)paint();});
    paint();
  }
- return {init,derive,setChecking,setLive,setOffline};
+ return {init,derive,setChecking,setLive,setBlocked,setOffline};
 });

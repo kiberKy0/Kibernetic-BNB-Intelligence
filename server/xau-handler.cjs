@@ -52,7 +52,9 @@ module.exports = async function handler(req,res){
     if(!data.quality.ok)return res.status(503).json({
       error:'Dati non adatti ad analisi operativa: '+data.quality.reason,
       code:'FEED_BLOCKED',source:data.source,quality:data.quality,
-      checkedAt:data.timestamp
+      checkedAt:data.timestamp,
+      lastClosedAt:data.lastClosedAt,
+      lastCandleStart:data.lastCandleStart
     });
     return res.status(200).json(data);
   }catch(error){
