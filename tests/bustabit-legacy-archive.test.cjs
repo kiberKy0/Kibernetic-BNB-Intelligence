@@ -14,10 +14,10 @@ test('historical numeric bands and conflicting Cyber Striker 3.0 outcomes remain
  assert.equal(L.audits[0].bets,6212);assert.equal(L.audits[0].net,108.01);
  assert.equal(L.audits[1].bets,6493);assert.equal(L.audits[1].net,-567.34);
 });
-test('only historical source originals are presented on active sector; later metadata retained offscreen',()=>{
+test('historical bot dossiers are presented without publishing source; later metadata remain in catalog',()=>{
  const h=rd('bustabit-lab.html'),js=rd('bustabit-vault.js');
- assert.match(h,/Archivio dei bot/);assert.match(h,/bvaBotList/);
- assert.match(h,/Copia tutto il codice/);assert.match(h,/Scarica originale \.js/);
+ assert.match(h,/Biblioteca dei bot/);assert.match(h,/bvaBotList/);
+ assert.match(h,/Codice in elaborazione/);assert.match(h,/Strategie e tecnologie/);
  assert.match(h,/https:\/\/bustabit\.com/);
  assert.match(js,/const items=\[\.\.\.L\.primary,\.\.\.L\.variants\]/);
  assert.doesNotMatch(h,/kbtAnalyze|bustabit-scanner\.js/);

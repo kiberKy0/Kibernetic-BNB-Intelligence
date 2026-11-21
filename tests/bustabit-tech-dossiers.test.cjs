@@ -55,22 +55,20 @@ test('performance belongs to the exact original version, not to adjacent revisio
  assert.equal(x.kiber30[0].bets,128166);
  assert.equal(x.kiber30[0].net,null);
 });
-test('active Bustabit sector gives each original version named technologies, statistics, and copyable source',()=>{
+test('active Bustabit sector exposes strategies and performance while source is in elaboration',()=>{
  const html=rd('bustabit-lab.html'),ui=rd('bustabit-vault.js');
- for(const id of ['bvaBotList','bvaDossier','bvaBotName','bvaCopy','bvaDownload','bvaStrategies','bvaResults','bvaLogic','bvaFnList'])assert.match(html,new RegExp('id="'+id+'"'),id);
- for(const h of ['COSA','QUANDO','COME','PERCHÉ','Performance e log','Copia tutto il codice'])assert.ok(html.includes(h)||ui.includes(h),h);
+ for(const id of ['bvaBotList','bvaDossier','bvaBotName','bvaStrategies','bvaResults','bvaLogic','bvaTopModules','bvaFnList','bvaPaneCode'])assert.match(html,new RegExp('id="'+id+'"'),id);
+ for(const h of ['COSA','QUANDO','COME','PERCHÉ','Performance e log','Codice in elaborazione'])assert.ok(html.includes(h)||ui.includes(h),h);
  for(const p of ['bustabit-tech-data.js','bustabit-tech-functions-primary.js','bustabit-tech-functions-variants.js','bustabit-vault.js','bustabit-vault.css'])assert.ok(html.includes(p),p);
  assert.ok(html.indexOf('bustabit-tech-data.js')<html.indexOf('bustabit-vault.js'));
  assert.doesNotThrow(()=>new vm.Script(ui,{filename:'bustabit-vault.js'}));
+ assert.match(ui,/setTab\('logic'\)/);
 });
-test('no false LIVE performance: missing numeric evidence remains explicitly unavailable',()=>{
+test('unverified results remain unavailable without implementing any source retrieval or execution',()=>{
  const ui=rd('bustabit-vault.js');
- assert.match(ui,/Non sono disponibili performance quantitative dimostrate/);
- assert.match(ui,/non vengono attribuiti a questa/);
- assert.match(ui,/SHA-256/);
- assert.match(ui,/crypto\.subtle\.digest/);
- assert.match(ui,/checksum!==entry\.sha/);
- assert.match(ui,/navigator\.clipboard\.writeText/);
- assert.doesNotMatch(ui,/engine\s*\.\s*bet\s*\(/);
- assert.doesNotMatch(ui,/\beval\s*\(/);
+ assert.match(ui,/Nessuna performance numerica verificabile/);
+ assert.match(ui,/I risultati di altri bot non vengono trasferiti qui/);
+ assert.doesNotMatch(ui,/fetch\s*\(|crypto\.subtle\.digest|clipboard|new Blob\s*\(|engine\s*\.\s*bet\s*\(|\beval\s*\(/);
+ const html=rd('bustabit-lab.html');
+ assert.doesNotMatch(html,/bvaCopy|bvaDownload|bvaCodeText|Copia tutto il codice/);
 });
