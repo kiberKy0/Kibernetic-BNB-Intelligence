@@ -7,6 +7,10 @@
       "destination": "/api/coingecko?type=xau"
     },
     {
+      "source": "/api/xau-revision",
+      "destination": "/api/coingecko?type=xau-revision"
+    },
+    {
       "source": "/api/bnb-dex-live",
       "destination": "/api/coingecko?type=bnb-dex-live"
     },
