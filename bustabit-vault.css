@@ -30,3 +30,16 @@
 .bva-empty{font-size:12px;line-height:1.6;color:#c5d9e8;border:1px dashed #4d698c;border-radius:12px;padding:13px}.bva-footnote{margin:14px 0;background:#0c2346;border:1px solid #355b83;border-radius:13px;padding:11px 13px;font-size:11px;line-height:1.6;color:#bbd4eb}.bva-footnote strong{color:#fff}.bva-footer{font-size:10px;color:#9bbada;padding:12px 0}
 @media(max-width:850px){.bva-workspace{grid-template-columns:1fr}.bva-library{position:static;max-height:none}.bva-bot-list{grid-template-columns:repeat(2,minmax(0,1fr))}.bva-top{align-items:flex-start}.bva-kiber{display:none}.bva-header{align-items:center}.bva-tabs button{flex:1 0 auto}}
 @media(max-width:530px){.bva-main{padding:10px}.bva-header{gap:9px}.bva-brand img{width:35px;height:35px}.bva-brand h1{font-size:16px}.bva-brand small{font-size:10px}.bva-head-actions{width:100%}.bva-head-actions>*{flex:1}.bva-top h2{font-size:27px}.bva-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.bva-bot-list{grid-template-columns:1fr}.bva-library,.bva-dossier{padding:11px}.bva-four{grid-template-columns:1fr}.bva-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.bva-result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.bva-func-grid{grid-template-columns:1fr}.bva-tabs button{padding:10px 11px;font-size:11px}}
+
+/* Reparto Bustabit: documentazione visibile, sorgente futuro */
+.bva-code-pending{display:flex;align-items:flex-start;gap:16px;padding:24px 20px;border:1px dashed rgba(101,194,245,.62);border-radius:16px;background:linear-gradient(135deg,rgba(15,59,106,.67),rgba(12,30,69,.55));min-height:185px}
+.bva-code-pending h3{font-size:clamp(18px,2.4vw,23px);margin:1px 0 10px;color:#eafaff}
+.bva-code-pending p{font-size:12px;line-height:1.7;color:#bcdcf3;max-width:640px;margin:7px 0}
+.bva-code-pending small{color:#8fccea;font-size:11px;line-height:1.6}
+.bva-pending-mark{border:1px solid #4984bb;background:#143b6a;padding:12px 15px;font-size:24px;border-radius:14px;color:#a8eaff;flex-shrink:0}
+.bva-technology-overview{margin-top:20px;padding-top:13px;border-top:1px solid rgba(115,177,226,.23)}
+.bva-technology-overview h3{margin:0 0 11px;font-size:14px}
+.bva-module-chips{display:flex;flex-wrap:wrap;gap:8px}
+.bva-module-chip{background:#174478;color:#e6f8ff;border:1px solid #5499c9;border-radius:10px;padding:10px 12px;font-size:11px;font-weight:750;max-width:100%;text-align:left;line-height:1.5}
+.bva-module-chip:hover,.bva-module-chip:focus-visible{background:#2563a1;border-color:#9ddaff}
+@media(max-width:530px){.bva-code-pending{padding:17px 13px;gap:10px;min-height:0}.bva-pending-mark{padding:9px 12px;font-size:20px}.bva-module-chip{font-size:10px}}
