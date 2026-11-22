@@ -738,7 +738,8 @@
     {
       "oracle": {
         "scenario": null,
-        "band": 1.8487033115393905
+        "band": 1.8487033115393905,
+        "actual": "up"
       },
       "t": 1795262400000,
       "issuedAt": 1795264746396,
@@ -746,14 +747,15 @@
       "entry": 530.19,
       "probabilityUp": 0.5,
       "baseline": 0.5625,
-      "actual": null,
+      "actual": 1,
       "validation": {
         "n": 50,
         "challenger": 0.2657365773103099,
         "incumbent": 0.25,
         "baselineLoss": 0.26140625,
         "promoted": false
-      }
+      },
+      "settledAt": 1795364219465
     },
     {
       "oracle": {
@@ -792,6 +794,26 @@
         "challenger": 0.27283107018716474,
         "incumbent": 0.25,
         "baselineLoss": 0.25115114795918375,
+        "promoted": false
+      }
+    },
+    {
+      "oracle": {
+        "scenario": null,
+        "band": 2.038369053075188
+      },
+      "t": 1795363200000,
+      "issuedAt": 1795364219465,
+      "due": 1795449600000,
+      "entry": 556.88,
+      "probabilityUp": 0.5,
+      "baseline": 0.49107142857142855,
+      "actual": null,
+      "validation": {
+        "n": 50,
+        "challenger": 0.2677428612354257,
+        "incumbent": 0.25,
+        "baselineLoss": 0.24936543367346925,
         "promoted": false
       }
     }
